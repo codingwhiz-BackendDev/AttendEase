@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="content">
+    <header>
+        <h2>Welcome, <span>{{ user.last_name }}</span></h2>
+        <div class="profile-icon">
+            <img src="{% static 'sta.jpg' %}" alt="Profile">
+        </div>
+    </header>
+
+    <section class="cards">
+        <!-- Upcoming Classes -->
+        <div class="card">
+            <h3>Upcoming Classes</h3>
+
+            {% if attendances %}
+            {% for attendance in attendances %}
+            <div class="class">
+                <h4>{{attendance.course}}</h4>
+                <p>Time: {{ attendance.start_time }} - {{ attendance.end_time }}</p>
+                <p>Location: {{ attendance.lecture_hall }}</p>
+                <button class="mark-attendance">Mark Attendance</button>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="class">
+                <p>No scheduled lectures</p>
+            </div>
+            {% endif %}
+
+
+        </div>
+
+        <!-- Attendance Overview -->
+        <div class="card">
+            <h3>Attendance Overview</h3>
+            <div class="chart">
+                <p>Overall Attendance: <strong>85%</strong></p>
+            </div>
+        </div>
+
+    </section>
+</main>
+{% endblock content %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="content">
+    <header>
+        <h2>My Profile Settings</h2>
+    </header>
+
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <section class="cards">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="matric_number">Matric Number</label>
+                <input type="text" id="matric_number" required name="matric_number" value="{{ student.matric_number }}">
+            </div>
+
+            <div class="form-group">
+                <label for="department">Department</label>
+                <input type="text" id="department" required name="department" value="{{ student.department }}">
+            </div>
+
+            <div class="form-group">
+                <label for="faculty">Faculty</label>
+                <input type="text" id="faculty" required name="faculty" value="{{ student.faculty }}">
+            </div>
+
+            <div class="form-group">
+                <label for="year_of_study">Year Of Study</label>
+                <input type="text" id="year_of_study" required name="year_of_study" value="{{ student.year_of_study }}">
+            </div>
+
+            {% if student.face_image %}
+            <p><strong>Face already captured.</strong></p>
+            {% else %}
+            <label>Capture Face:</label>
+            <h6>Center your head in the circle</h6>
+            <div class="video-container">
+                <video id="webcam" autoplay></video>
+                <div class="overlay-circle"></div> <!-- Circular Overlay -->
+            </div>
+            <canvas id="canvas" style="display: none;"></canvas>
+            <button type="button" class="save-btn" id="capture-btn">Capture</button>
+
+            <!-- Hidden File Input for Image Upload -->
+            <input type="file" name="face_image" id="face_image" style="display: none;">
+            {% endif %}
+
+            <br><br><br><br>
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </section>
+</main>
+
+<script>
+    // Access the webcam
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('capture-btn');
+    const faceImageInput = document.getElementById('face_image'); // Hidden input for image
+
+    // Start the webcam
+    function startWebcam() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                alert("Camera access denied. Please allow camera permissions.");
+            });
+    }
+
+    // Ensure webcam is started
+    if (video.srcObject === null) {
+        startWebcam();
+    }
+
+    // Capture Full Face Image
+    captureBtn.addEventListener('click', function () {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert canvas to Blob
+        canvas.toBlob(blob => {
+            const file = new File([blob], "captured_face.jpg", { type: "image/jpeg" });
+
+            // Use DataTransfer to assign file to input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            faceImageInput.files = dataTransfer.files;
+
+            // Debugging: Check the image file added to input
+            if (faceImageInput.files.length > 0) {
+                alert(`File Added: ${faceImageInput.files[0].name}, Type: ${faceImageInput.files[0].type}`);
+            } else {
+                alert("No file added!");
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Face Captured!',
+                text: 'Click "Save Changes" to update your profile.',
+            });
+        }, "image/jpeg");
+    });
+</script>
+
+{% endblock content %}

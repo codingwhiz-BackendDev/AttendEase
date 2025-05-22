@@ -1,0 +1,111 @@
+/* Global Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #E3EAFD;
+    color: #27496D;
+    margin: 0;
+    padding: 0;
+}
+
+/* Content Layout */
+.content {
+    padding: 20px;
+}
+
+/* Header */
+header h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+header {
+    margin-bottom: 2rem;
+}
+
+/* Search Bar */
+.search-container {
+    display: flex;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto 30px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-container input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    outline: none;
+    color: #27496D;
+}
+
+.search-container button {
+    background: #27496D;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.search-container button i {
+    font-size: 18px;
+}
+
+/* Course List */
+.course-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Course Card */
+.course-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 500px;
+}
+
+.course-card h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+}
+
+.course-card p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+/* Enroll Button */
+.enroll-btn {
+    background: #27496D;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+}
+
+.enroll-btn:hover {
+    background: #1B3358;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    font-size: 18px;
+    color: #1B3358;
+    margin-top: 20px;
+}

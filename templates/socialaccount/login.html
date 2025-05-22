@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AttendEase</title>
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Background with Overlay -->
+    <div class="hero">
+        <div class="overlay"></div>
+
+        <!-- Login Container -->
+        <div class="login-container">
+            <!-- Logo (Checkmark) -->
+            <div class="logo">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <h1>AttendEase</h1>
+            <p>Take your attendance with ease...</p>
+
+            <span class="divider">Sign in as a {% if request.session.login_process == "lecturer" %}Lecturer{% else %}Student{% endif %} </span>
+
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-google">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2025 AttendEase. All rights reserved.
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+/* Profile Container */
+.profile-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+/* Profile Info Card */
+.profile-info {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 40%;
+    min-width: 300px;
+    text-align: center;
+}
+
+/* Profile Header */
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #27496D;
+}
+
+.profile-header h3 {
+    font-size: 22px;
+    color: #27496D;
+    margin: 10px 0 5px;
+}
+
+.matric-number {
+    font-size: 14px;
+    color: #1B3358;
+}
+
+/* Profile Details */
+.profile-details {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: #E3EAFD;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #1B3358;
+}
+
+.detail-value {
+    color: #27496D;
+}
+
+/* Course Section */
+.course-section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 45%;
+    min-width: 300px;
+}
+
+.course-section h3 {
+    font-size: 20px;
+    color: #27496D;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Course List */
+.course-list {
+    list-style: none;
+    padding: 0;
+}
+
+.course-item {
+    background: #E3EAFD;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.course-item i {
+    color: #FFD700;
+    font-size: 16px;
+}

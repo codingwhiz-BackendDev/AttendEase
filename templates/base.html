@@ -1,0 +1,88 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'student_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'student_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'courses.css' %}">
+    <link rel="stylesheet" href="{% static 'create_attendance.css' %}">
+    <link rel="stylesheet" href="{% static 'settings.css' %}">
+    <link rel="stylesheet" href="{% static 'notification_messages.css' %}">
+    <script defer src="{% static 'dashboard.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'font-awesome3/css/all.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert for messages -->
+    <title>Dashboard | AttendEase</title>
+</head>
+
+<body>
+
+    {% block sidebar %}
+    <nav class="sidebar collapsed">
+        <div class="logo">
+            <span class="fas fa-check-circle"></span>
+            <span class="logo-text">AttendEase</span>
+            <button class="toggle-btn"><i class="fas fa-bars"></i></button>
+
+        </div>
+
+        {% if user_role == 'student' %}
+        <ul class="menu">
+            <li><a href="/student/dashboard" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="/timetable"><i class="fas fa-calendar"></i> <span>Timetable</span></a></li>
+            <li><a href="/student_courses"><i class="fas fa-book"></i> <span>Courses</span></a></li>
+            <li><a href="/student/view-attendance/"><i class="fas fa-chart-line"></i> <span>Attendance</span></a></li>
+            <li><a href="/student/settings/"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="/student/profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+        </ul>
+        {% else %}
+        <ul class="menu">
+            <li><a href="/lecturer/dashboard" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="/reports"><i class="fas fa-calendar"></i> <span>Schedule</span></a></li>
+            <li><a href="/lecturer_courses"><i class="fas fa-book"></i> <span>Courses</span></a></li>
+            <li><a href="/lecturer/create-attendance/"><i class="fas fa-chart-line"></i> <span>Attendance</span></a>
+            </li>
+            <li><a href="/lecturer/settings/"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="/lecturer/profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+        </ul>
+        {% endif %}
+
+    </nav>
+    {% endblock sidebar %}
+
+    <div class="dashboard">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.querySelector(".toggle-btn");
+            const sidebar = document.querySelector(".sidebar");
+            const content = document.querySelector(".content");
+
+            toggleBtn.addEventListener("click", function () {
+                sidebar.classList.toggle("collapsed");
+
+                // Adjust content margin based on sidebar state
+                //if (sidebar.classList.contains("collapsed")) {
+                //content.style.marginLeft = "40px";
+                //content.style.width = "90%"
+                //sidebar.style.width = "6px"
+                //} else {
+                //content.style.marginLeft = "250px";
+                //sidebar.style.width = "250px"
+                //content.style.width = "90%"
+                //}
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="content">
+    <header>
+        <h2>Search Courses</h2>
+    </header>
+
+    <!-- Search Bar -->
+    <section>
+        <form action="" method="post">
+            <div class="search-container">
+                {% csrf_token %}
+                <input type="text" required id="course" name="course"
+                    placeholder="Search for a course with its course title...">
+                <button type="submit" id="search-btn"><i class="fas fa-search"></i></button>
+
+            </div>
+        </form>
+    </section>
+
+    <!-- Course List -->
+    <section class="course-list">
+        {% for course in results %}
+
+        <div class="course-card">
+            <h3>{{ course.course_title }}</h3>
+            <p><strong>Course Code:</strong> {{ course.course_code }}</p>
+            <p><strong>Unit:</strong> {{ course.credit }} units</p>
+            <form method="POST" action="/course_enrollment">
+                {% csrf_token %}
+                <input type="hidden" name="course" value="{{course.course_title}}">
+                <input type="hidden" name="student" value="{{request.user}}">
+                <button type="submit" class="enroll-btn">Enroll</button>
+            </form>
+        </div>
+        {% endfor %}
+
+        <div class="message-container">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+
+        {% if course %}
+        {% for course in student_courses %}
+        <div class="course-card">
+            <h3>{{ course.course_title }}</h3>
+            <p><strong>Course Code:</strong> {{ course.course_code }}</p>
+            <p><strong>Unit:</strong> {{ course.credit }} units</p>
+            <form method="POST" action="/course_enrollment">
+                {% csrf_token %}
+                <input type="hidden" name="course" value="{{course.course_title}}">
+                <input type="hidden" name="student" value="{{request.user}}">
+                <button type="submit" class="enroll-btn">Unenroll</button>
+            </form>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p></p>
+        {% endif %}
+
+
+    </section>
+</main>
+{% endblock content %}

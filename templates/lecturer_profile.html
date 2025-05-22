@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="content">
+    <header>
+        <h2>My Profile</h2>
+        <div class="profile-icon">
+            <img src="{% static 'sta.jpg' %}" alt="Profile Picture">
+        </div>
+    </header>
+
+    <section class="profile-container">
+        <!-- Profile Card -->
+        <div class="profile-info">
+            <div class="profile-header">
+                <img src="{% static 'sta.jpg' %}" alt="Profile Picture" class="profile-pic">
+                <h3>{{ lecturer_profile.user }}</h3>
+                <p class="matric-number">Staff Id: {{ lecturer_profile.staff_id }}</p>
+            </div>
+ 
+            <div class="profile-details">
+                <div class="detail-item">
+                    <span class="detail-label">Department:</span>
+                    <span class="detail-value">{{ lecturer_profile.department }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Academic Rank:</span>
+                    <span class="detail-value">{{ lecturer_profile.academic_rank }}</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Enrolled Courses -->
+
+
+        <div class="course-section">
+            <h3>Courses I Lecture</h3>
+            <ul class="course-list">
+                {% for course in courses_taught %}
+                <li class="course-item">
+                    <i class="fas fa-book"></i>{{course}}   --{{course.course_code}}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+
+    </section>
+</main>
+{% endblock content %}

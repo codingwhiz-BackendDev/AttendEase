@@ -1,0 +1,227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance | AttendEase</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert for messages -->
+    <style>
+        body {
+            background-color: #E3EAFD;
+            font-family: Arial, sans-serif;
+            color: #27496D;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        video,
+        canvas {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .btn {
+            background-color: #27496D;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: #1b3650;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Message container */
+        .message-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        /* Base style for messages */
+        .message {
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: fadeIn 0.5s ease-in forwards, fadeOut 0.5s ease-out 3.5s forwards;
+        }
+
+        /* Success Message */
+        .message.success {
+            background-color: #28a745;
+            /* Green */
+        }
+
+        /* Error Message */
+        .message.error {
+            background-color: #dc3545;
+            /* Red */
+        }
+
+        /* Info Message */
+        .message.info {
+            background-color: #007bff;
+            /* Blue */
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Fade-out animation */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <div class="container">
+        <h2>Mark Your Attendance</h2>
+        <p>Align your face in the camera and click "Capture" to mark your attendance.</p>
+
+        <video id="video" autoplay></video>
+        <canvas id="canvas" class="hidden"></canvas>
+
+        <button id="capture-btn" class="btn">Capture</button>
+
+        <form id="attendance-form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="captured_image" id="captured-image" class="hidden">
+            <input type="text" id="latitude" readonly name="latitude">
+            <input type="text" id="longitude" readonly name="longitude">
+            <button type="submit" class="btn">Submit Attendance</button>
+        </form>
+    </div>
+
+    <script>
+
+        // GET LOCATION 
+        document.addEventListener("DOMContentLoaded", function () {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition(
+                    function (position) {
+                        document.getElementById("latitude").value = position.coords.latitude;
+                        document.getElementById("longitude").value = position.coords.longitude;
+                        console.log("Updated Location: ", position.coords.latitude, position.coords.longitude);
+                    },
+                    function (error) {
+                        alert("Location access denied! Please enable GPS.");
+                        console.error("Geolocation error:", error);
+                    },
+                    {
+                        enableHighAccuracy: true, // Get precise location
+                        maximumAge: 0, // Do not use cached location
+                        timeout: 10000 // Wait max 10 seconds
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        });
+        window.addEventListener("beforeunload", function () {
+            navigator.geolocation.getCurrentPosition(() => { }, () => { });
+        });
+
+
+
+
+        // CAPTURE FACE 
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('capture-btn');
+        const attendanceForm = document.getElementById('attendance-form');
+        const imageInput = document.getElementById('captured-image');
+
+        // Start Camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                alert("Camera access denied. Please allow camera permissions.");
+            });
+
+        // Capture Image
+        captureBtn.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(blob => {
+                const file = new File([blob], "attendance.jpg", { type: "image/jpeg" });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                imageInput.files = dataTransfer.files;
+
+                // Debugging: Check the image file added to input
+                if (imageInput.files.length > 0) {
+                    alert(`File Added: ${imageInput.files[0].name}, Type: ${imageInput.files[0].type}`);
+                } else {
+                    alert("No file added!");
+                }
+            }, "image/jpeg");
+
+        });
+    </script>
+
+</body>
+
+</html>

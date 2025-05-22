@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="content">
+    <header>
+        <h2>Welcome, {{ lecturer.academic_rank|default:'Mr' }} <span>{{ user.username }}</span></h2>
+        <div class="profile-icon">
+            <img src="{% static 'sta.jpg' %}" alt="Profile">
+        </div>
+    </header>
+
+    <section class="cards">
+        <!-- Scheduled Lectures -->
+        <div class="card">
+            <div class="message-container">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <h3>Scheduled Lectures</h3>
+
+            {% if scheduled_lectures %}
+            {% for class in scheduled_lectures %}
+            <div class="class">
+                <h4>{{ class.course }}</h4>
+                <p>Time: {{ class.start_time }} - {{ class.end_time }}</p>
+                <p>Location: {{ class.lecture_hall }}</p>
+                <button class="view-class">View Class</button>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="class">
+                <p>No scheduled lectures</p>
+            </div>
+            {% endif %}
+
+
+        </div>
+
+        <!-- Attendance Management -->
+        <div class="card">
+            <h3>Attendance Management</h3>
+            <div class="class">
+                <h4>Create new class Attendance</h4>
+                <button class="manage-attendance"><a href="/lecturer/create-attendance/">Create</a></button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <h3>Quick Actions</h3>
+            <button>Upload Course Material</button>
+            <button>Schedule Office Hours</button>
+            <button>Send Announcements</button>
+        </div>
+    </section>
+</main>
+{% endblock content %}

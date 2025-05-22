@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="content">
+    <header>
+        <h2>Create Attendance Session</h2>
+    </header>
+
+    <section class="form-section">
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Course Title -->
+            <label for="course">Course Title</label>
+            <select name="course" required>
+                {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.course_title }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Lecture Hall -->
+            <label for="lecture_hall">Lecture Hall</label>
+            <input type="text" name="lecture_hall" placeholder="Enter lecture hall" required>
+
+            <!-- Location Coordinates (Auto-filled) -->
+            <label>Lecture Location (Auto-detected)</label>
+            <input type="text" id="latitude" name="latitude" placeholder="Latitude" readonly>
+            <input type="text" id="longitude" name="longitude" placeholder="Longitude" readonly>
+            <p id="location-status">Fetching location...</p>
+
+            <!-- Start Time -->
+            <label for="start_time">Start Time</label>
+            <input type="datetime-local" name="start_time" required>
+
+            <!-- End Time -->
+            <label for="end_time">End Time</label>
+            <input type="datetime-local" name="end_time" required>
+
+            <!-- Additional Notes -->
+            <label for="notes">Additional Notes</label>
+            <textarea name="notes" placeholder="Enter any additional notes"></textarea>
+
+            <button type="submit" class="submit-btn">Create Attendance</button>
+        </form>
+    </section>
+</main>
+
+<script>
+    // Auto-fetch lecturer's location
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    document.getElementById("latitude").value = position.coords.latitude;
+                    document.getElementById("longitude").value = position.coords.longitude;
+                    document.getElementById("location-status").innerText = "Location fetched successfully!";
+                },
+                function (error) {
+                    document.getElementById("location-status").innerText = "Failed to fetch location.";
+                }
+            );
+        } else {
+            document.getElementById("location-status").innerText = "Geolocation is not supported.";
+        }
+    }
+
+    // Call function on page load
+    getLocation();
+</script>
+{% endblock content %}

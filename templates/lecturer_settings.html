@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="content">
+    <header>
+        <h2>My Profile Settings</h2>
+    </header>
+
+    <section class="cards">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="staff_id">Staff ID</label>
+                <input type="text" id="staff_id" required name="staff_id" value="{{ lecturer.staff_id }}">
+            </div>
+
+            <div class="form-group">
+                <label for="department">Department</label>
+                <input type="text" id="department" required name="department" value="{{ lecturer.department }}">
+            </div>
+
+            <div class="form-group">
+                <label for="academic_rank">Academic Rank</label>
+                <input type="text" id="academic_rank" required name="academic_rank"
+                    value="{{ lecturer.academic_rank }}">
+            </div>
+
+            <div class="form-group">
+                <label for="office_location">Office Location</label>
+                <input type="text" id="office_location" required name="office_location"
+                    value="{{ lecturer.office_location }}">
+            </div>
+
+            <div class="form-group">
+                <label for="phone_number">Phone Number</label>
+                <input type="text" id="phone_number" required name="phone_number" value="{{ lecturer.phone_number }}">
+            </div>
+
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </section>
+</main>
+{% endblock content %}
