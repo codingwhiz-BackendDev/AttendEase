@@ -1,0 +1,114 @@
+body {
+    background-color: #E3EAFD;
+    font-family: Arial, sans-serif;
+    color: #27496D;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin: auto;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+video,
+canvas {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.btn {
+    background-color: #27496D;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: #1b3650;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Message container */
+.message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 300px;
+}
+
+/* Base style for messages */
+.message {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: fadeIn 0.5s ease-in forwards, fadeOut 0.5s ease-out 3.5s forwards;
+}
+
+/* Success Message */
+.message.success {
+    background-color: #28a745;
+    /* Green */
+}
+
+/* Error Message */
+.message.error {
+    background-color: #dc3545;
+    /* Red */
+}
+
+/* Info Message */
+.message.info {
+    background-color: #007bff;
+    /* Blue */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade-out animation */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}

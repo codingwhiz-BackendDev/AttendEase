@@ -86,8 +86,6 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_ADAPTER = "App.adapters.CustomAccountAdapter"
 SOCIALACCOUNT_ADAPTER = "App.adapters.CustomSocialAccountAdapter"
 
-SOCIALACCOUNT_ADAPTER = "App.adapters.CustomSocialAccountAdapter"
-
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 MIDDLEWARE = [

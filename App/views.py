@@ -17,63 +17,91 @@ import math
 import tempfile
 import io
 from django.conf import settings
-import mediapipe as mp
+import face_recognition
+import logging
+from functools import wraps
+from django.db import transaction
 
-# Initialize MediaPipe Face Detection
-mp_face_detection = mp.solutions.face_detection
-mp_face_mesh = mp.solutions.face_mesh
-mp_drawing = mp.solutions.drawing_utils
+logger = logging.getLogger(__name__)
 
-def get_face_landmarks(image_path):
-    """Extract face landmarks using MediaPipe Face Mesh"""
+def get_user_role(user):
+    """Helper function to determine user role based on email domain."""
+    return "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+
+def student_required(view_func):
+    """Decorator to ensure only students can access the view."""
+    @wraps(view_func)
+    @login_required(login_url='/')
+    def wrapped_view(request, *args, **kwargs):
+        if get_user_role(request.user) != "student":
+            messages.error(request, "Access denied. This page is for students only.")
+            return redirect('welcome_page')
+        return view_func(request, *args, **kwargs)
+    return wrapped_view
+
+def lecturer_required(view_func):
+    """Decorator to ensure only lecturers can access the view."""
+    @wraps(view_func)
+    @login_required(login_url='/')
+    def wrapped_view(request, *args, **kwargs):
+        if get_user_role(request.user) != "lecturer":
+            messages.error(request, "Access denied. This page is for lecturers only.")
+            return redirect('welcome_page')
+        return view_func(request, *args, **kwargs)
+    return wrapped_view
+
+def get_face_encoding(image_path):
+    """Extract face encoding using face_recognition library"""
     try:
-        # Read image
-        image = cv2.imread(image_path)
-        if image is None:
+        # Load image
+        image = face_recognition.load_image_file(image_path)
+        
+        # Detect face locations and encodings
+        face_locations = face_recognition.face_locations(image)
+        
+        if not face_locations:
+            logger.warning(f"No face detected in {image_path}")
             return None
         
-        # Convert to RGB
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # Get face encoding (128-dimensional vector)
+        face_encodings = face_recognition.face_encodings(image, face_locations)
         
-        # Initialize Face Mesh
-        with mp_face_mesh.FaceMesh(
-            static_image_mode=True,
-            max_num_faces=1,
-            min_detection_confidence=0.5) as face_mesh:
-            
-            # Process the image
-            results = face_mesh.process(image_rgb)
-            
-            if not results.multi_face_landmarks:
-                return None
-            
-            # Get face landmarks
-            face_landmarks = results.multi_face_landmarks[0]
-            
-            # Convert landmarks to numpy array (normalized coordinates)
-            landmarks = np.array([[lm.x, lm.y, lm.z] for lm in face_landmarks.landmark])
-            
-            return landmarks.flatten()  # Return flattened array of landmarks
+        if not face_encodings:
+            logger.warning(f"Could not generate face encoding for {image_path}")
+            return None
+        
+        logger.info(f"Successfully extracted face encoding from {image_path}")
+        return face_encodings[0]  # Return the first face encoding
             
     except Exception as e:
-        print(f"Error processing image: {e}")
+        logger.error(f"Error processing image {image_path}: {e}")
         return None
 
-def compare_faces(known_landmarks, candidate_landmarks, tolerance=0.6):
-    """Compare two face landmarks using cosine similarity"""
-    if known_landmarks is None or candidate_landmarks is None:
+def compare_faces(known_encoding, candidate_encoding, tolerance=0.6):
+    """Compare two face encodings using face_recognition library"""
+    if known_encoding is None or candidate_encoding is None:
+        logger.warning("One or both face encodings are None")
         return False
-        
-    # Calculate cosine similarity
-    similarity = np.dot(known_landmarks, candidate_landmarks) / (
-        np.linalg.norm(known_landmarks) * np.linalg.norm(candidate_landmarks)
-    )
     
-    return similarity > tolerance
+    # Use face_recognition's built-in comparison
+    try:
+        # Compare faces using the face_recognition library
+        # tolerance: How much distance between faces to consider it a match. Lower is more strict.
+        # 0.6 is typical for face recognition
+        matches = face_recognition.compare_faces([known_encoding], candidate_encoding, tolerance=tolerance)
+        
+        # Calculate distance for debugging
+        distance = face_recognition.face_distance([known_encoding], candidate_encoding)[0]
+        logger.info(f"Face distance: {distance:.4f} (threshold: {tolerance})")
+        
+        return matches[0]
+    except Exception as e:
+        logger.error(f"Error comparing faces: {e}")
+        return False
 
 def redirect_to_google_login(request):
     if request.method == 'POST':
-        print('heyyy')
+        logger.info('Redirecting to welcome page')
         return redirect('welcome_page')
 
 @login_required(login_url='/')
@@ -81,9 +109,10 @@ def redirect_after_login(request):
     """Redirect users to the correct dashboard based on their email."""
     user = request.user
     user_object = User.objects.get(username=user)
+    user_role = get_user_role(user)
     
     # Check if profile exists, if it doesn't create it
-    if user.email.endswith("@run.edu.ng"):
+    if user_role == "student":
         if StudentProfile.objects.filter(student_name=user_object).exists():
             pass
         else:
@@ -92,7 +121,7 @@ def redirect_after_login(request):
         return redirect("student_dashboard")  # Redirect to student dashboard
     
     # Check if profile exists, if it doesn't create it
-    elif user.email.endswith("@lecturer.edu.ng"):
+    elif user_role == "lecturer":
         if LecturerProfile.objects.filter(user=user_object).exists():
             pass
         else:
@@ -105,11 +134,11 @@ def redirect_after_login(request):
 
 
 """View for the student dashboard."""
-@login_required(login_url='/')
+@student_required
 def student_dashboard(request):
     user = request.user
     user_obj = User.objects.get(username=user)
-    user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"  # Determine role dynamically
+    user_role = get_user_role(user)
     
     student_profile = StudentProfile.objects.get(student_name=user_obj)
     enrolled_courses = student_profile.courses_enrolled.all()
@@ -123,23 +152,21 @@ def student_dashboard(request):
 
 
 """View for the lecturer dashboard."""
-@login_required(login_url='/')
+@lecturer_required
 def lecturer_dashboard(request): 
     user = request.user
-   
-    user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"  # Determine role dynamically
+    user_role = get_user_role(user)
       
     user_obj = User.objects.get(username= request.user)
     lecturer = LecturerProfile.objects.get(user=user_obj)
     scheduled_lectures  = AttendanceSession.objects.filter(lecturer = lecturer)
     
     context = {
-        'user_role': 'lecturer' , # Pass user role
+        'user_role': user_role,
         'scheduled_lectures':scheduled_lectures,
         'lecturer':lecturer,
-        'user_role': user_role
         }  
-    print(scheduled_lectures)
+    logger.info(f"Lecturer dashboard accessed by {user.username}")
     return render(request, "lecturer_dashboard.html", context) 
 
 # Default page to welcome unauthenticated users
@@ -161,7 +188,7 @@ def student_profile(request):
     student_profile = StudentProfile.objects.get(student_name=user) 
     
     logged_user = request.user
-    user_role = "student" if logged_user.email.endswith("@run.edu.ng") else "lecturer"
+    user_role = get_user_role(logged_user)
     
     enrolled_courses = student_profile.courses_enrolled.all() 
     context = {
@@ -174,10 +201,10 @@ def student_profile(request):
 
 
 # Search courses & Courses page
-@login_required(login_url='/')
+@student_required
 def student_courses(request):
     user = request.user
-    user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+    user_role = get_user_role(user)
 
     if request.method == 'POST':
         course = request.POST['course']
@@ -192,14 +219,27 @@ def student_courses(request):
 
 
 # View to enroll course
+@transaction.atomic
 def course_enrollment(request):
     if request.method == "POST":
-        student = request.POST['student']
-        course_title = request.POST['course']
+        student = request.POST.get('student')
+        course_title = request.POST.get('course')
+        
+        # Validation
+        if not student or not course_title:
+            messages.error(request, "Missing required fields.")
+            return redirect('student_courses')
         
         """ Get the user object of the person enrolling & the Course """
-        user = User.objects.get(username= student)
-        course = Course.objects.get(course_title=course_title)
+        try:
+            user = User.objects.get(username= student)
+            course = Course.objects.get(course_title=course_title)
+        except User.DoesNotExist:
+            messages.error(request, "User not found.")
+            return redirect('student_courses')
+        except Course.DoesNotExist:
+            messages.error(request, "Course not found.")
+            return redirect('student_courses')
         
         if StudentProfile.objects.filter(student_name = user).exists():
             
@@ -242,7 +282,7 @@ def lecturer_courses(request):
         # Else a form is not submitted, display the normal home page
         lecturer_profile = LecturerProfile.objects.get(user=user_obj) 
         courses_taught =  lecturer_profile.courses_taught.all()
-        print(courses_taught)
+        logger.info(f"Lecturer courses: {courses_taught}")
         
         return render(request, 'lecturer_courses.html', {'courses_taught':courses_taught})
     
@@ -250,14 +290,27 @@ def lecturer_courses(request):
 
 
 #Lecturer enroll for course
+@transaction.atomic
 def lecturer_course_enrollment(request):
     if request.method == "POST":
-        lecturer = request.POST['lecturer']
-        course_title = request.POST['course']
+        lecturer = request.POST.get('lecturer')
+        course_title = request.POST.get('course')
+        
+        # Validation
+        if not lecturer or not course_title:
+            messages.error(request, "Missing required fields.")
+            return redirect('lecturer_courses')
         
         """ Get the user object of the person enrolling & the Course """
-        user = User.objects.get(username= lecturer)
-        course = Course.objects.get(course_title=course_title)
+        try:
+            user = User.objects.get(username= lecturer)
+            course = Course.objects.get(course_title=course_title)
+        except User.DoesNotExist:
+            messages.error(request, "User not found.")
+            return redirect('lecturer_courses')
+        except Course.DoesNotExist:
+            messages.error(request, "Course not found.")
+            return redirect('lecturer_courses')
         
         # Check if lecturer exists
         if LecturerProfile.objects.filter(user = user).exists():
@@ -277,20 +330,34 @@ def lecturer_course_enrollment(request):
 
 
 #Lecturer Unenroll for course
+@transaction.atomic
 def lecturer_course_unenrollment(request):
     user = request.user
     user_obj = User.objects.get(username=user)
     if request.method == 'POST':
-        course = request.POST['course'] 
+        course_title = request.POST.get('course')
         
-        lecturer_profile = LecturerProfile.objects.get(user=user_obj)
-        course = Course.objects.get(course_title= course)
+        # Validation
+        if not course_title:
+            messages.error(request, "Missing required field.")
+            return redirect('lecturer_courses')
+        
+        try:
+            lecturer_profile = LecturerProfile.objects.get(user=user_obj)
+            course = Course.objects.get(course_title=course_title)
+        except LecturerProfile.DoesNotExist:
+            messages.error(request, "Lecturer profile not found.")
+            return redirect('lecturer_courses')
+        except Course.DoesNotExist:
+            messages.error(request, "Course not found.")
+            return redirect('lecturer_courses')
         
         lecturer_profile.courses_taught.remove(course)
         messages.success(request, f"You've successfully unenrolled for '{course}' as a Lecturer") 
         return redirect('lecturer_courses')
 
-@login_required(login_url='/')
+@lecturer_required
+@transaction.atomic
 def create_attendance(request):
     """Allow lecturers to create an attendance session with geofencing"""
     user_object = User.objects.get(username=request.user)
@@ -352,7 +419,8 @@ def is_within_geofence(lat1, lon1, lat2, lon2, radius):
     return distance <= radius
 
 
-@login_required(login_url='/')
+@student_required
+@transaction.atomic
 def mark_attendance(request, pk):
     user = request.user
     student_profile = get_object_or_404(StudentProfile, student_name=user)
@@ -402,16 +470,22 @@ def mark_attendance(request, pk):
                 return redirect('student_settings')
 
             try:
-                # Get face landmarks
-                profile_landmarks = get_face_landmarks(student_profile.face_image.path)
-                captured_landmarks = get_face_landmarks(temp_captured_path)
+                # Get face encodings
+                print(f"DEBUG: Processing profile image: {student_profile.face_image.path}")
+                profile_encoding = get_face_encoding(student_profile.face_image.path)
+                print(f"DEBUG: Processing captured image: {temp_captured_path}")
+                captured_encoding = get_face_encoding(temp_captured_path)
                 
-                if profile_landmarks is None or captured_landmarks is None:
-                    messages.error(request, "Could not detect face in one or both images. Please try again.")
+                if profile_encoding is None:
+                    messages.error(request, "Could not detect face in your profile image. Please upload a clear photo in settings.")
+                    return redirect('student_settings')
+                
+                if captured_encoding is None:
+                    messages.error(request, "Could not detect face in captured image. Please ensure your face is clearly visible and well-lit.")
                     return render(request, 'mark_attendance.html')
                 
                 # Compare faces
-                if compare_faces(profile_landmarks, captured_landmarks):
+                if compare_faces(profile_encoding, captured_encoding):
                     attendance_session.student_marked.add(user)
 
                     attendance_dir = "Attendance_records"
@@ -425,10 +499,12 @@ def mark_attendance(request, pk):
                     messages.success(request, "Attendance marked successfully!")
                     return redirect('view_attendance')
                 else:
-                    messages.error(request, "Face verification failed. Please try again.")
+                    messages.error(request, "Face verification failed. The captured face doesn't match your profile. Please try again with better lighting and angle.")
             except Exception as e:
                 print(f"DEBUG: Face verification error: {str(e)}")
-                messages.error(request, "Face verification failed. Please try again.")
+                import traceback
+                traceback.print_exc()
+                messages.error(request, f"Face verification error: {str(e)}")
 
         finally:
             # Clean up the temporary file
@@ -443,10 +519,10 @@ def mark_attendance(request, pk):
 
 
 # Lecturer Sets his profile
-@login_required(login_url='/')
+@lecturer_required
 def lecturer_settings(request):
     user = request.user
-    user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+    user_role = get_user_role(user)
     
     # Fetch or create lecturer profile
     lecturer, created = LecturerProfile.objects.get_or_create(user=user)
@@ -470,10 +546,10 @@ def lecturer_settings(request):
 
 
 # Students Sets his profile
-@login_required(login_url='/')
+@student_required
 def student_settings(request):
     user = request.user
-    user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+    user_role = get_user_role(user)
     
     # Fetch or create student profile
     student, created = StudentProfile.objects.get_or_create(student_name=user)
@@ -512,11 +588,11 @@ def student_settings(request):
 
 
 # Students view his attendance
-@login_required(login_url='/')
+@student_required
 def view_attendance(request):
     user = request.user
     user_obj = User.objects.get(username=user)
-    user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"  # Determine role dynamically
+    user_role = get_user_role(user)
     
     student_profile = StudentProfile.objects.get(student_name=user_obj)
     enrolled_courses = student_profile.courses_enrolled.all()

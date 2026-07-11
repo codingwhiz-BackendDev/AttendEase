@@ -9,6 +9,12 @@ class Course(models.Model):
     course_title = models.CharField(max_length=255)  
     credit = models.IntegerField()
     
+    class Meta:
+        indexes = [
+            models.Index(fields=['course_code']),
+            models.Index(fields=['course_title']),
+        ]
+    
     def __str__(self):
         return self.course_title
     
@@ -22,6 +28,12 @@ class StudentProfile(models.Model):
     courses_enrolled  = models.ManyToManyField(Course,  related_name='students')
     face_image = models.ImageField(upload_to='faces/', null=True, blank=True)  
     
+    class Meta:
+        indexes = [
+            models.Index(fields=['matric_number']),
+            models.Index(fields=['department']),
+        ]
+    
     def __str__(self):
         return f"{self.student_name} ({self.matric_number})"
 
@@ -33,6 +45,12 @@ class LecturerProfile(models.Model):
     office_location = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15)
     courses_taught = models.ManyToManyField('Course', related_name='lecturers')  # Many-to-many relationship
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['staff_id']),
+            models.Index(fields=['department']),
+        ]
 
     def __str__(self):
         return f"{self.user} ({self.staff_id})"
@@ -50,6 +68,12 @@ class AttendanceSession(models.Model):
     # Geofencing Location Data
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['start_time']),
+            models.Index(fields=['course', 'lecturer']),
+        ]
 
     def __str__(self):
         return f"Attendance for {self.course.course_title} by {self.lecturer.user}"

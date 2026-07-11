@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="{% static 'notification_messages.css' %}">
     <script defer src="{% static 'dashboard.js' %}"></script>
     <link rel="stylesheet" href="{% static 'font-awesome3/css/all.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert for messages -->
     <title>Dashboard | AttendEase</title>
 </head>
@@ -36,7 +35,7 @@
             <li><a href="/student/view-attendance/"><i class="fas fa-chart-line"></i> <span>Attendance</span></a></li>
             <li><a href="/student/settings/"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
             <li><a href="/student/profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
-            <li><a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            <li><a href="/accounts/logout/"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
         </ul>
         {% else %}
         <ul class="menu">
@@ -47,7 +46,7 @@
             </li>
             <li><a href="/lecturer/settings/"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
             <li><a href="/lecturer/profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
-            <li><a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            <li><a href="/accounts/logout/"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
         </ul>
         {% endif %}
 
