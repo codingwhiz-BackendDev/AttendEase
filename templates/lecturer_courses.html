@@ -2,66 +2,171 @@
 {% load static %}
 
 {% block content %}
-<main class="content">
-    <header>
-        <h2>Search Courses</h2>
-    </header>
+<div class="p-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Course Management</h1>
+        <p class="text-gray-600">Search and manage the courses you teach</p>
+    </div>
 
-    <!-- Search Bar -->
-    <form action="" method="post">
-        <div class="search-container">
-            {% csrf_token %}
-            <input type="text" required id="course" name="course"
-                placeholder="Search for a course with its course title...">
-            <button type="submit" id="search-btn"><i class="fas fa-search"></i></button>
-
-        </div>
-    </form>
-
-    <!-- Course List -->
-    <section class="course-list">
-        {% for course in results %}
-
-        <div class="course-card">
-            <h3>{{ course.course_title }}</h3>
-            <p><strong>Course Code:</strong> {{ course.course_code }}</p>
-            <p><strong>Unit:</strong> {{ course.credit }} units</p>
-            <form method="POST" action="/lecturer_course_enrollment">
-                {% csrf_token %}
-                <input type="hidden" name="course" value="{{course.course_title}}">
-                <input type="hidden" name="lecturer" value="{{request.user}}">
-                <button type="submit" class="enroll-btn">Enroll as a Lecturer</button>
-            </form>
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            <div class="flex items-center">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                {{ message }}
+            </div>
         </div>
         {% endfor %}
+    </div>
+    {% endif %}
 
-        <div class="message-container">
-            {% if messages %}
-            {% for message in messages %}
-            <div class="message {{ message.tags }}">{{ message }}</div>
+    <!-- Search Bar -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-8 card-hover">
+        <form action="" method="post" class="flex gap-4" id="search-form">
+            {% csrf_token %}
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" required id="course" name="course"
+                    placeholder="Search for a course by title..."
+                    class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+            </div>
+            <button type="submit" id="search-btn" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg">
+                <i class="fas fa-search mr-2"></i>Search
+            </button>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    {% if results %}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Search Results</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in results %}
+            <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                        <i class="fas fa-book text-white text-xl"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">{{ course.credit }} Units</span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ course.course_title }}</h3>
+                <p class="text-gray-600 mb-4"><i class="fas fa-code mr-2 text-indigo-500"></i>{{ course.course_code }}</p>
+                <form method="POST" action="/lecturer_course_enrollment" class="enroll-form" data-course-title="{{ course.course_title }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="course" value="{{course.course_title}}">
+                    <input type="hidden" name="lecturer" value="{{request.user}}">
+                    <button type="submit" class="enroll-btn w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all">
+                        <i class="fas fa-plus mr-2"></i>Enroll as Lecturer
+                    </button>
+                </form>
+            </div>
             {% endfor %}
-            {% endif %}
         </div>
+    </div>
+    {% endif %}
 
-
+    <!-- Enrolled Courses -->
+    <div>
+        <h2 class="text-xl font-bold text-gray-900 mb-4">My Courses</h2>
         {% if courses_taught %}
-        {% for course in courses_taught %}
-        <div class="course-card">
-            <h3>{{ course.course_title }}</h3>
-            <p><strong>Course Code:</strong> {{ course.course_code }}</p>
-            <p><strong>Unit:</strong> {{ course.credit }} units</p>
-            <form method="POST" action="/lecturer_course_unenrollment">
-                {% csrf_token %}
-                <input type="hidden" name="course" value="{{ course.course_title }}">
-                <input type="hidden" name="lecturer" value="{{ request.user }}">
-                <button type="submit" class="enroll-btn">Unenroll</button>
-            </form>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in courses_taught %}
+            <div class="bg-white rounded-2xl shadow-xl p-6 card-hover border-2 border-indigo-100">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <i class="fas fa-book text-white text-xl"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">Enrolled</span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ course.course_title }}</h3>
+                <p class="text-gray-600 mb-4"><i class="fas fa-code mr-2 text-emerald-500"></i>{{ course.course_code }}</p>
+                <form method="POST" action="/lecturer_course_unenrollment" class="unenroll-form" data-course-title="{{ course.course_title }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="course" value="{{ course.course_title }}">
+                    <input type="hidden" name="lecturer" value="{{ request.user }}">
+                    <button type="submit" class="unenroll-btn w-full py-3 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-all">
+                        <i class="fas fa-times mr-2"></i>Unenroll
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %} 
+        {% else %}
+        <div class="bg-white rounded-2xl shadow-xl p-12 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <i class="fas fa-book-open text-2xl text-gray-400"></i>
+            </div>
+            <p class="text-gray-500">No courses enrolled yet</p>
+            <p class="text-sm text-gray-400 mt-1">Search and enroll in courses above</p>
+        </div>
         {% endif %}
+    </div>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Enroll form handling
+    document.querySelectorAll('.enroll-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const courseTitle = this.dataset.courseTitle;
+            const btn = this.querySelector('.enroll-btn');
+            
+            Swal.fire({
+                title: 'Enroll in Course',
+                text: `Are you sure you want to enroll as a lecturer for "${courseTitle}"?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Enroll',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enrolling...';
+                    btn.disabled = true;
+                    
+                    this.submit();
+                }
+            });
+        });
+    });
 
+    // Unenroll form handling
+    document.querySelectorAll('.unenroll-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const courseTitle = this.dataset.courseTitle;
+            const btn = this.querySelector('.unenroll-btn');
+            
+            Swal.fire({
+                title: 'Unenroll from Course',
+                text: `Are you sure you want to unenroll from "${courseTitle}"? This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Unenroll',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Unenrolling...';
+                    btn.disabled = true;
+                    
+                    this.submit();
+                }
+            });
+        });
+    });
 
-    </section>
-</main>
+    // Search form handling
+    document.getElementById('search-form').addEventListener('submit', function(e) {
+        const btn = document.getElementById('search-btn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Searching...';
+        btn.disabled = true;
+    });
+</script>
 {% endblock content %}

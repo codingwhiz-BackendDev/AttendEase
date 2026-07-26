@@ -17,7 +17,7 @@ import math
 import tempfile
 import io
 from django.conf import settings
-import face_recognition
+import insightface
 import logging
 from functools import wraps
 from django.db import transaction
@@ -27,6 +27,22 @@ logger = logging.getLogger(__name__)
 def get_user_role(user):
     """Helper function to determine user role based on email domain."""
     return "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+
+# Initialize InsightFace model (lazy loading)
+_face_app = None
+
+def get_face_app():
+    """Lazy load InsightFace model to avoid startup delay."""
+    global _face_app
+    if _face_app is None:
+        try:
+            _face_app = insightface.app.FaceAnalysis(name='buffalo_l')
+            _face_app.prepare(ctx_id=0, det_size=(640, 640))
+            logger.info("InsightFace model loaded successfully")
+        except Exception as e:
+            logger.error(f"Error loading InsightFace model: {e}")
+            raise
+    return _face_app
 
 def student_required(view_func):
     """Decorator to ensure only students can access the view."""
@@ -51,50 +67,54 @@ def lecturer_required(view_func):
     return wrapped_view
 
 def get_face_encoding(image_path):
-    """Extract face encoding using face_recognition library"""
+    """Extract face encoding using InsightFace library"""
     try:
-        # Load image
-        image = face_recognition.load_image_file(image_path)
+        # Initialize InsightFace model
+        face_app = get_face_app()
         
-        # Detect face locations and encodings
-        face_locations = face_recognition.face_locations(image)
+        # Load image using OpenCV
+        image = cv2.imread(image_path)
+        if image is None:
+            logger.warning(f"Could not read image from {image_path}")
+            return None
         
-        if not face_locations:
+        # Detect faces and get embeddings
+        faces = face_app.get(image)
+        
+        if not faces:
             logger.warning(f"No face detected in {image_path}")
             return None
         
-        # Get face encoding (128-dimensional vector)
-        face_encodings = face_recognition.face_encodings(image, face_locations)
+        # Get the embedding (face encoding) of the first face
+        face_embedding = faces[0].embedding
         
-        if not face_encodings:
-            logger.warning(f"Could not generate face encoding for {image_path}")
-            return None
-        
-        logger.info(f"Successfully extracted face encoding from {image_path}")
-        return face_encodings[0]  # Return the first face encoding
+        logger.info(f"Successfully extracted face embedding from {image_path}")
+        return face_embedding
             
     except Exception as e:
         logger.error(f"Error processing image {image_path}: {e}")
         return None
 
-def compare_faces(known_encoding, candidate_encoding, tolerance=0.6):
-    """Compare two face encodings using face_recognition library"""
-    if known_encoding is None or candidate_encoding is None:
-        logger.warning("One or both face encodings are None")
+def compare_faces(known_embedding, candidate_embedding, threshold=0.5):
+    """Compare two face embeddings using InsightFace library"""
+    if known_embedding is None or candidate_embedding is None:
+        logger.warning("One or both face embeddings are None")
         return False
     
-    # Use face_recognition's built-in comparison
+    # Use cosine similarity for comparison
     try:
-        # Compare faces using the face_recognition library
-        # tolerance: How much distance between faces to consider it a match. Lower is more strict.
-        # 0.6 is typical for face recognition
-        matches = face_recognition.compare_faces([known_encoding], candidate_encoding, tolerance=tolerance)
+        # Calculate cosine similarity
+        similarity = np.dot(known_embedding, candidate_embedding) / (
+            np.linalg.norm(known_embedding) * np.linalg.norm(candidate_embedding)
+        )
         
-        # Calculate distance for debugging
-        distance = face_recognition.face_distance([known_encoding], candidate_encoding)[0]
-        logger.info(f"Face distance: {distance:.4f} (threshold: {tolerance})")
+        # Convert similarity to distance (lower distance = more similar)
+        distance = 1 - similarity
         
-        return matches[0]
+        logger.info(f"Face similarity: {similarity:.4f}, distance: {distance:.4f} (threshold: {threshold})")
+        
+        # Return True if distance is below threshold (faces match)
+        return distance < threshold
     except Exception as e:
         logger.error(f"Error comparing faces: {e}")
         return False
@@ -103,35 +123,6 @@ def redirect_to_google_login(request):
     if request.method == 'POST':
         logger.info('Redirecting to welcome page')
         return redirect('welcome_page')
-
-@login_required(login_url='/')
-def redirect_after_login(request):
-    """Redirect users to the correct dashboard based on their email."""
-    user = request.user
-    user_object = User.objects.get(username=user)
-    user_role = get_user_role(user)
-    
-    # Check if profile exists, if it doesn't create it
-    if user_role == "student":
-        if StudentProfile.objects.filter(student_name=user_object).exists():
-            pass
-        else:
-            student_profile = StudentProfile.objects.create(student_name=user_object)
-            student_profile.save()
-        return redirect("student_dashboard")  # Redirect to student dashboard
-    
-    # Check if profile exists, if it doesn't create it
-    elif user_role == "lecturer":
-        if LecturerProfile.objects.filter(user=user_object).exists():
-            pass
-        else:
-            lecturer_profile = LecturerProfile.objects.create(user=user_object)
-            lecturer_profile.save()
-        return redirect("lecturer_dashboard")  # Redirect to lecturer dashboard
-
-    # Default redirect if email format is unknown
-    return redirect("welcome_page")  
-
 
 """View for the student dashboard."""
 @student_required
@@ -213,7 +204,13 @@ def student_courses(request):
             messages.info(request, f" 'No Course Found on {course}'")
         return render(request, 'student_courses.html', {'results': results, 'user_role': user_role})
 
-    student_courses = StudentProfile.objects.all()
+    # Get current student's enrolled courses
+    try:
+        student_profile = StudentProfile.objects.get(student_name=request.user)
+        student_courses = student_profile.courses_enrolled.all()
+    except StudentProfile.DoesNotExist:
+        student_courses = []
+    
     return render(request, 'student_courses.html', {'student_courses': student_courses, 'user_role': user_role})
 
 
@@ -314,17 +311,18 @@ def lecturer_course_enrollment(request):
         
         # Check if lecturer exists
         if LecturerProfile.objects.filter(user = user).exists():
-            #Check if a lecturer has enrolled for this course
-            if LecturerProfile.objects.filter(courses_taught=course).exists():
-                messages.info(request, f"This '{course}' has already been enrolled by a  Lecturer")  
+            lecturer_profile = LecturerProfile.objects.get(user=user)
+            # Check if THIS lecturer has already enrolled for this course
+            if lecturer_profile.courses_taught.filter(id=course.id).exists():
+                messages.warning(request, f"You are already enrolled in '{course.course_title}'")  
                 return redirect('lecturer_courses')
             else:
-                lecturer_profile = LecturerProfile.objects.get(user=user)
                 lecturer_profile.courses_taught.add(course)
-                messages.success(request, f"You've successfully enrolled for '{course}' as a Lecturer")            
+                messages.success(request, f"Successfully enrolled in '{course.course_title}'")            
         else:
             lecturer_profile  = LecturerProfile.objects.create(user=user)
             lecturer_profile.courses_taught.add(course)
+            messages.success(request, f"Successfully enrolled in '{course.course_title}'")
          
         return redirect('lecturer_courses')
 
@@ -363,6 +361,10 @@ def create_attendance(request):
     user_object = User.objects.get(username=request.user)
     lecturer_profile = get_object_or_404(LecturerProfile, user=user_object)
     courses = lecturer_profile.courses_taught.all()  # Get only courses the lecturer teaches
+    
+    logger.info(f"Lecturer {request.user.username} has {courses.count()} courses taught")
+    for course in courses:
+        logger.info(f"Course: {course.course_title}")
 
     if request.method == "POST":
         course_id = request.POST['course']
@@ -470,22 +472,22 @@ def mark_attendance(request, pk):
                 return redirect('student_settings')
 
             try:
-                # Get face encodings
-                print(f"DEBUG: Processing profile image: {student_profile.face_image.path}")
-                profile_encoding = get_face_encoding(student_profile.face_image.path)
-                print(f"DEBUG: Processing captured image: {temp_captured_path}")
-                captured_encoding = get_face_encoding(temp_captured_path)
+                # Get face embeddings
+                logger.info(f"Processing profile image: {student_profile.face_image.path}")
+                profile_embedding = get_face_encoding(student_profile.face_image.path)
+                logger.info(f"Processing captured image: {temp_captured_path}")
+                captured_embedding = get_face_encoding(temp_captured_path)
                 
-                if profile_encoding is None:
+                if profile_embedding is None:
                     messages.error(request, "Could not detect face in your profile image. Please upload a clear photo in settings.")
                     return redirect('student_settings')
                 
-                if captured_encoding is None:
+                if captured_embedding is None:
                     messages.error(request, "Could not detect face in captured image. Please ensure your face is clearly visible and well-lit.")
                     return render(request, 'mark_attendance.html')
                 
                 # Compare faces
-                if compare_faces(profile_encoding, captured_encoding):
+                if compare_faces(profile_embedding, captured_embedding):
                     attendance_session.student_marked.add(user)
 
                     attendance_dir = "Attendance_records"

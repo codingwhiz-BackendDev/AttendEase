@@ -5,54 +5,104 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from allauth.exceptions import ImmediateHttpResponse
 from django.urls import reverse
+from django.db import transaction
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     def clean_email(self, email):
         """Restrict login to student or lecturer emails."""
-        allowed_domains = ["@run.edu.ng", "@lecturer.edu.ng"]
+        allowed_domains = ["@run.edu.ng", "@gmail.com"]
         if not any(email.endswith(domain) for domain in allowed_domains):
-            raise ValidationError("Only student (@run.edu.ng) and lecturer (@lecturer.edu.ng) emails are allowed.")
+            raise ValidationError("Only student (@run.edu.ng) and lecturer (@gmail.com) emails are allowed.")
         return email
 
     def get_login_redirect_url(self, request):
         """Redirect students and lecturers to their respective dashboards after login."""
+        from .models import StudentProfile, LecturerProfile
+        
         user = request.user
-        if user.email.endswith("@run.edu.ng"):
-            return reverse("student_dashboard")  # Ensure this URL exists in `urls.py`
-        elif user.email.endswith("@lecturer.edu.ng"):
-            return reverse("lecturer_dashboard")  # Ensure this URL exists in `urls.py`
+        user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+        
+        # Auto-create profile if doesn't exist
+        with transaction.atomic():
+            if user_role == "student":
+                if not StudentProfile.objects.filter(student_name=user).exists():
+                    StudentProfile.objects.create(student_name=user)
+                    logger.info(f"Created StudentProfile for user {user.email}")
+                return reverse("student_dashboard")
+            elif user_role == "lecturer":
+                if not LecturerProfile.objects.filter(user=user).exists():
+                    LecturerProfile.objects.create(user=user)
+                    logger.info(f"Created LecturerProfile for user {user.email}")
+                return reverse("lecturer_dashboard")
+        
         return reverse("welcome_page")  # Fallback
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         """Ensure login is for students or lecturers and validate emails accordingly."""
+        from .models import StudentProfile, LecturerProfile
+        from django.contrib.auth.models import User
+        
         process = request.session.get("login_process", "")
         email = sociallogin.account.extra_data.get("email", "")
 
-        print(f"Process: {process}")  # Debugging
-        print(f"Email: {email}")  # Debugging
+        logger.info(f"Login process: {process}, Email: {email}")
 
         if process == "student" and not email.endswith("@run.edu.ng"):
             messages.error(request, "Only student emails (@run.edu.ng) are allowed.")
-            print("Blocking non-student email")  # Debugging
+            logger.warning(f"Blocked non-student email: {email}")
             raise ImmediateHttpResponse(redirect("/student/login/"))
-        elif process == "lecturer" and not email.endswith("@lecturer.edu.ng"):
-            messages.error(request, "Only lecturer emails (@lecturer.edu.ng) are allowed.")
-            print("Blocking non-lecturer email")  # Debugging
+        elif process == "lecturer" and not email.endswith("@gmail.com"):
+            messages.error(request, "Only lecturer emails (@gmail.com) are allowed.")
+            logger.warning(f"Blocked non-lecturer email: {email}")
             raise ImmediateHttpResponse(redirect("/lecturer/login/"))
+
+        # Auto-link social account to existing user by email
+        if not sociallogin.is_existing:
+            try:
+                user = User.objects.get(email=email)
+                sociallogin.user = user
+                logger.info(f"Auto-linked Google account to existing user: {email}")
+            except User.DoesNotExist:
+                logger.info(f"No existing user found for {email}, will create new account")
+
+        # Auto-create profile if doesn't exist
+        with transaction.atomic():
+            if process == "student":
+                if not StudentProfile.objects.filter(student_name__email=email).exists():
+                    # User will be created by allauth, so we need to handle this after user creation
+                    logger.info(f"Will create StudentProfile for {email}")
+            elif process == "lecturer":
+                if not LecturerProfile.objects.filter(user__email=email).exists():
+                    logger.info(f"Will create LecturerProfile for {email}")
 
         # Clear session data after login
         request.session.pop("login_process", None)
 
     def get_login_redirect_url(self, request):
         """Redirect based on stored session login type."""
+        from .models import StudentProfile, LecturerProfile
+        
         process = request.session.get("login_process", "")
-        print(f"Redirecting based on process: {process}")  # Debugging
+        user = request.user
+        logger.info(f"Redirecting based on process: {process}")
 
+        # Use the main adapter logic for consistency
         if process == "student":
+            with transaction.atomic():
+                if not StudentProfile.objects.filter(student_name=user).exists():
+                    StudentProfile.objects.create(student_name=user)
+                    logger.info(f"Created StudentProfile for user {user.email}")
             return reverse("student_dashboard")
         elif process == "lecturer":
+            with transaction.atomic():
+                if not LecturerProfile.objects.filter(user=user).exists():
+                    LecturerProfile.objects.create(user=user)
+                    logger.info(f"Created LecturerProfile for user {user.email}")
             return reverse("lecturer_dashboard")
 
         return super().get_login_redirect_url(request)  # Default

@@ -6,35 +6,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mark Attendance | AttendEase</title>
-    <link rel="stylesheet" href="{% static 'mark_attendance.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert for messages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 
-<body>
-    {% for message in messages %}
-    <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
+<body class="bg-gray-50 min-h-screen">
+    <!-- Sidebar -->
+    <nav class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-emerald-900 via-teal-900 to-emerald-800 text-white shadow-2xl z-50">
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+                <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-teal-200">AttendEase</span>
+            </div>
+        </div>
 
-    <div class="container">
-        <h2>Mark Your Attendance</h2>
-        <p>Align your face in the camera and click "Capture" to mark your attendance.</p>
+        <div class="p-4 space-y-2">
+            <a href="/student/dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-home w-5"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/student_courses" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-book w-5"></i>
+                <span>Courses</span>
+            </a>
+            <a href="/student/view-attendance/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-chart-line w-5"></i>
+                <span>Attendance</span>
+            </a>
+            <a href="/student/settings/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-cog w-5"></i>
+                <span>Settings</span>
+            </a>
+            <a href="/student/profile" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-user w-5"></i>
+                <span>Profile</span>
+            </a>
+        </div>
 
-        <video id="video" autoplay></video>
-        <canvas id="canvas" class="hidden"></canvas>
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+            <a href="/accounts/logout/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all">
+                <i class="fas fa-sign-out-alt w-5"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
 
-        <button id="capture-btn" class="btn">Capture</button>
+    <!-- Main Content -->
+    <div class="lg:ml-64 min-h-screen p-8">
+        <!-- Messages -->
+        {% for message in messages %}
+        <div class="mb-6 px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            <div class="flex items-center">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
 
-        <form id="attendance-form" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="file" name="captured_image" id="captured-image" class="hidden">
-            <input type="text" id="latitude" readonly name="latitude">
-            <input type="text" id="longitude" readonly name="longitude">
-            <button type="submit" class="btn">Submit Attendance</button>
-        </form>
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Mark Your Attendance</h1>
+                <p class="text-gray-600">Align your face in the camera and click "Capture" to mark your attendance</p>
+            </div>
+
+            <!-- Camera Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
+                <div class="relative w-full max-w-lg mx-auto mb-6">
+                    <video id="video" autoplay class="w-full rounded-2xl bg-gray-900 shadow-lg"></video>
+                    <div id="video-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="w-64 h-64 rounded-full border-4 border-emerald-400 border-dashed"></div>
+                    </div>
+                    <img id="captured-preview" class="w-full rounded-2xl bg-gray-900 shadow-lg hidden">
+                </div>
+                
+                <canvas id="canvas" class="hidden"></canvas>
+                
+                <!-- Capture Button -->
+                <div id="capture-section" class="flex gap-4 justify-center mb-6">
+                    <button id="capture-btn" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg">
+                        <i class="fas fa-camera mr-2"></i>Capture Face
+                    </button>
+                </div>
+
+                <!-- Preview Section (hidden initially) -->
+                <div id="preview-section" class="hidden mb-6">
+                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-check text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Face Captured Successfully!</h3>
+                                <p class="text-sm text-gray-600">Please review your captured face below</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 justify-center">
+                            <button id="retake-btn" class="px-6 py-3 bg-gray-500 text-white font-semibold rounded-xl hover:bg-gray-600 transition-all">
+                                <i class="fas fa-redo mr-2"></i>Retake
+                            </button>
+                            <button id="proceed-btn" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all">
+                                <i class="fas fa-arrow-right mr-2"></i>Proceed to Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Status -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-location-dot text-emerald-600 text-xl mr-3"></i>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700">Location Status</p>
+                                <p id="location-status" class="text-sm text-gray-600">Fetching location...</p>
+                            </div>
+                        </div>
+                        <div id="location-coords" class="text-right text-sm text-gray-600">
+                            <p>Lat: <span id="lat-display">--</span></p>
+                            <p>Lng: <span id="lng-display">--</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Form (hidden initially) -->
+            <form id="attendance-form" method="POST" enctype="multipart/form-data" class="hidden">
+                {% csrf_token %}
+                <input type="file" name="captured_image" id="captured-image" class="hidden">
+                <input type="text" id="latitude" readonly name="latitude" class="hidden">
+                <input type="text" id="longitude" readonly name="longitude" class="hidden">
+                <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 focus:ring-4 focus:ring-emerald-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <i class="fas fa-check-circle mr-2"></i>Submit Attendance
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
-
         // GET LOCATION 
         document.addEventListener("DOMContentLoaded", function () {
             if ("geolocation" in navigator) {
@@ -42,47 +158,48 @@
                     function (position) {
                         document.getElementById("latitude").value = position.coords.latitude;
                         document.getElementById("longitude").value = position.coords.longitude;
-                        console.log("Updated Location: ", position.coords.latitude, position.coords.longitude);
+                        document.getElementById("lat-display").textContent = position.coords.latitude.toFixed(6);
+                        document.getElementById("lng-display").textContent = position.coords.longitude.toFixed(6);
+                        document.getElementById("location-status").innerHTML = '<span class="text-emerald-600"><i class="fas fa-check-circle mr-1"></i>Location detected</span>';
                     },
                     function (error) {
-                        alert("Location access denied! Please enable GPS.");
-                        console.error("Geolocation error:", error);
+                        document.getElementById("location-status").innerHTML = '<span class="text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>Location access denied</span>';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Location Error',
+                            text: 'Please enable GPS to mark attendance.',
+                        });
                     },
                     {
-                        enableHighAccuracy: true, // Get precise location
-                        maximumAge: 0, // Do not use cached location
-                        timeout: 10000 // Wait max 10 seconds
+                        enableHighAccuracy: true,
+                        maximumAge: 0,
+                        timeout: 10000
                     }
                 );
             } else {
-                alert("Geolocation is not supported by your browser.");
+                document.getElementById("location-status").innerHTML = '<span class="text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>Geolocation not supported</span>';
             }
         });
-        window.addEventListener("beforeunload", function () {
-            navigator.geolocation.getCurrentPosition(() => { }, () => { });
-        });
-
-
-
 
         // CAPTURE FACE 
-
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const captureBtn = document.getElementById('capture-btn');
         const attendanceForm = document.getElementById('attendance-form');
         const imageInput = document.getElementById('captured-image');
 
-        // Start Camera
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
             })
             .catch(err => {
-                alert("Camera access denied. Please allow camera permissions.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Camera Error',
+                    text: 'Please allow camera permissions to mark attendance.',
+                });
             });
 
-        // Capture Image
         captureBtn.addEventListener('click', () => {
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
@@ -95,17 +212,13 @@
                 dataTransfer.items.add(file);
                 imageInput.files = dataTransfer.files;
 
-                // Debugging: Check the image file added to input
-                if (imageInput.files.length > 0) {
-                    alert(`File Added: ${imageInput.files[0].name}, Type: ${imageInput.files[0].type}`);
-                } else {
-                    alert("No file added!");
-                }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Face Captured!',
+                    text: 'Click "Submit Attendance" to complete.',
+                });
             }, "image/jpeg");
-
         });
     </script>
-
 </body>
-
 </html>

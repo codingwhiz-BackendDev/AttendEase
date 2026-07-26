@@ -2,54 +2,131 @@
 {% load static %}
 
 {% block content %}
-<main class="content">
-    <header>
-        <h2>Welcome <span>{{ user.last_name }}</span></h2>
-        <div class="profile-icon">
-            <img src="{% static 'sta.jpg' %}" alt="Profile">
-        </div>
-    </header>
-
-    <section class="cards">
-        <!-- Upcoming Classes -->
-        <div class="card">
-            <h3>Upcoming Classes</h3>
-
-            {% if attendances %}
-            {% for attendance in attendances %}
-            <div class="class">
-                <h4>{{attendance.course}}</h4>
-                <p>Time: {{ attendance.start_time }} - {{ attendance.end_time }}</p>
-                <p>Location: {{ attendance.lecture_hall }}</p>
-                <a href="/student/mark-attendance/{{attendance.id}}"><button class="mark-attendance">Mark
-                        Attendance</button></a>
-
+<div class="p-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, {{ user.last_name }}</h1>
+                <p class="text-gray-600">Track your attendance and stay on top of your classes</p>
             </div>
-            {% endfor %}
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    {{ user.username|first|upper }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-emerald-100 text-sm font-medium mb-1">Enrolled Courses</p>
+                    <p class="text-3xl font-bold">{{ attendances|length }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-book text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-indigo-100 text-sm font-medium mb-1">Overall Attendance</p>
+                    <p class="text-3xl font-bold">85%</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm font-medium mb-1">Upcoming Classes</p>
+                    <p class="text-3xl font-bold">{{ attendances|length }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-calendar text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Upcoming Classes -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 card-hover">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Upcoming Classes</h2>
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">{{ attendances|length }} Scheduled</span>
+            </div>
+            
+            {% if attendances %}
+            <div class="space-y-4">
+                {% for attendance in attendances %}
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-emerald-200 transition-all">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">{{ attendance.course.course_title }}</h3>
+                            <div class="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                                <span class="flex items-center"><i class="fas fa-clock mr-2 text-emerald-500"></i>{{ attendance.start_time|date:"H:i" }} - {{ attendance.end_time|date:"H:i" }}</span>
+                                <span class="flex items-center"><i class="fas fa-building mr-2 text-emerald-500"></i>{{ attendance.lecture_hall }}</span>
+                            </div>
+                            <a href="/student/mark-attendance/{{attendance.id}}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all text-sm font-medium">
+                                <i class="fas fa-check-circle mr-2"></i>Mark Attendance
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
             {% else %}
-            <div class="class">
-                <p>No scheduled lectures</p>
+            <div class="text-center py-12">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i class="fas fa-calendar-times text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-500">No upcoming classes</p>
+                <p class="text-sm text-gray-400 mt-1">Enroll in courses to see your schedule here</p>
             </div>
             {% endif %}
-
-
-        </div>
-
-        <!-- Attendance Overview -->
-        <div class="card">
-            <h3>Attendance Overview</h3>
-            <div class="chart">
-                <p>Overall Attendance: <strong>85%</strong></p>
-            </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="card">
-            <h3>Quick Actions</h3>
-            <button>View Timetable</button>
-            <button>Submit Excuse</button>
-            <button>Contact Professor</button>
+        <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+            <div class="space-y-3">
+                <a href="/student_courses" class="flex items-center p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100 hover:from-emerald-100 hover:to-teal-100 transition-all group">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-book text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Browse Courses</p>
+                        <p class="text-sm text-gray-500">Enroll in new courses</p>
+                    </div>
+                </a>
+                <a href="/student/view-attendance/" class="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all group">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-chart-line text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">View Attendance</p>
+                        <p class="text-sm text-gray-500">Check your history</p>
+                    </div>
+                </a>
+                <a href="/student/settings/" class="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all group">
+                    <div class="w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-cog text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Settings</p>
+                        <p class="text-sm text-gray-500">Update your profile</p>
+                    </div>
+                </a>
+            </div>
         </div>
-    </section>
-</main>
+    </div>
+</div>
 {% endblock content %}

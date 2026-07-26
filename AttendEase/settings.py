@@ -54,26 +54,10 @@ INSTALLED_APPS = [
    
  
 SITE_ID = 1
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': os.getenv('GOOGLE_CLIENT_ID'),
-            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),
-            'key': '',
-        },
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-    }
-}
 
 # Login and Logout Redirects
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
-LOGIN_REDIRECT_URL = "/redirect-after-login/"  # Custom redirect handler
+LOGIN_REDIRECT_URL = "/"  # Let adapter handle redirect
 LOGOUT_REDIRECT_URL = "/"  # Redirect to welcome page after logout
 
 # Email Verification and Authentication
@@ -81,6 +65,10 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
+
+# Auto-link social accounts to existing accounts by email
+ACCOUNT_PREVENT_ENUMERATION = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
 # Allauth Adapter Configurations
 ACCOUNT_ADAPTER = "App.adapters.CustomAccountAdapter"

@@ -2,52 +2,95 @@
 {% load static %}
 
 {% block content %}
-<main class="content">
-    <header>
-        <h2>My Profile</h2>
-        <div class="profile-icon">
-            <img src="{% static 'sta.jpg' %}" alt="Profile Picture">
-        </div>
-    </header>
+<div class="p-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
+        <p class="text-gray-600">View your student information and enrolled courses</p>
+    </div>
 
-    <section class="profile-container">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Profile Card -->
-        <div class="profile-info">
-            <div class="profile-header">
-                <img src="{% static 'sta.jpg' %}" alt="Profile Picture" class="profile-pic">
-                <h3>{{ student_profile.student_name }}</h3>
-                <p class="matric-number">Matric No: {{ student_profile.matric_number }}</p>
-            </div>
-
-            <div class="profile-details">
-                <div class="detail-item">
-                    <span class="detail-label">Department:</span>
-                    <span class="detail-value">{{ student_profile.department }}</span>
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl shadow-xl p-8 card-hover text-center">
+                <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                    {{ student_profile.student_name.username|first|upper }}
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">Year of Study:</span>
-                    <span class="detail-value">{{ student_profile.year_of_study }}</span>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ student_profile.student_name.username }}</h2>
+                <p class="text-emerald-600 font-medium mb-6">Student</p>
+                
+                <div class="space-y-4 text-left">
+                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
+                        <i class="fas fa-id-card text-emerald-600 w-6"></i>
+                        <div class="ml-3">
+                            <p class="text-xs text-gray-500">Matric Number</p>
+                            <p class="font-semibold text-gray-900">{{ student_profile.matric_number|default:"Not set" }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
+                        <i class="fas fa-building text-emerald-600 w-6"></i>
+                        <div class="ml-3">
+                            <p class="text-xs text-gray-500">Department</p>
+                            <p class="font-semibold text-gray-900">{{ student_profile.department|default:"Not set" }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
+                        <i class="fas fa-university text-emerald-600 w-6"></i>
+                        <div class="ml-3">
+                            <p class="text-xs text-gray-500">Faculty</p>
+                            <p class="font-semibold text-gray-900">{{ student_profile.faculty|default:"Not set" }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
+                        <i class="fas fa-graduation-cap text-emerald-600 w-6"></i>
+                        <div class="ml-3">
+                            <p class="text-xs text-gray-500">Year of Study</p>
+                            <p class="font-semibold text-gray-900">{{ student_profile.year_of_study|default:"Not set" }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-
-        <!-- Enrolled Courses -->
-
-
-        <div class="course-section">
-            <h3>Enrolled Courses</h3>
-            <ul class="course-list">
-                {% for course in enrolled_courses %}
-                <li class="course-item">
-                    <i class="fas fa-book"></i>{{course}}   --{{course.course_code}}
-                </li>
-                {% endfor %}
-            </ul>
+        <!-- Courses Section -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Enrolled Courses</h2>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">{{ enrolled_courses.count }} Courses</span>
+                </div>
+                
+                {% if enrolled_courses %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for course in enrolled_courses %}
+                    <div class="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
+                        <div class="flex items-center mb-2">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center mr-3">
+                                <i class="fas fa-book text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">{{ course.course_title }}</h3>
+                                <p class="text-sm text-gray-600">{{ course.course_code }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-star text-yellow-500 mr-2"></i>
+                            <span>{{ course.credit }} Credit Units</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-book-open text-2xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-500">No courses enrolled yet</p>
+                    <p class="text-sm text-gray-400 mt-1">Browse and enroll in courses to see them here</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
-
-
-
-    </section>
-</main>
+    </div>
+</div>
 {% endblock content %}

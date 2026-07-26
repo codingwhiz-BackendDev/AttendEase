@@ -2,7 +2,6 @@ from . import views
 from django.urls import path,include
 
 urlpatterns = [ 
-    path("redirect-after-login/", views.redirect_after_login, name="redirect_after_login"),  # Handles login redirects
     path('', views.welcome_page, name="welcome_page"),
     path('accounts/', include('allauth.urls')),
     

@@ -4,83 +4,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'student_dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'student_profile.css' %}">
-    <link rel="stylesheet" href="{% static 'courses.css' %}">
-    <link rel="stylesheet" href="{% static 'create_attendance.css' %}">
-    <link rel="stylesheet" href="{% static 'settings.css' %}">
-    <link rel="stylesheet" href="{% static 'notification_messages.css' %}">
-    <script defer src="{% static 'dashboard.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'font-awesome3/css/all.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert for messages -->
-    <title>Dashboard | AttendEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>AttendEase - Smart Attendance System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    </style>
 </head>
 
-<body>
+<body class="bg-gray-50 min-h-screen">
 
     {% block sidebar %}
-    <nav class="sidebar collapsed">
-        <div class="logo">
-            <span class="fas fa-check-circle"></span>
-            <span class="logo-text">AttendEase</span>
-            <button class="toggle-btn"><i class="fas fa-bars"></i></button>
-
+    <nav class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 text-white shadow-2xl z-50 transition-all duration-300" id="sidebar">
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">AttendEase</span>
+                </div>
+                <button class="lg:hidden text-white/70 hover:text-white transition-colors" id="toggleBtn">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
         </div>
 
-        {% if user_role == 'student' %}
-        <ul class="menu">
-            <li><a href="/student/dashboard" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-            <li><a href="/timetable"><i class="fas fa-calendar"></i> <span>Timetable</span></a></li>
-            <li><a href="/student_courses"><i class="fas fa-book"></i> <span>Courses</span></a></li>
-            <li><a href="/student/view-attendance/"><i class="fas fa-chart-line"></i> <span>Attendance</span></a></li>
-            <li><a href="/student/settings/"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-            <li><a href="/student/profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
-            <li><a href="/accounts/logout/"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
-        </ul>
-        {% else %}
-        <ul class="menu">
-            <li><a href="/lecturer/dashboard" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-            <li><a href="/reports"><i class="fas fa-calendar"></i> <span>Schedule</span></a></li>
-            <li><a href="/lecturer_courses"><i class="fas fa-book"></i> <span>Courses</span></a></li>
-            <li><a href="/lecturer/create-attendance/"><i class="fas fa-chart-line"></i> <span>Attendance</span></a>
-            </li>
-            <li><a href="/lecturer/settings/"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-            <li><a href="/lecturer/profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
-            <li><a href="/accounts/logout/"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
-        </ul>
-        {% endif %}
+        <div class="p-4 space-y-2">
+            {% if user_role == 'student' %}
+            <a href="/student/dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 text-white font-medium transition-all hover:bg-white/20">
+                <i class="fas fa-home w-5"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/timetable" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-calendar w-5"></i>
+                <span>Timetable</span>
+            </a>
+            <a href="/student_courses" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-book w-5"></i>
+                <span>Courses</span>
+            </a>
+            <a href="/student/view-attendance/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-chart-line w-5"></i>
+                <span>Attendance</span>
+            </a>
+            <a href="/student/settings/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-cog w-5"></i>
+                <span>Settings</span>
+            </a>
+            <a href="/student/profile" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-user w-5"></i>
+                <span>Profile</span>
+            </a>
+            {% else %}
+            <a href="/lecturer/dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 text-white font-medium transition-all hover:bg-white/20">
+                <i class="fas fa-home w-5"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/reports" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-calendar w-5"></i>
+                <span>Schedule</span>
+            </a>
+            <a href="/lecturer_courses" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-book w-5"></i>
+                <span>Courses</span>
+            </a>
+            <a href="/lecturer/create-attendance/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-chart-line w-5"></i>
+                <span>Attendance</span>
+            </a>
+            <a href="/lecturer/settings/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-cog w-5"></i>
+                <span>Settings</span>
+            </a>
+            <a href="/lecturer/profile" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                <i class="fas fa-user w-5"></i>
+                <span>Profile</span>
+            </a>
+            {% endif %}
+        </div>
 
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+            <a href="/accounts/logout/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all">
+                <i class="fas fa-sign-out-alt w-5"></i>
+                <span>Logout</span>
+            </a>
+        </div>
     </nav>
     {% endblock sidebar %}
 
-    <div class="dashboard">
+    <div class="lg:ml-64 min-h-screen">
         {% block content %}
         {% endblock content %}
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const toggleBtn = document.querySelector(".toggle-btn");
-            const sidebar = document.querySelector(".sidebar");
-            const content = document.querySelector(".content");
+            const toggleBtn = document.getElementById("toggleBtn");
+            const sidebar = document.getElementById("sidebar");
 
-            toggleBtn.addEventListener("click", function () {
-                sidebar.classList.toggle("collapsed");
-
-                // Adjust content margin based on sidebar state
-                //if (sidebar.classList.contains("collapsed")) {
-                //content.style.marginLeft = "40px";
-                //content.style.width = "90%"
-                //sidebar.style.width = "6px"
-                //} else {
-                //content.style.marginLeft = "250px";
-                //sidebar.style.width = "250px"
-                //content.style.width = "90%"
-                //}
-            });
+            if (toggleBtn) {
+                toggleBtn.addEventListener("click", function () {
+                    sidebar.classList.toggle("-translate-x-full");
+                });
+            }
         });
-
-
     </script>
 </body>
 

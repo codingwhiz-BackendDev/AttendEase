@@ -2,60 +2,145 @@
 {% load static %}
 
 {% block content %}
-<main class="content">
-    <header>
-        <h2>Welcome, {{ lecturer.academic_rank|default:'Mr' }} <span>{{ user.username }}</span></h2>
-        <div class="profile-icon">
-            <img src="{% static 'sta.jpg' %}" alt="Profile">
+<div class="p-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, {{ lecturer.academic_rank|default:'Mr.' }} {{ user.username }}</h1>
+                <p class="text-gray-600">Here's what's happening with your courses today</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    {{ user.username|first|upper }}
+                </div>
+            </div>
         </div>
-    </header>
+    </div>
 
-    <section class="cards">
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            <div class="flex items-center">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-indigo-100 text-sm font-medium mb-1">Total Courses</p>
+                    <p class="text-3xl font-bold">{{ lecturer.courses_taught.count }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-book text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-emerald-100 text-sm font-medium mb-1">Scheduled Lectures</p>
+                    <p class="text-3xl font-bold">{{ scheduled_lectures.count }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-calendar text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm font-medium mb-1">Active Sessions</p>
+                    <p class="text-3xl font-bold">{{ scheduled_lectures.count }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-users text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Scheduled Lectures -->
-        <div class="card">
-            <div class="message-container">
-                {% if messages %}
-                {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-                {% endif %}
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 card-hover">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Scheduled Lectures</h2>
+                <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">{{ scheduled_lectures.count }} Active</span>
             </div>
-            <h3>Scheduled Lectures</h3>
-
+            
             {% if scheduled_lectures %}
-            {% for class in scheduled_lectures %}
-            <div class="class">
-                <h4>{{ class.course }}</h4>
-                <p>Time: {{ class.start_time }} - {{ class.end_time }}</p>
-                <p>Location: {{ class.lecture_hall }}</p>
-                <button class="view-class">View Class</button>
+            <div class="space-y-4">
+                {% for class in scheduled_lectures %}
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-indigo-200 transition-all">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">{{ class.course.course_title }}</h3>
+                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                <span class="flex items-center"><i class="fas fa-clock mr-2 text-indigo-500"></i>{{ class.start_time|date:"H:i" }} - {{ class.end_time|date:"H:i" }}</span>
+                                <span class="flex items-center"><i class="fas fa-building mr-2 text-indigo-500"></i>{{ class.lecture_hall }}</span>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
             {% else %}
-            <div class="class">
-                <p>No scheduled lectures</p>
+            <div class="text-center py-12">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i class="fas fa-calendar-times text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-500">No scheduled lectures yet</p>
+                <p class="text-sm text-gray-400 mt-1">Create your first attendance session to get started</p>
             </div>
             {% endif %}
-
-
-        </div>
-
-        <!-- Attendance Management -->
-        <div class="card">
-            <h3>Attendance Management</h3>
-            <div class="class">
-                <h4>Create new class Attendance</h4>
-                <button class="manage-attendance"><a href="/lecturer/create-attendance/">Create</a></button>
-            </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="card">
-            <h3>Quick Actions</h3>
-            <button>Upload Course Material</button>
-            <button>Schedule Office Hours</button>
-            <button>Send Announcements</button>
+        <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+            <div class="space-y-3">
+                <a href="/lecturer/create-attendance/" class="flex items-center p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 hover:from-indigo-100 hover:to-purple-100 transition-all group">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-plus text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Create Attendance</p>
+                        <p class="text-sm text-gray-500">Start a new session</p>
+                    </div>
+                </a>
+                <a href="/lecturer_courses" class="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all group">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-book text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Manage Courses</p>
+                        <p class="text-sm text-gray-500">Add or remove courses</p>
+                    </div>
+                </a>
+                <a href="/lecturer/settings/" class="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all group">
+                    <div class="w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-cog text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Settings</p>
+                        <p class="text-sm text-gray-500">Update your profile</p>
+                    </div>
+                </a>
+            </div>
         </div>
-    </section>
-</main>
+    </div>
+</div>
 {% endblock content %}
