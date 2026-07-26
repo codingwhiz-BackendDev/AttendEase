@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Leaflet.js Map Assets -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="p-8">
+    <!-- Breadcrumb & Back -->
+    <div class="mb-6 flex items-center justify-between">
+        <a href="{% url 'lecturer_dashboard' %}" class="flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+        </a>
+        <div class="flex items-center space-x-3">
+            {% if session.status_label == 'Active' %}
+            <a href="{% url 'close_session_early' session.id %}" onclick="return confirmClose(event)" class="px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-xl hover:bg-red-100 transition-all font-semibold text-sm">
+                <i class="fas fa-times-circle mr-1.5"></i>Close Session Early
+            </a>
+            {% endif %}
+            <a href="{% url 'download_session_excel' session.id %}" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all font-semibold text-sm shadow-md hover:shadow-lg">
+                <i class="fas fa-file-excel mr-1.5"></i>Download Excel Report
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            <div class="flex items-center">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Top Grid: Session Details and Geofence Map -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- Details Card -->
+        <div class="lg:col-span-1 bg-white rounded-2xl shadow-xl p-6 border border-gray-100 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-{{ session.status_color }}-100 text-{{ session.status_color }}-800 font-bold">
+                        {{ session.status_label }}
+                    </span>
+                    <span class="text-xs text-gray-500 font-bold text-gray-400">ID: #{{ session.id }}</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ session.course.course_title }}</h1>
+                <p class="text-sm text-gray-500 mb-6 font-semibold">{{ session.course.course_code }}</p>
+
+                <div class="space-y-4 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-building text-indigo-500 w-5 mt-0.5"></i>
+                        <div>
+                            <p class="text-gray-900 font-semibold">Lecture Hall</p>
+                            <p class="text-gray-600">{{ session.lecture_hall }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-clock text-indigo-500 w-5 mt-0.5"></i>
+                        <div>
+                            <p class="text-gray-900 font-semibold">Scheduled Time</p>
+                            <p class="text-gray-600">{{ session.start_time|date:"M d, H:i" }} - {{ session.end_time|date:"H:i" }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-compress-arrows-alt text-indigo-500 w-5 mt-0.5"></i>
+                        <div>
+                            <p class="text-gray-900 font-semibold">Geofence Radius</p>
+                            <p class="text-gray-600">{{ session.radius }} meters</p>
+                        </div>
+                    </div>
+                    {% if session.notes %}
+                    <div class="flex items-start">
+                        <i class="fas fa-sticky-note text-indigo-500 w-5 mt-0.5"></i>
+                        <div>
+                            <p class="text-gray-900 font-semibold">Lecturer's Notes</p>
+                            <p class="text-gray-600 italic">"{{ session.notes }}"</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Mini Summary Metric -->
+            <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Attendance Count</p>
+                    <p class="text-3xl font-extrabold text-indigo-600">{{ records.count }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl font-bold">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Card -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 border border-gray-100 flex flex-col">
+            <h2 class="text-lg font-bold text-gray-900 mb-3">
+                <i class="fas fa-map-marked-alt text-indigo-600 mr-2"></i>Geofencing Coordinates
+            </h2>
+            <div id="session-map" class="w-full flex-1 min-h-[300px] rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shadow-inner z-10"></div>
+        </div>
+    </div>
+
+    <!-- Attendance Record Table Card -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">Enrolled & Marked Students</h2>
+            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-full">
+                {{ records.count }} Present
+            </span>
+        </div>
+
+        {% if records %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-xs text-gray-500 uppercase font-bold tracking-wider border-b border-gray-100">
+                        <th class="p-6">Matric Number</th>
+                        <th class="p-6">Student Name</th>
+                        <th class="p-6">Department & Faculty</th>
+                        <th class="p-6">Time Marked</th>
+                        <th class="p-6">Geofence Distance</th>
+                        <th class="p-6 text-right">Verification Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                    {% for rec in records %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="p-6 font-semibold text-gray-900">{{ rec.matric }}</td>
+                        <td class="p-6">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs mr-3">
+                                    {{ rec.student.username|first|upper }}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">{{ rec.student.get_full_name|default:rec.student.username }}</p>
+                                    <p class="text-xs text-gray-500">{{ rec.student.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-6">
+                            <p class="text-gray-900">{{ rec.department }}</p>
+                            <p class="text-xs text-gray-500">{{ rec.faculty }} (Year {{ rec.year }})</p>
+                        </td>
+                        <td class="p-6 text-gray-600">{{ rec.marked_time|date:"Y-m-d H:i:s" }}</td>
+                        <td class="p-6 text-gray-600">
+                            <span class="flex items-center">
+                                <i class="fas fa-location-arrow text-xs text-indigo-500 mr-1.5"></i>
+                                {{ rec.distance|floatformat:1 }} meters away
+                            </span>
+                        </td>
+                        <td class="p-6 text-right">
+                            <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">
+                                <i class="fas fa-check-circle mr-1"></i>Verified (Face Match)
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-16">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-users-slash text-2xl text-gray-400"></i>
+            </div>
+            <h3 class="font-bold text-gray-900 text-lg mb-1">No Attendance Records Yet</h3>
+            <p class="text-gray-500 text-sm max-w-sm mx-auto">Once students start checking in, their verified information will populate in this table in real-time.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Initialize Leaflet Interactive Map
+    document.addEventListener("DOMContentLoaded", function () {
+        const lat = {{ session.latitude|default:0 }};
+        const lon = {{ session.longitude|default:0 }};
+        const radius = {{ session.radius|default:100 }};
+
+        if (lat !== 0 && lon !== 0) {
+            const map = L.map('session-map').setView([lat, lon], 17);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            // Lecturer Lecture Center Marker
+            const centerMarker = L.marker([lat, lon]).addTo(map)
+                .bindPopup('<b>Lecture Location Center</b><br>Hall: {{ session.lecture_hall }}')
+                .openPopup();
+
+            // Geofence Circle Boundary
+            const circle = L.circle([lat, lon], {
+                color: '#4f46e5',
+                fillColor: '#818cf8',
+                fillOpacity: 0.15,
+                radius: radius
+            }).addTo(map);
+
+            // Fit boundary
+            map.fitBounds(circle.getBounds());
+            
+            // Add student marker coordinates dynamically
+            {% for rec in records %}
+                L.circleMarker([{{ rec.latitude }}, {{ rec.longitude }}], {
+                    radius: 6,
+                    fillColor: "#10b981",
+                    color: "#ffffff",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map)
+                .bindPopup('<b>{{ rec.student.get_full_name|default:rec.student.username }}</b><br>Distance: {{ rec.distance|floatformat:1 }}m');
+            {% endfor %}
+        }
+    });
+
+    function confirmClose(event) {
+        if (!confirm("Are you sure you want to end this attendance session early? Students will not be able to mark attendance after this.")) {
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock content %}

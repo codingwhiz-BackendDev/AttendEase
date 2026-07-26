@@ -60,13 +60,14 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-orange-100 text-sm font-medium mb-1">Active Sessions</p>
-                    <p class="text-3xl font-bold">{{ scheduled_lectures.count }}</p>
+                    <p class="text-3xl font-bold">{{ active_count }}</p>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
                     <i class="fas fa-users text-2xl"></i>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Main Content Grid -->
@@ -84,19 +85,26 @@
                 <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-indigo-200 transition-all">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-gray-900 mb-2">{{ class.course.course_title }}</h3>
+                            <div class="flex items-center gap-3 mb-2">
+                                <h3 class="font-semibold text-gray-900">{{ class.course.course_title }}</h3>
+                                <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-{{ class.status_color }}-100 text-{{ class.status_color }}-800">
+                                    {{ class.status_label }}
+                                </span>
+                            </div>
                             <div class="flex items-center space-x-4 text-sm text-gray-600">
-                                <span class="flex items-center"><i class="fas fa-clock mr-2 text-indigo-500"></i>{{ class.start_time|date:"H:i" }} - {{ class.end_time|date:"H:i" }}</span>
+                                <span class="flex items-center"><i class="fas fa-clock mr-2 text-indigo-500"></i>{{ class.start_time|date:"M d, H:i" }} - {{ class.end_time|date:"H:i" }}</span>
                                 <span class="flex items-center"><i class="fas fa-building mr-2 text-indigo-500"></i>{{ class.lecture_hall }}</span>
+                                <span class="flex items-center"><i class="fas fa-users mr-2 text-indigo-500"></i>{{ class.marked_count }} Marked</span>
                             </div>
                         </div>
-                        <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
+                        <a href="/lecturer/session/{{ class.id }}/" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
                             View Details
-                        </button>
+                        </a>
                     </div>
                 </div>
                 {% endfor %}
             </div>
+
             {% else %}
             <div class="text-center py-12">
                 <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">

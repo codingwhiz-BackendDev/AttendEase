@@ -73,14 +73,17 @@
             <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-emerald-200 transition-all">
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
-                        <div class="flex items-center mb-2">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center mr-3">
+                        <div class="flex items-center mb-2 gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center mr-1">
                                 <i class="fas fa-book text-white"></i>
                             </div>
                             <div>
                                 <h3 class="font-semibold text-gray-900">{{ attendance.course.course_title }}</h3>
                                 <p class="text-sm text-gray-600">{{ attendance.course.course_code }}</p>
                             </div>
+                            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-{{ attendance.status_color }}-100 text-{{ attendance.status_color }}-800">
+                                {{ attendance.status_label }}
+                            </span>
                         </div>
                         <div class="flex items-center space-x-4 text-sm text-gray-600">
                             <span class="flex items-center"><i class="fas fa-clock mr-2 text-emerald-500"></i>{{ attendance.start_time|date:"H:i" }} - {{ attendance.end_time|date:"H:i" }}</span>
@@ -89,14 +92,22 @@
                         </div>
                     </div>
                     <div class="flex flex-col items-end space-y-2">
-                        {% if attendance.student_marked.all %}
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                            <i class="fas fa-check mr-1"></i>Attended
+                        {% if attendance.has_attended %}
+                        <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-xl text-sm font-semibold">
+                            <i class="fas fa-check-circle mr-1"></i>Attended
                         </span>
-                        {% else %}
-                        <a href="/student/mark-attendance/{{attendance.id}}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all text-sm font-medium">
+                        {% elif attendance.status_label == 'Active' %}
+                        <a href="/student/mark-attendance/{{attendance.id}}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all text-sm font-semibold shadow-md">
                             <i class="fas fa-check-circle mr-1"></i>Mark Attendance
                         </a>
+                        {% elif attendance.status_label == 'Expired' %}
+                        <span class="px-3 py-1.5 bg-red-50 text-red-500 rounded-xl text-sm font-semibold border border-red-100">
+                            <i class="fas fa-times-circle mr-1"></i>Missed
+                        </span>
+                        {% else %}
+                        <span class="px-3 py-1.5 bg-indigo-50 text-indigo-500 rounded-xl text-sm font-semibold border border-indigo-100">
+                            <i class="fas fa-calendar mr-1"></i>Upcoming
+                        </span>
                         {% endif %}
                     </div>
                 </div>

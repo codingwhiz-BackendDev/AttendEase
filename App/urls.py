@@ -24,4 +24,8 @@ urlpatterns = [
     path('lecturer_course_unenrollment', views.lecturer_course_unenrollment, name='lecturer_course_unenrollment'),
     path('student/mark-attendance/<str:pk>', views.mark_attendance, name='mark_attendance'), 
     path('student/view-attendance/', views.view_attendance, name='view_attendance'),  
+    path('lecturer/session/<int:pk>/', views.lecturer_session_detail, name='lecturer_session_detail'),
+    path('lecturer/session/<int:pk>/close/', views.close_session_early, name='close_session_early'),
+    path('lecturer/session/<int:pk>/download/', views.download_session_excel, name='download_session_excel'),
 ]
+

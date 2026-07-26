@@ -153,14 +153,44 @@
     <script>
         // GET LOCATION 
         document.addEventListener("DOMContentLoaded", function () {
+            const hallLat = {{ attendance_session.latitude|default:0 }};
+            const hallLon = {{ attendance_session.longitude|default:0 }};
+            const allowedRadius = {{ attendance_session.radius|default:100 }};
+
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371000; // Radius of the earth in m
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = 
+                    Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                const d = R * c; // Distance in m
+                return d;
+            }
+
             if ("geolocation" in navigator) {
                 navigator.geolocation.watchPosition(
                     function (position) {
-                        document.getElementById("latitude").value = position.coords.latitude;
-                        document.getElementById("longitude").value = position.coords.longitude;
-                        document.getElementById("lat-display").textContent = position.coords.latitude.toFixed(6);
-                        document.getElementById("lng-display").textContent = position.coords.longitude.toFixed(6);
-                        document.getElementById("location-status").innerHTML = '<span class="text-emerald-600"><i class="fas fa-check-circle mr-1"></i>Location detected</span>';
+                        const studentLat = position.coords.latitude;
+                        const studentLon = position.coords.longitude;
+                        document.getElementById("latitude").value = studentLat;
+                        document.getElementById("longitude").value = studentLon;
+                        document.getElementById("lat-display").textContent = studentLat.toFixed(6);
+                        document.getElementById("lng-display").textContent = studentLon.toFixed(6);
+                        
+                        if (hallLat !== 0 && hallLon !== 0) {
+                            const dist = getDistance(studentLat, studentLon, hallLat, hallLon);
+                            const distDisplay = dist.toFixed(1);
+                            if (dist <= allowedRadius) {
+                                document.getElementById("location-status").innerHTML = `<span class="text-emerald-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>In range (${distDisplay}m to center, allowed: ${allowedRadius}m)</span>`;
+                            } else {
+                                document.getElementById("location-status").innerHTML = `<span class="text-red-600 font-semibold"><i class="fas fa-exclamation-circle mr-1"></i>Out of range (${distDisplay}m to center, allowed: ${allowedRadius}m)</span>`;
+                            }
+                        } else {
+                            document.getElementById("location-status").innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Location detected</span>';
+                        }
                     },
                     function (error) {
                         document.getElementById("location-status").innerHTML = '<span class="text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>Location access denied</span>';
@@ -187,6 +217,12 @@
         const captureBtn = document.getElementById('capture-btn');
         const attendanceForm = document.getElementById('attendance-form');
         const imageInput = document.getElementById('captured-image');
+        const capturedPreview = document.getElementById('captured-preview');
+        const videoOverlay = document.getElementById('video-overlay');
+        const captureSection = document.getElementById('capture-section');
+        const previewSection = document.getElementById('preview-section');
+        const retakeBtn = document.getElementById('retake-btn');
+        const proceedBtn = document.getElementById('proceed-btn');
 
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
@@ -206,18 +242,48 @@
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+            // Convert canvas to data URL for preview
+            const dataURL = canvas.toDataURL('image/jpeg');
+            capturedPreview.src = dataURL;
+            capturedPreview.classList.remove('hidden');
+            video.classList.add('hidden');
+            videoOverlay.classList.add('hidden');
+
+            // Store the image data
             canvas.toBlob(blob => {
                 const file = new File([blob], "attendance.jpg", { type: "image/jpeg" });
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 imageInput.files = dataTransfer.files;
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Face Captured!',
-                    text: 'Click "Submit Attendance" to complete.',
-                });
             }, "image/jpeg");
+
+            // Show preview section, hide capture section
+            captureSection.classList.add('hidden');
+            previewSection.classList.remove('hidden');
+        });
+
+        // Retake button
+        retakeBtn.addEventListener('click', () => {
+            capturedPreview.classList.add('hidden');
+            video.classList.remove('hidden');
+            videoOverlay.classList.remove('hidden');
+            previewSection.classList.add('hidden');
+            captureSection.classList.remove('hidden');
+            
+            // Clear previous capture
+            imageInput.files = null;
+        });
+
+        // Proceed button
+        proceedBtn.addEventListener('click', () => {
+            attendanceForm.classList.remove('hidden');
+            previewSection.classList.add('hidden');
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Ready to Submit',
+                text: 'Your face has been captured. Click "Submit Attendance" to complete.',
+            });
         });
     </script>
 </body>

@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect,get_object_or_404
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import StudentProfile, LecturerProfile, Course,User, AttendanceSession
+from .models import StudentProfile, LecturerProfile, Course, User, AttendanceSession, AttendanceRecord
+from django.utils.timezone import is_naive, make_aware
+
 from django.contrib import messages
 from datetime import datetime
 import base64
@@ -135,11 +138,26 @@ def student_dashboard(request):
     enrolled_courses = student_profile.courses_enrolled.all()
     attendances = AttendanceSession.objects.filter(course__in=enrolled_courses).order_by('-start_time')
     
+    # Annotate attendance session status and check if student has marked attendance
+    current_time = now()
+    for att in attendances:
+        att.has_attended = att.records.filter(student=user).exists()
+        if current_time < att.start_time:
+            att.status_label = 'Upcoming'
+            att.status_color = 'indigo'
+        elif current_time > att.end_time:
+            att.status_label = 'Expired'
+            att.status_color = 'red'
+        else:
+            att.status_label = 'Active'
+            att.status_color = 'green'
+            
     context = {
         'user_role': user_role,
         'attendances': attendances 
     }  
     return render(request, "student_dashboard.html", context)
+
 
 
 """View for the lecturer dashboard."""
@@ -148,17 +166,35 @@ def lecturer_dashboard(request):
     user = request.user
     user_role = get_user_role(user)
       
-    user_obj = User.objects.get(username= request.user)
+    user_obj = User.objects.get(username=request.user)
     lecturer = LecturerProfile.objects.get(user=user_obj)
-    scheduled_lectures  = AttendanceSession.objects.filter(lecturer = lecturer)
+    scheduled_lectures = AttendanceSession.objects.filter(lecturer=lecturer).order_by('-start_time')
     
+    # Annotate session status and calculate metrics
+    current_time = now()
+    active_count = 0
+    for class_obj in scheduled_lectures:
+        class_obj.marked_count = class_obj.records.count()
+        if current_time < class_obj.start_time:
+            class_obj.status_label = 'Upcoming'
+            class_obj.status_color = 'indigo'
+        elif current_time > class_obj.end_time:
+            class_obj.status_label = 'Expired'
+            class_obj.status_color = 'red'
+        else:
+            class_obj.status_label = 'Active'
+            class_obj.status_color = 'green'
+            active_count += 1
+            
     context = {
         'user_role': user_role,
-        'scheduled_lectures':scheduled_lectures,
-        'lecturer':lecturer,
-        }  
+        'scheduled_lectures': scheduled_lectures,
+        'lecturer': lecturer,
+        'active_count': active_count,
+    }  
     logger.info(f"Lecturer dashboard accessed by {user.username}")
     return render(request, "lecturer_dashboard.html", context) 
+ 
 
 # Default page to welcome unauthenticated users
 def welcome_page(request):
@@ -354,6 +390,12 @@ def lecturer_course_unenrollment(request):
         messages.success(request, f"You've successfully unenrolled for '{course}' as a Lecturer") 
         return redirect('lecturer_courses')
 
+def get_aware_datetime(dt_str):
+    dt = datetime.fromisoformat(dt_str)
+    if is_naive(dt):
+        return make_aware(dt)
+    return dt
+
 @lecturer_required
 @transaction.atomic
 def create_attendance(request):
@@ -372,6 +414,7 @@ def create_attendance(request):
         start_time = request.POST['start_time']
         end_time = request.POST['end_time']
         notes = request.POST.get('notes', '')
+        radius = request.POST.get('radius', '100')
 
         latitude = request.POST.get('latitude')
         longitude = request.POST.get('longitude')
@@ -382,33 +425,44 @@ def create_attendance(request):
 
         course = get_object_or_404(Course, id=course_id)
 
-        # Check if attendance session already exists
-        if AttendanceSession.objects.filter(lecturer=lecturer_profile, course=course).exists():
-            messages.warning(request, "Attendance session for this course already exists!")
-        else:
-            AttendanceSession.objects.create(
-                course=course,
-                lecturer=lecturer_profile,
-                lecture_hall=lecture_hall,
-                start_time=datetime.fromisoformat(start_time),
-                end_time=datetime.fromisoformat(end_time),
-                notes=notes,
-                latitude=latitude,  # Store latitude
-                longitude=longitude  # Store longitude
-            )
+        try:
+            start_dt = get_aware_datetime(start_time)
+            end_dt = get_aware_datetime(end_time)
+        except ValueError:
+            messages.error(request, "Invalid date/time values provided.")
+            return redirect("create_attendance")
 
-            messages.success(request, "Attendance session created successfully!")
+        if start_dt >= end_dt:
+            messages.error(request, "Start time must be before end time.")
+            return redirect("create_attendance")
+
+        # Create the session
+        session = AttendanceSession.objects.create(
+            course=course,
+            lecturer=lecturer_profile,
+            lecture_hall=lecture_hall,
+            start_time=start_dt,
+            end_time=end_dt,
+            notes=notes,
+            latitude=latitude,  # Store latitude
+            longitude=longitude,  # Store longitude
+            radius=int(radius) if radius else 100
+        )
+
+        # Pre-generate the CSV spreadsheet template
+        generate_session_csv(session)
+
+        messages.success(request, "Attendance session created successfully!")
         return redirect('lecturer_dashboard')
 
     context = {'courses': courses}
     return render(request, 'lecturer_create_attendance.html', context)
+
  
 
 
-def is_within_geofence(lat1, lon1, lat2, lon2, radius):
-    """
-    Check if the student is within the specified radius (meters) of the lecture hall.
-    """
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """Calculate the great-circle distance between two points in meters."""
     R = 6371000  # Earth radius in meters
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     delta_phi = math.radians(lat2 - lat1)
@@ -417,8 +471,68 @@ def is_within_geofence(lat1, lon1, lat2, lon2, radius):
     a = math.sin(delta_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-    distance = R * c  # Distance in meters
-    return distance <= radius
+    return R * c
+
+def compare_faces_with_distance(known_embedding, candidate_embedding):
+    if known_embedding is None or candidate_embedding is None:
+        return False, 1.0
+    try:
+        similarity = np.dot(known_embedding, candidate_embedding) / (
+            np.linalg.norm(known_embedding) * np.linalg.norm(candidate_embedding)
+        )
+        distance = float(1 - similarity)
+        return distance < 0.5, distance
+    except Exception as e:
+        logger.error(f"Error comparing faces: {e}")
+        return False, 1.0
+
+def generate_session_csv(session):
+    attendance_dir = "Attendance_records"
+    os.makedirs(attendance_dir, exist_ok=True)
+    # Sanitize course title for safe file name
+    safe_title = "".join(c for c in session.course.course_title if c.isalnum() or c in (' ', '_', '-')).strip()
+    csv_path = os.path.join(attendance_dir, f"{safe_title}_session_{session.id}.csv")
+    
+    with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "Matric Number", "Student Name", "Email", "Department", 
+            "Faculty", "Year of Study", "Marked Time", "Distance (m)", "Status"
+        ])
+        
+        records = session.records.select_related('student').all().order_by('marked_time')
+        for rec in records:
+            try:
+                profile = StudentProfile.objects.get(student_name=rec.student)
+                matric = profile.matric_number or "N/A"
+                dept = profile.department or "N/A"
+                fac = profile.faculty or "N/A"
+                year = profile.year_of_study or "N/A"
+            except StudentProfile.DoesNotExist:
+                matric, dept, fac, year = "N/A", "N/A", "N/A", "N/A"
+            
+            local_time = rec.marked_time.strftime("%Y-%m-%d %H:%M:%S")
+            writer.writerow([
+                matric,
+                rec.student.get_full_name() or rec.student.username,
+                rec.student.email,
+                dept,
+                fac,
+                year,
+                local_time,
+                f"{rec.distance:.2f}",
+                rec.status
+            ])
+            
+    # Also write a course master csv (backward compatibility)
+    master_path = os.path.join(attendance_dir, f"{session.course.course_title}.csv")
+    with open(master_path, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        # We append simple logs as it was previously doing
+        for rec in records:
+            writer.writerow([rec.student.username, rec.student.email, rec.marked_time.strftime("%Y-%m-%d %H:%M:%S")])
+            
+    return csv_path
 
 
 @student_required
@@ -428,7 +542,18 @@ def mark_attendance(request, pk):
     student_profile = get_object_or_404(StudentProfile, student_name=user)
     attendance_session = get_object_or_404(AttendanceSession, id=pk)
 
-    if attendance_session.student_marked.filter(id=user.id).exists():
+    # 1. Expiration and time checks
+    current_time = now()
+    if current_time < attendance_session.start_time:
+        messages.error(request, f"This attendance session has not started yet. Starts at {attendance_session.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        return redirect('view_attendance')
+        
+    if current_time > attendance_session.end_time:
+        messages.error(request, "This attendance session has expired.")
+        return redirect('view_attendance')
+
+    # 2. Check if student has already marked attendance
+    if AttendanceRecord.objects.filter(session=attendance_session, student=user).exists():
         messages.info(request, "Attendance already marked.")
         return redirect('view_attendance')
 
@@ -449,9 +574,14 @@ def mark_attendance(request, pk):
 
         hall_lat = attendance_session.latitude
         hall_lon = attendance_session.longitude
+        radius = attendance_session.radius
 
-        if not is_within_geofence(student_lat, student_lon, hall_lat, hall_lon, 5000):
-            messages.error(request, "You are not in the lecture hall! Attendance not marked.")
+        # Calculate exact distance
+        distance = calculate_distance(student_lat, student_lon, hall_lat, hall_lon)
+
+        # 3. Check geofence
+        if distance > radius:
+            messages.error(request, f"You are not in the lecture hall! You are {distance:.1f} meters away (allowed radius: {radius}m).")
             return render(request, 'mark_attendance.html')
 
         captured_image_data = request.FILES.get('captured_image')
@@ -486,24 +616,32 @@ def mark_attendance(request, pk):
                     messages.error(request, "Could not detect face in captured image. Please ensure your face is clearly visible and well-lit.")
                     return render(request, 'mark_attendance.html')
                 
-                # Compare faces
-                if compare_faces(profile_embedding, captured_embedding):
+                # Compare faces and get similarity score
+                match, face_dist = compare_faces_with_distance(profile_embedding, captured_embedding)
+                
+                if match:
+                    # Save AttendanceRecord
+                    AttendanceRecord.objects.create(
+                        session=attendance_session,
+                        student=user,
+                        latitude=student_lat,
+                        longitude=student_lon,
+                        distance=distance,
+                        face_similarity=face_dist,
+                        status="Present"
+                    )
+                    # Keep backward compatibility student_marked ManyToMany
                     attendance_session.student_marked.add(user)
 
-                    attendance_dir = "Attendance_records"
-                    os.makedirs(attendance_dir, exist_ok=True)
-                    csv_path = os.path.join(attendance_dir, f"{attendance_session.course.course_title}.csv")
+                    # Update spreadsheet
+                    generate_session_csv(attendance_session)
 
-                    with open(csv_path, 'a', newline='') as f:
-                        writer = csv.writer(f)
-                        writer.writerow([user.username, user.email, datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
-
-                    messages.success(request, "Attendance marked successfully!")
+                    messages.success(request, f"Attendance marked successfully! You are {distance:.1f}m from the center.")
                     return redirect('view_attendance')
                 else:
                     messages.error(request, "Face verification failed. The captured face doesn't match your profile. Please try again with better lighting and angle.")
             except Exception as e:
-                print(f"DEBUG: Face verification error: {str(e)}")
+                logger.error(f"Face verification error: {str(e)}")
                 import traceback
                 traceback.print_exc()
                 messages.error(request, f"Face verification error: {str(e)}")
@@ -516,6 +654,7 @@ def mark_attendance(request, pk):
         return render(request, 'mark_attendance.html')
 
     return render(request, 'mark_attendance.html')
+
 
 
 
@@ -600,8 +739,109 @@ def view_attendance(request):
     enrolled_courses = student_profile.courses_enrolled.all()
     attendances = AttendanceSession.objects.filter(course__in=enrolled_courses).order_by('-start_time')
     
+    # Annotate attendance session status and check if student has marked attendance
+    current_time = now()
+    for att in attendances:
+        att.has_attended = att.records.filter(student=user).exists()
+        if current_time < att.start_time:
+            att.status_label = 'Upcoming'
+            att.status_color = 'indigo'
+        elif current_time > att.end_time:
+            att.status_label = 'Expired'
+            att.status_color = 'red'
+        else:
+            att.status_label = 'Active'
+            att.status_color = 'green'
+            
     context = {
         'user_role': user_role,
         'attendances': attendances 
     }  
     return render(request, 'view_attendace.html', context)
+
+
+# Lecturer views the details of a session
+@lecturer_required
+def lecturer_session_detail(request, pk):
+    user_obj = User.objects.get(username=request.user)
+    lecturer = get_object_or_404(LecturerProfile, user=user_obj)
+    session = get_object_or_404(AttendanceSession, id=pk, lecturer=lecturer)
+    
+    # Annotate session status
+    current_time = now()
+    if current_time < session.start_time:
+        session.status_label = 'Upcoming'
+        session.status_color = 'indigo'
+    elif current_time > session.end_time:
+        session.status_label = 'Expired'
+        session.status_color = 'red'
+    else:
+        session.status_label = 'Active'
+        session.status_color = 'green'
+        
+    records = session.records.select_related('student').all().order_by('marked_time')
+    
+    # Augment records with student profiles
+    for rec in records:
+        try:
+            profile = StudentProfile.objects.get(student_name=rec.student)
+            rec.matric = profile.matric_number
+            rec.department = profile.department
+            rec.faculty = profile.faculty
+            rec.year = profile.year_of_study
+        except StudentProfile.DoesNotExist:
+            rec.matric = "N/A"
+            rec.department = "N/A"
+            rec.faculty = "N/A"
+            rec.year = "N/A"
+            
+    context = {
+        'session': session,
+        'records': records,
+        'user_role': 'lecturer',
+    }
+    return render(request, 'lecturer_session_detail.html', context)
+
+
+# Lecturer closes an active session early
+@lecturer_required
+@transaction.atomic
+def close_session_early(request, pk):
+    user_obj = User.objects.get(username=request.user)
+    lecturer = get_object_or_404(LecturerProfile, user=user_obj)
+    session = get_object_or_404(AttendanceSession, id=pk, lecturer=lecturer)
+    
+    current_time = now()
+    if session.start_time <= current_time < session.end_time:
+        session.end_time = current_time
+        session.save()
+        
+        # Regenerate CSV report upon expiration
+        generate_session_csv(session)
+        
+        messages.success(request, "Attendance session has been closed early successfully.")
+    else:
+        messages.warning(request, "This session cannot be closed early because it is not currently active.")
+        
+    return redirect('lecturer_session_detail', pk=pk)
+
+
+# Lecturer downloads the spreadsheet (CSV) dynamically
+@lecturer_required
+def download_session_excel(request, pk):
+    user_obj = User.objects.get(username=request.user)
+    lecturer = get_object_or_404(LecturerProfile, user=user_obj)
+    session = get_object_or_404(AttendanceSession, id=pk, lecturer=lecturer)
+    
+    # Generate/update spreadsheet
+    csv_path = generate_session_csv(session)
+    
+    if os.path.exists(csv_path):
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            response = HttpResponse(f.read(), content_type='text/csv')
+            safe_title = "".join(c for c in session.course.course_title if c.isalnum() or c in (' ', '_', '-')).strip()
+            response['Content-Disposition'] = f'attachment; filename="{safe_title}_session_{session.id}.csv"'
+            return response
+    else:
+        messages.error(request, "Spreadsheet report could not be generated.")
+        return redirect('lecturer_session_detail', pk=pk)

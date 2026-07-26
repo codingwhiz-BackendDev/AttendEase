@@ -68,6 +68,7 @@ class AttendanceSession(models.Model):
     # Geofencing Location Data
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    radius = models.IntegerField(default=100, help_text="Geofence radius in meters")
 
     class Meta:
         indexes = [
@@ -77,3 +78,24 @@ class AttendanceSession(models.Model):
 
     def __str__(self):
         return f"Attendance for {self.course.course_title} by {self.lecturer.user}"
+
+
+class AttendanceRecord(models.Model):
+    session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE, related_name='records')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attendance_records')
+    marked_time = models.DateTimeField(auto_now_add=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    distance = models.FloatField(help_text="Distance in meters from center")
+    status = models.CharField(max_length=20, default="Present")
+    face_similarity = models.FloatField(null=True, blank=True, help_text="Cosine similarity distance")
+
+    class Meta:
+        unique_together = ('session', 'student')
+        indexes = [
+            models.Index(fields=['session', 'student']),
+        ]
+
+    def __str__(self):
+        return f"{self.student.username} marked present for {self.session.course.course_title}"
+
