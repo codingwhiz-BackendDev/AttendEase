@@ -1,0 +1,532 @@
+{% extends 'base.html' %} 
+{% block content %}
+<div class="p-6 md:p-8 max-w-7xl mx-auto">
+    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h1
+                class="text-3xl md:text-4xl font-black text-gray-900 mb-2 flex items-center gap-3"
+            >
+                <span
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg"
+                >
+                    <i class="fas fa-users-rectangle"></i>
+                </span>
+                Course Roster
+            </h1>
+            <p class="text-gray-600 max-w-3xl">
+                All students enrolled in your courses. Click any student to
+                deep-dive into attendance history, face verification readiness,
+                and course-level performance.
+            </p>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <div
+                class="rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-xs text-gray-500"
+            >
+                Server time:
+                <span class="font-mono font-bold text-indigo-700 ml-1"
+                    >{{ server_now_lagos }}</span
+                >
+            </div>
+            <a
+                href="/reports/"
+                class="inline-flex items-center gap-2 rounded-2xl bg-white border border-indigo-100 px-4 py-3 text-sm font-black text-indigo-700 shadow-sm hover:bg-indigo-50 transition-all"
+            >
+                <i class="fas fa-chart-column"></i>View Reports
+            </a>
+            <a
+                href="/lecturer/create-attendance/"
+                class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-emerald-200 hover:-translate-y-0.5 hover:shadow-xl transition-all"
+            >
+                <i class="fas fa-plus-circle"></i>New Session
+            </a>
+        </div>
+    </div>
+
+    {% if not courses %}
+    <div
+        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-14 text-center"
+    >
+        <div
+            class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center"
+        >
+            <i class="fas fa-book-open text-4xl text-emerald-600"></i>
+        </div>
+        <h2 class="text-2xl font-black text-gray-900 mb-2">
+            No courses assigned yet
+        </h2>
+        <p class="text-gray-500 max-w-md mx-auto mb-6">
+            You haven't added any courses to your lecturer profile. Assign
+            courses first to see your student rosters.
+        </p>
+        <a
+            href="/lecturer_courses"
+            class="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-black shadow-lg shadow-emerald-200 hover:-translate-y-0.5 hover:shadow-xl transition-all"
+        >
+            <i class="fas fa-book-plus"></i>Assign Courses
+        </a>
+    </div>
+    {% else %}
+    <div
+        class="mb-6 flex flex-wrap gap-2 rounded-3xl border border-gray-200 bg-white p-2 shadow-sm"
+    >
+        {% for c in courses %}
+        <a
+            href="?course={{ c.id }}"
+            class="px-4 py-2.5 rounded-2xl text-sm font-black transition-all {% if c.id == selected_course_id %}bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-50{% endif %}"
+        >
+            <span class="inline-flex items-center gap-1.5">
+                <span>{{ c.course_code }}</span>
+                <span class="hidden md:inline opacity-80"
+                    >· {{ c.course_title|truncatechars:30 }}</span
+                >
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if selected_course %}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+        >
+            <div class="flex items-center justify-between mb-2">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Enrolled
+                </p>
+                <div
+                    class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"
+                >
+                    <i class="fas fa-user-graduate text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-gray-900">
+                {{ total_enrolled }}
+            </p>
+            <p class="text-[11px] text-gray-500 mt-1 font-bold">
+                {{ selected_course.course_code }}
+            </p>
+        </div>
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+        >
+            <div class="flex items-center justify-between mb-2">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Sessions Held
+                </p>
+                <div
+                    class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"
+                >
+                    <i class="fas fa-calendar-check text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-blue-700">
+                {{ course_sessions_held }}
+            </p>
+            <p class="text-[11px] text-gray-500 mt-1 font-bold">
+                of {{ course_sessions_total }} total
+            </p>
+        </div>
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+        >
+            <div class="flex items-center justify-between mb-2">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Total Check-ins
+                </p>
+                <div
+                    class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"
+                >
+                    <i class="fas fa-user-check text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-emerald-700">
+                {{ course_total_present }}
+            </p>
+            <p class="text-[11px] text-gray-500 mt-1 font-bold">
+                Across all sessions
+            </p>
+        </div>
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+        >
+            <div class="flex items-center justify-between mb-2">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Overall %
+                </p>
+                <div
+                    class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"
+                >
+                    <i class="fas fa-percentage text-sm"></i>
+                </div>
+            </div>
+            <p
+                class="text-3xl font-black {% if course_overall_pct >= 80 %}text-emerald-700{% elif course_overall_pct >= 60 %}text-orange-600{% else %}text-red-600{% endif %}"
+            >
+                {{ course_overall_pct }}%
+            </p>
+            <div
+                class="w-full h-1.5 rounded-full bg-gray-100 mt-1.5 overflow-hidden"
+            >
+                <div
+                    class="h-full {% if course_overall_pct >= 80 %}bg-emerald-500{% elif course_overall_pct >= 60 %}bg-orange-500{% else %}bg-red-500{% endif %}"
+                    style="width:{{ course_overall_pct }}%;"
+                ></div>
+            </div>
+        </div>
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+        >
+            <div class="flex items-center justify-between mb-2">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    On Track
+                </p>
+                <div
+                    class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"
+                >
+                    <i class="fas fa-check text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-emerald-700">{{ good_count }}</p>
+            <p class="text-[11px] text-gray-500 mt-1 font-bold">
+                ≥ 80% attendance
+            </p>
+        </div>
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+        >
+            <div class="flex items-center justify-between mb-2">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    At Risk
+                </p>
+                <div
+                    class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"
+                >
+                    <i class="fas fa-triangle-exclamation text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-black text-red-700">
+                {{ warn_count|add:danger_count }}
+            </p>
+            <p class="text-[11px] text-red-500 mt-1 font-bold">
+                {{ danger_count }} failing · {{ warn_count }} at risk
+            </p>
+        </div>
+    </div>
+
+    <form method="GET" class="mb-6">
+        <input type="hidden" name="course" value="{{ selected_course_id }}" />
+        <div
+            class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center"
+        >
+            <div class="relative flex-1">
+                <i
+                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                ></i>
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ search_q }}"
+                    placeholder="Search students by name, matric, email, or department..."
+                    class="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none text-sm font-medium"
+                />
+            </div>
+            <div class="flex gap-2">
+                <button
+                    type="submit"
+                    class="px-4 py-3 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-md hover:bg-emerald-700 transition-all"
+                >
+                    <i class="fas fa-filter mr-1"></i>Search
+                </button>
+                <a
+                    href="?course={{ selected_course_id }}"
+                    class="px-4 py-3 bg-white text-gray-600 border border-gray-200 rounded-2xl font-black text-sm hover:bg-gray-50 transition-all"
+                    ><i class="fas fa-times mr-1"></i>Clear</a
+                >
+            </div>
+        </div>
+    </form>
+
+    <div class="flex flex-wrap items-center justify-between mb-3 px-1 gap-3">
+        <p class="text-sm font-bold text-gray-600">
+            Showing
+            <span class="text-emerald-700 text-lg font-black"
+                >{{ students|length }}</span
+            >
+            of {{ total_enrolled }} enrolled students{% if search_q %} matching
+            "<b class="text-emerald-700">{{ search_q }}</b>"{% endif %}
+        </p>
+        <p class="text-xs text-gray-500 font-bold hidden md:block">
+            Click a student's name to view full attendance history,
+            face-verification readiness, and performance signals.
+        </p>
+    </div>
+
+    {% if students %}
+    <div
+        class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden"
+    >
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr
+                        class="bg-gradient-to-r from-gray-50 to-slate-50 text-[11px] text-gray-600 uppercase tracking-wider border-b border-gray-100"
+                    >
+                        <th class="text-left p-4 font-black">Student</th>
+                        <th class="text-left p-4 font-black">Matric · Dept</th>
+                        <th class="text-left p-4 font-black">Year</th>
+                        <th class="text-center p-4 font-black">Present</th>
+                        <th class="text-center p-4 font-black">Absent</th>
+                        <th class="text-left p-4 font-black">Attendance %</th>
+                        <th class="text-left p-4 font-black">Last Seen</th>
+                        <th class="text-left p-4 font-black">Status</th>
+                        <th class="text-right p-4 font-black">Face ID</th>
+                        <th class="p-4"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for stu in students %}
+                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black shadow-sm shrink-0"
+                                >
+                                    {{ stu.first_initial }}
+                                </div>
+                                <div class="min-w-0">
+                                    <a
+                                        href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
+                                        class="font-black text-gray-900 hover:text-emerald-700 transition-colors block truncate"
+                                        >{{ stu.full_name }}</a
+                                    >
+                                    <p
+                                        class="text-[11px] text-gray-500 font-bold truncate"
+                                    >
+                                        {{ stu.email }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <p
+                                class="font-mono font-black text-gray-800 text-xs"
+                            >
+                                {{ stu.matric }}
+                            </p>
+                            <p
+                                class="text-[11px] text-gray-500 font-bold truncate"
+                            >
+                                {{ stu.department }}
+                            </p>
+                        </td>
+                        <td class="p-4 text-center">
+                            <span
+                                class="px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 font-bold text-xs"
+                                >{% if stu.year_of_study == 'N/A' %}—{% else
+                                %}{{ stu.year_of_study }} L{% endif %}</span
+                            >
+                        </td>
+                        <td class="p-4 text-center">
+                            <p class="text-lg font-black text-emerald-700">
+                                {{ stu.present_count }}
+                            </p>
+                        </td>
+                        <td class="p-4 text-center">
+                            <p class="text-lg font-black text-red-600">
+                                {{ stu.absent_count }}
+                            </p>
+                        </td>
+                        <td class="p-4 min-w-[180px]">
+                            <div class="flex items-center gap-2.5">
+                                <div
+                                    class="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden"
+                                >
+                                    <div
+                                        class="h-full rounded-full {% if stu.risk_level == 'good' %}bg-gradient-to-r from-emerald-400 to-emerald-600{% elif stu.risk_level == 'warn' %}bg-gradient-to-r from-orange-400 to-orange-600{% elif stu.risk_level == 'danger' %}bg-gradient-to-r from-red-400 to-red-600{% else %}bg-gray-300{% endif %}"
+                                        style="width:{{ stu.attendance_pct }}%;"
+                                    ></div>
+                                </div>
+                                <p
+                                    class="text-sm font-black {% if stu.risk_level == 'good' %}text-emerald-700{% elif stu.risk_level == 'warn' %}text-orange-600{% elif stu.risk_level == 'danger' %}text-red-600{% else %}text-gray-500{% endif %} w-12 text-right"
+                                >
+                                    {{ stu.attendance_pct }}%
+                                </p>
+                            </div>
+                            <div
+                                class="flex gap-1 mt-1 text-[10px] text-gray-500 font-bold"
+                            >
+                                {% if stu.avg_distance is not None %}
+                                <span
+                                    class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700"
+                                >
+                                    📍{{ stu.avg_distance }}m avg
+                                </span>
+                                {% endif %} {% if stu.avg_face_similarity is not None %}
+                                <span
+                                    class="px-1.5 py-0.5 rounded bg-purple-50 text-purple-700"
+                                >
+                                    👤{{ stu.avg_face_similarity }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="p-4 text-xs">
+                            {% if stu.last_seen == 'Never' %}<span
+                                class="text-gray-400 font-bold italic"
+                                >Never</span
+                            >{% else %}
+                            <p class="font-bold text-gray-700 leading-tight">
+                                {{ stu.last_seen|slice:"0:22" }}
+                            </p>
+                            {% endif %}
+                        </td>
+                        <td class="p-4">
+                            <span
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black {% if stu.risk_level == 'good' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif stu.risk_level == 'warn' %}bg-orange-50 text-orange-700 border border-orange-200{% elif stu.risk_level == 'danger' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-gray-100 text-gray-600 border border-gray-200{% endif %}"
+                            >
+                                {% if stu.risk_level == 'good' %}<i
+                                    class="fas fa-star text-[10px]"
+                                ></i
+                                >{% elif stu.risk_level == 'warn' %}<i
+                                    class="fas fa-exclamation text-[10px]"
+                                ></i
+                                >{% elif stu.risk_level == 'danger' %}<i
+                                    class="fas fa-fire text-[10px]"
+                                ></i
+                                >{% else %}<i
+                                    class="fas fa-clock text-[10px]"
+                                ></i
+                                >{% endif %} {{ stu.risk_label }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-right">
+                            {% if stu.has_face_image %}<span
+                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-bold"
+                                ><i class="fas fa-circle-check"></i
+                                >Enrolled</span
+                            >{% else %}<span
+                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 text-red-700 border border-red-100 text-xs font-bold"
+                                ><i class="fas fa-circle-xmark"></i>No
+                                Face</span
+                            >{% endif %}
+                        </td>
+                        <td class="p-4 text-right">
+                            <a
+                                href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-100 rounded-lg font-bold text-xs hover:bg-emerald-50 transition-all"
+                                ><i class="fas fa-eye"></i>Profile</a
+                            >
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="md:hidden divide-y divide-gray-100">
+            {% for stu in students %}
+            <div class="p-4">
+                <div class="flex items-start gap-3 mb-3">
+                    <div
+                        class="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black shrink-0 shadow-sm"
+                    >
+                        {{ stu.first_initial }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <a
+                            href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
+                            class="font-black text-gray-900 hover:text-emerald-700 block truncate"
+                            >{{ stu.full_name }}</a
+                        >
+                        <p class="text-[11px] text-gray-500 font-bold truncate">
+                            {{ stu.email }}
+                        </p>
+                        <p
+                            class="text-[11px] font-mono font-bold text-gray-700 mt-0.5"
+                        >
+                            {{ stu.matric }}
+                        </p>
+                    </div>
+                    <span
+                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black shrink-0 {% if stu.risk_level == 'good' %}bg-emerald-50 text-emerald-700{% elif stu.risk_level == 'warn' %}bg-orange-50 text-orange-700{% elif stu.risk_level == 'danger' %}bg-red-50 text-red-700{% else %}bg-gray-100 text-gray-600{% endif %}"
+                        >{{ stu.risk_label }}</span
+                    >
+                </div>
+                <div class="grid grid-cols-3 gap-2 mb-3 text-[10px]">
+                    <div class="p-2 rounded-lg bg-emerald-50 text-center">
+                        <p
+                            class="font-black text-emerald-700 text-lg leading-tight"
+                        >
+                            {{ stu.present_count }}
+                        </p>
+                        <p class="text-emerald-700 uppercase font-bold">
+                            Present
+                        </p>
+                    </div>
+                    <div class="p-2 rounded-lg bg-red-50 text-center">
+                        <p
+                            class="font-black text-red-700 text-lg leading-tight"
+                        >
+                            {{ stu.absent_count }}
+                        </p>
+                        <p class="text-red-700 uppercase font-bold">Absent</p>
+                    </div>
+                    <div class="p-2 rounded-lg bg-indigo-50 text-center">
+                        <p
+                            class="font-black text-indigo-700 text-lg leading-tight"
+                        >
+                            {{ stu.attendance_pct }}%
+                        </p>
+                        <p class="text-indigo-700 uppercase font-bold">
+                            Attendance
+                        </p>
+                    </div>
+                </div>
+                <a
+                    href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
+                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-sm hover:bg-emerald-700 transition-all"
+                    ><i class="fas fa-eye"></i>View Full Profile</a
+                >
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div
+        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-14 text-center"
+    >
+        <div
+            class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-gray-100 to-slate-100 flex items-center justify-center"
+        >
+            <i class="fas fa-magnifying-glass text-4xl text-gray-500"></i>
+        </div>
+        <h2 class="text-2xl font-black text-gray-900 mb-2">
+            No students match
+        </h2>
+        <p class="text-gray-500 max-w-md mx-auto">
+            Try adjusting your search or filter to find the student you're
+            looking for.
+        </p>
+    </div>
+    {% endif %} {% else %}
+    <div
+        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-10 text-center text-gray-500"
+    >
+        Select a course above to view its roster.
+    </div>
+    {% endif %} {% endif %}
+</div>
+{% endblock content %}

@@ -397,7 +397,7 @@
         const container = document.getElementById('next-class-minimap');
         if (lat && lon && container) {
             const m = L.map(container, { zoomControl: true, attributionControl: true }).setView([lat, lon], 17);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(m);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(m);
 
             const customIcon = L.divIcon({
                 className: '',

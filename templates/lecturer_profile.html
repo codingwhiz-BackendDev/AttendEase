@@ -1,95 +1,239 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-<div class="p-8">
-    <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-        <p class="text-gray-600">View your lecturer information and courses</p>
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="p-6 md:p-8 max-w-6xl mx-auto">
+    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <p
+                class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2"
+            >
+                Lecturer profile
+            </p>
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-2">
+                My Lecturer Profile
+            </h1>
+            <p class="text-gray-600 max-w-2xl">
+                Review your teaching identity, professional profile, and the
+                courses currently attached to your lecturer account.
+            </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a
+                href="/lecturer/settings/"
+                class="inline-flex items-center gap-2 rounded-2xl bg-white border border-gray-200 px-4 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"
+            >
+                <i class="fas fa-pen"></i>Edit Profile
+            </a>
+            <a
+                href="/lecturer_courses"
+                class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 hover:shadow-xl transition-all"
+            >
+                <i class="fas fa-book"></i>Manage Courses
+            </a>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Profile Card -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl shadow-xl p-8 card-hover text-center">
-                <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+        <div class="lg:col-span-1 space-y-6">
+            <div
+                class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm text-center"
+            >
+                <div
+                    class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-3xl font-black shadow-xl shadow-indigo-200"
+                >
                     {{ lecturer_profile.user.username|first|upper }}
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ lecturer_profile.user.username }}</h2>
-                <p class="text-indigo-600 font-medium mb-6">{{ lecturer_profile.academic_rank|default:"Lecturer" }}</p>
-                
-                <div class="space-y-4 text-left">
-                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
-                        <i class="fas fa-id-badge text-indigo-600 w-6"></i>
-                        <div class="ml-3">
-                            <p class="text-xs text-gray-500">Staff ID</p>
-                            <p class="font-semibold text-gray-900">{{ lecturer_profile.staff_id|default:"Not set" }}</p>
+                <h2 class="text-2xl font-black text-gray-900 mb-1">
+                    {{
+                    lecturer_profile.user.get_full_name|default:lecturer_profile.user.username
+                    }}
+                </h2>
+                <p class="text-indigo-600 font-bold mb-6">
+                    {{ lecturer_profile.academic_rank|default:"Lecturer" }}
+                </p>
+
+                <div class="space-y-3 text-left">
+                    <div
+                        class="rounded-2xl bg-gray-50 border border-gray-100 p-4"
+                    >
+                        <p
+                            class="text-[11px] font-black uppercase tracking-wide text-gray-500"
+                        >
+                            Staff ID
+                        </p>
+                        <p class="font-bold text-gray-900">
+                            {{ lecturer_profile.staff_id|default:"Not set" }}
+                        </p>
+                    </div>
+                    <div
+                        class="rounded-2xl bg-gray-50 border border-gray-100 p-4"
+                    >
+                        <p
+                            class="text-[11px] font-black uppercase tracking-wide text-gray-500"
+                        >
+                            Department
+                        </p>
+                        <p class="font-bold text-gray-900">
+                            {{ lecturer_profile.department|default:"Not set" }}
+                        </p>
+                    </div>
+                    <div
+                        class="rounded-2xl bg-gray-50 border border-gray-100 p-4"
+                    >
+                        <p
+                            class="text-[11px] font-black uppercase tracking-wide text-gray-500"
+                        >
+                            Office Location
+                        </p>
+                        <p class="font-bold text-gray-900">
+                            {{ lecturer_profile.office_location|default:"Not
+                            set" }}
+                        </p>
+                    </div>
+                    <div
+                        class="rounded-2xl bg-gray-50 border border-gray-100 p-4"
+                    >
+                        <p
+                            class="text-[11px] font-black uppercase tracking-wide text-gray-500"
+                        >
+                            Phone Number
+                        </p>
+                        <p class="font-bold text-gray-900">
+                            {{ lecturer_profile.phone_number|default:"Not set"
+                            }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm"
+            >
+                <h3 class="text-base font-black text-gray-900 mb-3">
+                    Profile readiness
+                </h3>
+                <div class="space-y-3 text-sm">
+                    <div
+                        class="flex items-start gap-3 rounded-2xl bg-gray-50 px-4 py-3 border border-gray-100"
+                    >
+                        <i
+                            class="fas {% if lecturer_profile.staff_id %}fa-circle-check text-indigo-600{% else %}fa-circle text-gray-300{% endif %} mt-0.5"
+                        ></i>
+                        <div>
+                            <p class="font-bold text-gray-900">
+                                Institutional identity
+                            </p>
+                            <p class="text-gray-500">
+                                Your staff ID and department should remain
+                                current for reliable reporting.
+                            </p>
                         </div>
                     </div>
-                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
-                        <i class="fas fa-building text-indigo-600 w-6"></i>
-                        <div class="ml-3">
-                            <p class="text-xs text-gray-500">Department</p>
-                            <p class="font-semibold text-gray-900">{{ lecturer_profile.department|default:"Not set" }}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
-                        <i class="fas fa-map-marker-alt text-indigo-600 w-6"></i>
-                        <div class="ml-3">
-                            <p class="text-xs text-gray-500">Office Location</p>
-                            <p class="font-semibold text-gray-900">{{ lecturer_profile.office_location|default:"Not set" }}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center p-3 bg-gray-50 rounded-xl">
-                        <i class="fas fa-phone text-indigo-600 w-6"></i>
-                        <div class="ml-3">
-                            <p class="text-xs text-gray-500">Phone</p>
-                            <p class="font-semibold text-gray-900">{{ lecturer_profile.phone_number|default:"Not set" }}</p>
+                    <div
+                        class="flex items-start gap-3 rounded-2xl bg-gray-50 px-4 py-3 border border-gray-100"
+                    >
+                        <i
+                            class="fas {% if courses_taught %}fa-circle-check text-indigo-600{% else %}fa-circle text-gray-300{% endif %} mt-0.5"
+                        ></i>
+                        <div>
+                            <p class="font-bold text-gray-900">
+                                Course assignment
+                            </p>
+                            <p class="text-gray-500">
+                                Assigned courses unlock attendance creation,
+                                reporting, and student roster views.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Courses Section -->
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-bold text-gray-900">Courses I Lecture</h2>
-                    <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">{{ courses_taught.count }} Courses</span>
+        <div
+            class="lg:col-span-2 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm"
+        >
+            <div class="mb-6 flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                    <h2 class="text-xl font-black text-gray-900">
+                        Courses I Lecture
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                        Every course currently mapped to your lecturer profile.
+                    </p>
                 </div>
-                
-                {% if courses_taught %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% for course in courses_taught %}
-                    <div class="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                        <div class="flex items-center mb-2">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center mr-3">
-                                <i class="fas fa-book text-white"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">{{ course.course_title }}</h3>
-                                <p class="text-sm text-gray-600">{{ course.course_code }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-600">
-                            <i class="fas fa-star text-yellow-500 mr-2"></i>
-                            <span>{{ course.credit }} Credit Units</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                        <i class="fas fa-book-open text-2xl text-gray-400"></i>
-                    </div>
-                    <p class="text-gray-500">No courses assigned yet</p>
-                    <p class="text-sm text-gray-400 mt-1">Enroll in courses to see them here</p>
-                </div>
-                {% endif %}
+                <span
+                    class="rounded-full bg-indigo-100 text-indigo-700 px-3 py-1 text-sm font-black"
+                    >{{ courses_taught.count }} Course{{
+                    courses_taught.count|pluralize }}</span
+                >
             </div>
+
+            {% if courses_taught %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for course in courses_taught %}
+                <div
+                    class="rounded-3xl border border-indigo-100 bg-gradient-to-br from-white to-indigo-50 p-5 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
+                >
+                    <div class="flex items-start justify-between gap-3 mb-4">
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-200"
+                        >
+                            <i class="fas fa-book text-lg"></i>
+                        </div>
+                        <span
+                            class="rounded-full bg-indigo-100 text-indigo-700 px-3 py-1 text-xs font-black"
+                            >{{ course.credit }} Units</span
+                        >
+                    </div>
+                    <p
+                        class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600 mb-2"
+                    >
+                        {{ course.course_code }}
+                    </p>
+                    <h3
+                        class="text-lg font-black text-gray-900 mb-4 leading-snug"
+                    >
+                        {{ course.course_title }}
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <a
+                            href="/lecturer/create-attendance/"
+                            class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-50 border border-indigo-100 px-4 py-3 text-sm font-black text-indigo-700 hover:bg-indigo-100 transition-all"
+                        >
+                            <i class="fas fa-plus-circle"></i>New Session
+                        </a>
+                        <a
+                            href="/reports/?course={{ course.id }}"
+                            class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white border border-gray-200 px-4 py-3 text-sm font-black text-gray-700 hover:bg-gray-50 transition-all"
+                        >
+                            <i class="fas fa-chart-column"></i>Report
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div
+                class="rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-12 text-center"
+            >
+                <div
+                    class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-gray-400 shadow-sm"
+                >
+                    <i class="fas fa-book-open text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-black text-gray-900 mb-1">
+                    No courses assigned yet
+                </h3>
+                <p class="text-sm text-gray-500 max-w-md mx-auto mb-6">
+                    Add courses to your lecturer profile so you can create
+                    attendance sessions and track student participation.
+                </p>
+                <a
+                    href="/lecturer_courses"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 hover:shadow-xl transition-all"
+                >
+                    <i class="fas fa-book"></i>Assign Courses
+                </a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

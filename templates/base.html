@@ -1,121 +1,373 @@
 {% load static %}
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>AttendEase - Smart Attendance System</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        * { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-    </style>
-</head>
-
-<body class="bg-gray-50 min-h-screen">
-
-    {% block sidebar %}
-    <nav class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 text-white shadow-2xl z-50 transition-all duration-300" id="sidebar">
-        <div class="p-6 border-b border-white/10">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                        <i class="fas fa-check-circle text-xl"></i>
-                    </div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">AttendEase</span>
-                </div>
-                <button class="lg:hidden text-white/70 hover:text-white transition-colors" id="toggleBtn">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="p-4 space-y-2">
-            {% if user_role == 'student' %}
-            <a href="/student/dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 text-white font-medium transition-all hover:bg-white/20">
-                <i class="fas fa-home w-5"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="/timetable" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-calendar w-5"></i>
-                <span>Timetable</span>
-            </a>
-            <a href="/student_courses" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-book w-5"></i>
-                <span>Courses</span>
-            </a>
-            <a href="/student/view-attendance/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-chart-line w-5"></i>
-                <span>Attendance</span>
-            </a>
-            <a href="/student/settings/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-cog w-5"></i>
-                <span>Settings</span>
-            </a>
-            <a href="/student/profile" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-user w-5"></i>
-                <span>Profile</span>
-            </a>
-            {% else %}
-            <a href="/lecturer/dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 text-white font-medium transition-all hover:bg-white/20">
-                <i class="fas fa-home w-5"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="/reports" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-calendar w-5"></i>
-                <span>Schedule</span>
-            </a>
-            <a href="/lecturer_courses" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-book w-5"></i>
-                <span>Courses</span>
-            </a>
-            <a href="/lecturer/create-attendance/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-chart-line w-5"></i>
-                <span>Attendance</span>
-            </a>
-            <a href="/lecturer/settings/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-cog w-5"></i>
-                <span>Settings</span>
-            </a>
-            <a href="/lecturer/profile" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                <i class="fas fa-user w-5"></i>
-                <span>Profile</span>
-            </a>
-            {% endif %}
-        </div>
-
-        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-            <a href="/accounts/logout/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all">
-                <i class="fas fa-sign-out-alt w-5"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-    </nav>
-    {% endblock sidebar %}
-
-    <div class="lg:ml-64 min-h-screen">
-        {% block content %}
-        {% endblock content %}
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleBtn = document.getElementById("toggleBtn");
-            const sidebar = document.getElementById("sidebar");
-
-            if (toggleBtn) {
-                toggleBtn.addEventListener("click", function () {
-                    sidebar.classList.toggle("-translate-x-full");
-                });
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AttendEase - Smart Attendance System</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+            * {
+                font-family: "Inter", sans-serif;
             }
-        });
-    </script>
-</body>
+            .gradient-bg {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .glass {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .card-hover {
+                transition: all 0.28s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            }
+            .app-shell {
+                background:
+                    radial-gradient(
+                        circle at top,
+                        rgba(99, 102, 241, 0.08),
+                        transparent 30%
+                    ),
+                    linear-gradient(180deg, #f8fafc 0%, #f8fafc 100%);
+            }
+            .sidebar-scroll {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+            }
+            .sidebar-scroll::-webkit-scrollbar {
+                width: 8px;
+            }
+            .sidebar-scroll::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.18);
+                border-radius: 999px;
+            }
+        </style>
+    </head>
+    <body class="app-shell min-h-screen text-gray-900">
+        {% block sidebar %}
+        <div
+            id="mobileSidebarBackdrop"
+            class="fixed inset-0 z-40 hidden bg-slate-950/50 backdrop-blur-sm lg:hidden"
+        ></div>
+        <nav
+            class="fixed left-0 top-0 z-50 h-full w-72 -translate-x-full pointer-events-none lg:pointer-events-auto lg:translate-x-0 bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 text-white shadow-2xl transition-transform duration-300"
+            id="sidebar"
+        >
+            <div class="flex h-full flex-col">
+                <div class="border-b border-white/10 px-6 py-5">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-lg shadow-indigo-950/50"
+                            >
+                                <i
+                                    class="fas fa-check-circle text-xl text-white"
+                                ></i>
+                            </div>
+                            <div>
+                                <p class="text-lg font-black tracking-tight">
+                                    AttendEase
+                                </p>
+                                <p
+                                    class="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55"
+                                >
+                                    Smart attendance workspace
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            class="lg:hidden text-white/70 hover:text-white transition-colors"
+                            id="closeSidebarBtn"
+                            type="button"
+                            aria-label="Close sidebar"
+                        >
+                            <i class="fas fa-xmark text-xl"></i>
+                        </button>
+                    </div>
+                </div>
 
+                <div class="sidebar-scroll flex-1 overflow-y-auto px-4 py-5">
+                    {% if user_role == 'student' %}
+                    <div
+                        class="mb-6 rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm"
+                    >
+                        <p
+                            class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-200/90"
+                        >
+                            Student workspace
+                        </p>
+                        <p class="mt-1 text-sm font-semibold text-white/80">
+                            Stay on top of your classes, profile, and attendance
+                            history.
+                        </p>
+                    </div>
+                    <div class="space-y-1.5">
+                        <a
+                            href="/student/dashboard/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student/dashboard/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-home w-5 text-center {% if request.path == '/student/dashboard/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a
+                            href="/student_courses"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student_courses' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-book w-5 text-center {% if request.path == '/student_courses' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Courses</span>
+                        </a>
+                        <a
+                            href="/student/view-attendance/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student/view-attendance/' or request.path == '/student/attendance-details/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-chart-line w-5 text-center {% if request.path == '/student/view-attendance/' or request.path == '/student/attendance-details/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <div class="flex-1">
+                                <p>Attendance</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/student/view-attendance/' or request.path == '/student/attendance-details/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    History, stats, and verification
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/student/settings/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student/settings/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-cog w-5 text-center {% if request.path == '/student/settings/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Settings</span>
+                        </a>
+                        <a
+                            href="/student/profile/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student/profile/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-user w-5 text-center {% if request.path == '/student/profile/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Profile</span>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div
+                        class="mb-6 rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm"
+                    >
+                        <p
+                            class="text-[11px] font-black uppercase tracking-[0.2em] text-indigo-200/90"
+                        >
+                            Lecturer workspace
+                        </p>
+                        <p class="mt-1 text-sm font-semibold text-white/80">
+                            Manage sessions, analyze reports, and track student
+                            participation.
+                        </p>
+                    </div>
+                    <div class="space-y-1.5">
+                        <a
+                            href="/lecturer/dashboard/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/lecturer/dashboard/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-home w-5 text-center {% if request.path == '/lecturer/dashboard/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a
+                            href="/reports/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/reports/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-chart-column w-5 text-center {% if request.path == '/reports/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <div class="flex-1">
+                                <p>Reports</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/reports/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Attendance intelligence and export
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/lecturer/roster/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/lecturer/roster/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-users-rectangle w-5 text-center {% if request.path == '/lecturer/roster/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Course Roster</span>
+                        </a>
+                        <a
+                            href="/lecturer_courses"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/lecturer_courses' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-book w-5 text-center {% if request.path == '/lecturer_courses' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Courses</span>
+                        </a>
+                        <a
+                            href="/lecturer/create-attendance/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/lecturer/create-attendance/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-plus-circle w-5 text-center {% if request.path == '/lecturer/create-attendance/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>New Attendance</span>
+                        </a>
+                        <a
+                            href="/lecturer/settings/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/lecturer/settings/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-cog w-5 text-center {% if request.path == '/lecturer/settings/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Settings</span>
+                        </a>
+                        <a
+                            href="/lecturer/profile/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/lecturer/profile/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-user w-5 text-center {% if request.path == '/lecturer/profile/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <span>Profile</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="border-t border-white/10 p-4">
+                    <a
+                        href="/accounts/logout/"
+                        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-red-200 transition-all hover:bg-red-500/20 hover:text-red-100"
+                    >
+                        <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                        <div>
+                            <p class="font-semibold">Logout</p>
+                            <p class="text-[11px] text-red-200/70">
+                                End current session securely
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        {% endblock sidebar %}
+
+        <div class="min-h-screen lg:ml-72">
+            <header
+                class="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl lg:hidden"
+            >
+                <div class="flex items-center justify-between px-4 py-3">
+                    <button
+                        id="openSidebarBtn"
+                        type="button"
+                        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
+                        aria-label="Open sidebar"
+                    >
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="text-center">
+                        <p
+                            class="text-sm font-black tracking-tight text-slate-900"
+                        >
+                            AttendEase
+                        </p>
+                        <p
+                            class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500"
+                        >
+                            Workspace
+                        </p>
+                    </div>
+                    <div
+                        class="h-11 w-11 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black shadow-md"
+                    >
+                        {{ user.username|default:'A'|first|upper }}
+                    </div>
+                </div>
+            </header>
+
+            <main>{% block content %} {% endblock content %}</main>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const sidebar = document.getElementById("sidebar");
+                const openSidebarBtn =
+                    document.getElementById("openSidebarBtn");
+                const closeSidebarBtn =
+                    document.getElementById("closeSidebarBtn");
+                const mobileSidebarBackdrop = document.getElementById(
+                    "mobileSidebarBackdrop",
+                );
+
+                function openSidebar() {
+                    if (!sidebar) return;
+                    sidebar.classList.remove("-translate-x-full");
+                    sidebar.classList.remove("pointer-events-none");
+                    mobileSidebarBackdrop?.classList.remove("hidden");
+                    document.body.classList.add("overflow-hidden");
+                }
+
+                function closeSidebar() {
+                    if (!sidebar) return;
+                    sidebar.classList.add("-translate-x-full");
+                    if (window.innerWidth < 1024) {
+                        sidebar.classList.add("pointer-events-none");
+                    }
+                    mobileSidebarBackdrop?.classList.add("hidden");
+                    document.body.classList.remove("overflow-hidden");
+                }
+
+                openSidebarBtn?.addEventListener("click", openSidebar);
+                closeSidebarBtn?.addEventListener("click", closeSidebar);
+                mobileSidebarBackdrop?.addEventListener("click", closeSidebar);
+
+                window.addEventListener("resize", function () {
+                    if (window.innerWidth >= 1024) {
+                        document.body.classList.remove("overflow-hidden");
+                        mobileSidebarBackdrop?.classList.add("hidden");
+                        sidebar?.classList.remove("-translate-x-full");
+                        sidebar?.classList.remove("pointer-events-none");
+                        sidebar?.classList.add("pointer-events-auto");
+                    } else {
+                        sidebar?.classList.remove("pointer-events-auto");
+                        if (sidebar?.classList.contains("-translate-x-full")) {
+                            sidebar?.classList.add("pointer-events-none");
+                        }
+                        if (
+                            !sidebar?.classList.contains("-translate-x-full") &&
+                            !mobileSidebarBackdrop?.classList.contains("hidden")
+                        ) {
+                            document.body.classList.add("overflow-hidden");
+                        }
+                    }
+                });
+
+                if (window.innerWidth >= 1024) {
+                    sidebar?.classList.remove("-translate-x-full");
+                    sidebar?.classList.remove("pointer-events-none");
+                    sidebar?.classList.add("pointer-events-auto");
+                }
+            });
+        </script>
+    </body>
 </html>

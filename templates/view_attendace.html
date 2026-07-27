@@ -6,20 +6,44 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-    .mini-map { border-radius: 0.75rem; overflow: hidden; background: #e5e7eb; border: 1px solid #e5e7eb; }
+    .mini-map { border-radius: 0.75rem; overflow: hidden; background: #e5e7eb; border: 1px solid #e5e7eb; position: relative; }
     .leaflet-container { z-index: 1; }
     .countdown-cell { font-variant-numeric: tabular-nums; }
+    .leaflet-control-attribution { font-size: 8px !important; }
+    .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 6px 20px rgba(0,0,0,.15) !important; }
+    /* Map overlay nav buttons */
+    .map-nav-overlay { position:absolute; bottom:6px; left:6px; z-index:400; display:flex; gap:4px; }
+    .map-nav-btn { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:4px 8px; font-size:10px; font-weight:800; color:#4f46e5; box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer; text-decoration:none; display:flex; align-items:center; gap:4px; }
+    .map-nav-btn:hover { background:#f0f0ff; }
 </style>
 
 <div class="p-6 lg:p-8 max-w-[1600px] mx-auto">
     <!-- Header -->
     <div class="mb-8 flex items-end justify-between flex-wrap gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">📚 My Attendance</h1>
-            <p class="text-gray-600">Track every session, never miss a class, know exactly where to go — in real-time.</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">
+                📚 My Attendance
+            </h1>
+            <p class="text-gray-600">
+                Track every session, never miss a class, know exactly where to
+                go — in real-time.
+            </p>
         </div>
-        <div class="text-xs text-gray-500 bg-white border border-gray-200 rounded-xl px-4 py-2 shadow-sm">
-            <i class="fas fa-clock mr-1 text-gray-400"></i>Server Time: <span class="font-mono text-gray-800 font-bold">{{ server_now_lagos|default:"N/A" }}</span>
+        <div class="flex items-center gap-3 flex-wrap">
+            <a
+                href="{% url 'student_attendance_detail' %}"
+                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+            >
+                <i class="fas fa-chart-line"></i>Open My Full Attendance Report
+            </a>
+            <div
+                class="text-xs text-gray-500 bg-white border border-gray-200 rounded-xl px-4 py-2 shadow-sm"
+            >
+                <i class="fas fa-clock mr-1 text-gray-400"></i>Server Time:
+                <span class="font-mono text-gray-800 font-bold"
+                    >{{ server_now_lagos|default:"N/A" }}</span
+                >
+            </div>
         </div>
     </div>
 
@@ -27,9 +51,13 @@
     {% if messages %}
     <div class="mb-6 space-y-2">
         {% for message in messages %}
-        <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+        <div
+            class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}"
+        >
             <div class="flex items-center">
-                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                <i
+                    class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"
+                ></i>
                 {{ message }}
             </div>
         </div>
@@ -39,99 +67,172 @@
 
     <!-- ======== TOP: KILLER STATS OVERVIEW ======== -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-xl card-hover">
+        <div
+            class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-xl card-hover"
+        >
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-emerald-100 text-xs font-bold uppercase tracking-wide mb-1">Attendance Rate</p>
-                    <p class="text-3xl font-black">{{ attendance_rate_pct }}<span class="text-lg">%</span></p>
+                    <p
+                        class="text-emerald-100 text-xs font-bold uppercase tracking-wide mb-1"
+                    >
+                        Attendance Rate
+                    </p>
+                    <p class="text-3xl font-black">
+                        {{ attendance_rate_pct }}<span class="text-lg">%</span>
+                    </p>
                 </div>
-                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                <div
+                    class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center"
+                >
                     <i class="fas fa-chart-pie text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-emerald-100 mt-2 font-semibold">{{ total_attended }}/{{ total_eligible }} sessions attended</p>
+            <p class="text-xs text-emerald-100 mt-2 font-semibold">
+                {{ total_attended }}/{{ total_eligible }} sessions attended
+            </p>
         </div>
-        <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-5 text-white shadow-xl card-hover">
+        <div
+            class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-5 text-white shadow-xl card-hover"
+        >
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-green-100 text-xs font-bold uppercase tracking-wide mb-1">✅ Sessions Attended</p>
+                    <p
+                        class="text-green-100 text-xs font-bold uppercase tracking-wide mb-1"
+                    >
+                        ✅ Sessions Attended
+                    </p>
                     <p class="text-3xl font-black">{{ total_attended }}</p>
                 </div>
-                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                <div
+                    class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center"
+                >
                     <i class="fas fa-circle-check text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-green-100 mt-2 font-semibold">Present count</p>
+            <p class="text-xs text-green-100 mt-2 font-semibold">
+                Present count
+            </p>
         </div>
-        <div class="bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-5 text-white shadow-xl card-hover">
+        <div
+            class="bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-5 text-white shadow-xl card-hover"
+        >
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-rose-100 text-xs font-bold uppercase tracking-wide mb-1">❌ Sessions Missed</p>
+                    <p
+                        class="text-rose-100 text-xs font-bold uppercase tracking-wide mb-1"
+                    >
+                        ❌ Sessions Missed
+                    </p>
                     <p class="text-3xl font-black">{{ missed_count }}</p>
                 </div>
-                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                <div
+                    class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center"
+                >
                     <i class="fas fa-xmark text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-rose-100 mt-2 font-semibold">Improve this — never miss another!</p>
+            <p class="text-xs text-rose-100 mt-2 font-semibold">
+                Improve this — never miss another!
+            </p>
         </div>
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-xl card-hover">
+        <div
+            class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-xl card-hover"
+        >
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-indigo-100 text-xs font-bold uppercase tracking-wide mb-1">🔔 Active / Upcoming</p>
-                    <p class="text-3xl font-black"><span id="live-active-count">{{ active_count }}</span> / {{ upcoming_count }}</p>
+                    <p
+                        class="text-indigo-100 text-xs font-bold uppercase tracking-wide mb-1"
+                    >
+                        🔔 Active / Upcoming
+                    </p>
+                    <p class="text-3xl font-black">
+                        <span id="live-active-count">{{ active_count }}</span> /
+                        {{ upcoming_count }}
+                    </p>
                 </div>
-                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                <div
+                    class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center"
+                >
                     <i class="fas fa-bell text-xl"></i>
                 </div>
             </div>
-            <p class="text-xs text-indigo-100 mt-2 font-semibold">{{ attendances.count }} total sessions tracked</p>
+            <p class="text-xs text-indigo-100 mt-2 font-semibold">
+                {{ attendances.count }} total sessions tracked
+            </p>
         </div>
     </div>
 
     <!-- Filter tabs -->
     <div class="flex gap-2 mb-6 flex-wrap">
-        <button onclick="filterCards('all')" class="filter-btn active px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-md">
+        <button
+            onclick="filterCards('all')"
+            class="filter-btn active px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-md"
+        >
             <i class="fas fa-layer-group mr-1"></i>All Sessions
         </button>
-        <button onclick="filterCards('Active')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+        <button
+            onclick="filterCards('Active')"
+            class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50"
+        >
             🟢 Active Now
         </button>
-        <button onclick="filterCards('Upcoming')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+        <button
+            onclick="filterCards('Upcoming')"
+            class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50"
+        >
             🔵 Upcoming
         </button>
-        <button onclick="filterCards('marked')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+        <button
+            onclick="filterCards('marked')"
+            class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50"
+        >
             ✅ I've Marked
         </button>
-        <button onclick="filterCards('Expired')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+        <button
+            onclick="filterCards('Expired')"
+            class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50"
+        >
             🔴 Past / Expired
         </button>
     </div>
 
     <!-- Attendance Sessions Grid (beautiful cards!) -->
     {% if attendances %}
-    <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+        id="cards-grid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
         {% for att in attendances %}
-        <div class="card-item bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover transition-all duration-300 hover:-translate-y-1"
-             data-status="{{ att.status_label }}"
-             data-marked="{% if att.has_attended %}1{% else %}0{% endif %}"
-             data-start="{{ att.start_time_iso }}"
-             data-end="{{ att.end_time_iso }}"
-             data-sid="{{ att.session_id }}"
-             data-lat="{{ att.latitude|default:'' }}"
-             data-lon="{{ att.longitude|default:'' }}"
-             data-radius="{{ att.radius|default:100 }}">
-
+        <div
+            class="card-item bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover transition-all duration-300 hover:-translate-y-1"
+            data-status="{{ att.status_label }}"
+            data-marked="{% if att.has_attended %}1{% else %}0{% endif %}"
+            data-start="{{ att.start_time_iso }}"
+            data-end="{{ att.end_time_iso }}"
+            data-sid="{{ att.session_id }}"
+            data-lat="{{ att.latitude|default:'' }}"
+            data-lon="{{ att.longitude|default:'' }}"
+            data-radius="{{ att.radius|default:100 }}"
+        >
             <!-- Top status bar -->
-            <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                <span class="px-2.5 py-1 text-[11px] font-black rounded-full bg-{{ att.status_color }}-100 text-{{ att.status_color }}-800 uppercase tracking-wider">
+            <div
+                class="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white"
+            >
+                <span
+                    class="px-2.5 py-1 text-[11px] font-black rounded-full bg-{{ att.status_color }}-100 text-{{ att.status_color }}-800 uppercase tracking-wider"
+                >
                     {{ att.status_label }}
                 </span>
                 <div class="flex items-center gap-3">
-                    <span class="text-[11px] font-bold text-gray-400">ID: #{{ att.session_id }}</span>
+                    <span class="text-[11px] font-bold text-gray-400"
+                        >ID: #{{ att.session_id }}</span
+                    >
                     {% if att.has_attended %}
-                    <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-[11px] font-black">
-                        <i class="fas fa-check-double mr-1 text-green-500"></i>Marked
+                    <span
+                        class="inline-flex items-center px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-[11px] font-black"
+                    >
+                        <i class="fas fa-check-double mr-1 text-green-500"></i
+                        >Marked
                     </span>
                     {% endif %}
                 </div>
@@ -139,9 +240,14 @@
 
             <!-- Mini map (if we have coords) -->
             {% if att.latitude and att.longitude %}
-            <div id="mini-map-{{ att.session_id }}" class="mini-map w-full h-40 border-b border-gray-100"></div>
+            <div
+                id="mini-map-{{ att.session_id }}"
+                class="mini-map w-full h-40 border-b border-gray-100"
+            ></div>
             {% else %}
-            <div class="w-full h-40 bg-gradient-to-br from-gray-100 to-gray-50 border-b border-gray-100 flex flex-col items-center justify-center text-gray-400">
+            <div
+                class="w-full h-40 bg-gradient-to-br from-gray-100 to-gray-50 border-b border-gray-100 flex flex-col items-center justify-center text-gray-400"
+            >
                 <i class="fas fa-map-marker-slash text-4xl mb-2"></i>
                 <p class="text-xs font-bold">No GPS data from lecturer</p>
             </div>
@@ -151,112 +257,195 @@
             <div class="p-5 space-y-3">
                 <div>
                     <div class="flex items-start gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <div
+                            class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md"
+                        >
                             <i class="fas fa-book text-white"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h3 class="font-extrabold text-gray-900 text-base leading-tight truncate" title="{{ att.course.course_title }}">
+                            <h3
+                                class="font-extrabold text-gray-900 text-base leading-tight truncate"
+                                title="{{ att.course.course_title }}"
+                            >
                                 {{ att.course.course_title }}
                             </h3>
-                            <p class="text-xs text-gray-500 font-bold mt-0.5">{{ att.course.course_code }} · {{ att.course.credit }} Credits</p>
+                            <p class="text-xs text-gray-500 font-bold mt-0.5">
+                                {{ att.course.course_code }} · {{
+                                att.course.credit }} Credits
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-100">
-                        <p class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1">Hall</p>
-                        <p class="font-bold text-gray-900 truncate" title="{{ att.hall }}">
-                            <i class="fas fa-building text-indigo-500 mr-1"></i>{{ att.hall }}
+                    <div
+                        class="bg-gray-50 rounded-xl p-2.5 border border-gray-100"
+                    >
+                        <p
+                            class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1"
+                        >
+                            Hall
+                        </p>
+                        <p
+                            class="font-bold text-gray-900 truncate"
+                            title="{{ att.hall }}"
+                        >
+                            <i class="fas fa-building text-indigo-500 mr-1"></i
+                            >{{ att.hall }}
                         </p>
                     </div>
-                    <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-100">
-                        <p class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1">Students Here</p>
+                    <div
+                        class="bg-gray-50 rounded-xl p-2.5 border border-gray-100"
+                    >
+                        <p
+                            class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1"
+                        >
+                            Students Here
+                        </p>
                         <p class="font-bold text-gray-900">
-                            <i class="fas fa-users text-indigo-500 mr-1"></i>{{ att.attendance_count }} marked
+                            <i class="fas fa-users text-indigo-500 mr-1"></i>{{
+                            att.attendance_count }} marked
                         </p>
                     </div>
                 </div>
 
                 <div>
-                    <p class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1">Session Window (Lagos/WAT)</p>
-                    <p class="font-bold text-gray-900 text-sm">
-                        <i class="fas fa-clock text-indigo-500 mr-1"></i>{{ att.formatted_start|slice:"11:16" }} → {{ att.formatted_end|slice:"11:16" }}
+                    <p
+                        class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1"
+                    >
+                        Session Window (Lagos/WAT)
                     </p>
-                    <p class="text-xs text-gray-500 mt-0.5">{{ att.formatted_start|slice:":11" }} · Radius {{ att.radius }}m</p>
+                    <p class="font-bold text-gray-900 text-sm">
+                        <i class="fas fa-clock text-indigo-500 mr-1"></i>{{
+                        att.formatted_start|slice:"11:16" }} → {{
+                        att.formatted_end|slice:"11:16" }}
+                    </p>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                        {{ att.formatted_start|slice:":11" }} · Radius {{
+                        att.radius }}m
+                    </p>
                 </div>
 
                 <!-- Live countdown or "Marked" info -->
-                <div id="card-countdown-{{ att.session_id }}" class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100 min-h-[68px]">
+                <div
+                    id="card-countdown-{{ att.session_id }}"
+                    class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100 min-h-[68px]"
+                >
                     {% if att.has_attended %}
-                        <p class="text-[11px] text-green-700 font-black uppercase tracking-wide mb-1">✅ You marked attendance</p>
-                        <p class="text-xs text-gray-800 font-bold">
-                            Time: {{ att.student_marked_time|default:"N/A"|slice:"11:19" }}
-                        </p>
-                        {% if att.student_distance is not None %}
-                        <p class="text-[11px] text-gray-600 mt-0.5 font-semibold">
-                            You were {{ att.student_distance }}m from the hall center.
-                        </p>
-                        {% endif %}
-                    {% else %}
-                        <p class="text-[11px] text-indigo-700 font-black uppercase tracking-wide mb-1 countdown-caption-{{ att.session_id }}">Loading…</p>
-                        <p class="font-black text-indigo-900 text-lg font-mono countdown-cell countdown-value-{{ att.session_id }}">--:--:--</p>
+                    <p
+                        class="text-[11px] text-green-700 font-black uppercase tracking-wide mb-1"
+                    >
+                        ✅ You marked attendance
+                    </p>
+                    <p class="text-xs text-gray-800 font-bold">
+                        Time: {{
+                        att.student_marked_time|default:"N/A"|slice:"11:19" }}
+                    </p>
+                    {% if att.student_distance is not None %}
+                    <p class="text-[11px] text-gray-600 mt-0.5 font-semibold">
+                        You were {{ att.student_distance }}m from the hall
+                        center.
+                    </p>
+                    {% endif %} {% else %}
+                    <p
+                        class="text-[11px] text-indigo-700 font-black uppercase tracking-wide mb-1 countdown-caption-{{ att.session_id }}"
+                    >
+                        Loading…
+                    </p>
+                    <p
+                        class="font-black text-indigo-900 text-lg font-mono countdown-cell countdown-value-{{ att.session_id }}"
+                    >
+                        --:--:--
+                    </p>
                     {% endif %}
                 </div>
 
                 <!-- Lecturer note -->
                 {% if att.notes %}
                 <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
-                    <p class="text-[11px] font-black text-amber-800 uppercase tracking-wide mb-1 flex items-center">
+                    <p
+                        class="text-[11px] font-black text-amber-800 uppercase tracking-wide mb-1 flex items-center"
+                    >
                         <i class="fas fa-sticky-note mr-1"></i>Lecturer's Note
                     </p>
-                    <p class="text-xs text-amber-900 italic">"{{ att.notes }}"</p>
+                    <p class="text-xs text-amber-900 italic">
+                        "{{ att.notes }}"
+                    </p>
                 </div>
                 {% endif %}
 
                 <!-- Action buttons -->
-                <div class="pt-2 border-t border-gray-100 flex gap-2 items-stretch">
+                <div class="pt-2 border-t border-gray-100 flex gap-2 items-stretch"></div>
                     {% if att.status_label == 'Active' and not att.has_attended %}
-                        <a href="/student/mark-attendance/{{ att.session_id }}"
-                           class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-black text-xs shadow-md hover:shadow-lg transition-all">
-                            <i class="fas fa-camera"></i>Mark Now
-                        </a>
+                    <a
+                        href="/student/mark-attendance/{{ att.session_id }}"
+                        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-black text-xs shadow-md hover:shadow-lg transition-all"
+                    >
+                        <i class="fas fa-camera"></i>Mark Now
+                    </a>
                     {% elif att.status_label == 'Upcoming' %}
-                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-indigo-50 text-indigo-700 rounded-xl font-black text-xs border border-indigo-100">
-                            <i class="fas fa-calendar"></i>Starts Soon
-                        </span>
+                    <span
+                        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-indigo-50 text-indigo-700 rounded-xl font-black text-xs border border-indigo-100"
+                    >
+                        <i class="fas fa-calendar"></i>Starts Soon
+                    </span>
                     {% elif att.status_label == 'Expired' and att.has_attended %}
-                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-green-50 text-green-700 rounded-xl font-black text-xs border border-green-200">
-                            <i class="fas fa-check"></i>Present ✓
-                        </span>
+                    <span
+                        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-green-50 text-green-700 rounded-xl font-black text-xs border border-green-200"
+                    >
+                        <i class="fas fa-check"></i>Present ✓
+                    </span>
                     {% elif att.status_label == 'Expired' %}
-                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-red-50 text-red-700 rounded-xl font-black text-xs border border-red-200">
-                            <i class="fas fa-xmark"></i>Missed
-                        </span>
+                    <span
+                        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-red-50 text-red-700 rounded-xl font-black text-xs border border-red-200"
+                    >
+                        <i class="fas fa-xmark"></i>Missed
+                    </span>
                     {% elif att.has_attended %}
-                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-green-50 text-green-700 rounded-xl font-black text-xs border border-green-200">
-                            <i class="fas fa-check-double"></i>Already Marked
-                        </span>
+                    <span
+                        class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-green-50 text-green-700 rounded-xl font-black text-xs border border-green-200"
+                    >
+                        <i class="fas fa-check-double"></i>Already Marked
+                    </span>
                     {% endif %}
 
                     <!-- Directions (if coords) -->
                     {% if att.latitude and att.longitude %}
                     <div class="flex gap-1.5">
-                        <button title="Get Google Maps directions to hall" onclick="openCardDirections('google', {{ att.session_id }})"
-                                class="w-10 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 border border-blue-100 font-bold shadow-sm transition-all">
+                        <button
+                            title="Get Google Maps directions to hall"
+                            onclick="openCardDirections('google', {{ att.session_id }})"
+                            class="w-10 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 border border-blue-100 font-bold shadow-sm transition-all"
+                        >
                             <i class="fab fa-google"></i>
                         </button>
-                        <button title="Waze navigation" onclick="openCardDirections('waze', {{ att.session_id }})"
-                                class="w-10 flex items-center justify-center bg-cyan-50 text-cyan-600 rounded-xl hover:bg-cyan-100 border border-cyan-100 font-bold shadow-sm transition-all">
+                        <button
+                            title="Waze navigation"
+                            onclick="openCardDirections('waze', {{ att.session_id }})"
+                            class="w-10 flex items-center justify-center bg-cyan-50 text-cyan-600 rounded-xl hover:bg-cyan-100 border border-cyan-100 font-bold shadow-sm transition-all"
+                        >
                             <i class="fas fa-route"></i>
                         </button>
-                        <button title="Open mark page (map & details)"
-                                {% if att.status_label == 'Active' %}
-                                onclick="location.href='/student/mark-attendance/{{ att.session_id }}'"
-                                {% elif att.latitude and att.longitude %}
-                                onclick="openCardMapInNewTab({{ att.session_id }})"
-                                {% endif %}
-                                class="w-10 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 border border-indigo-100 font-bold shadow-sm transition-all">
+                        <button
+                            title="Open mark page (map & details)"
+                            {%
+                            if
+                            att.status_label=""
+                            ="Active"
+                            %}
+                            onclick="location.href='/student/mark-attendance/{{ att.session_id }}'"
+                            {%
+                            elif
+                            att.latitude
+                            and
+                            att.longitude
+                            %}
+                            onclick="openCardMapInNewTab({{ att.session_id }})"
+                            {%
+                            endif
+                            %}
+                            class="w-10 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 border border-indigo-100 font-bold shadow-sm transition-all"
+                        >
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
@@ -268,13 +457,26 @@
     </div>
 
     {% else %}
-    <div class="text-center py-20 bg-white rounded-2xl shadow-xl border border-gray-100">
-        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+    <div
+        class="text-center py-20 bg-white rounded-2xl shadow-xl border border-gray-100"
+    >
+        <div
+            class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center"
+        >
             <i class="fas fa-calendar-days text-4xl text-indigo-500"></i>
         </div>
-        <h2 class="text-xl font-black text-gray-900 mb-1">No attendance sessions yet</h2>
-        <p class="text-gray-500 max-w-md mx-auto mb-6">This is where all your lecture attendance sessions will appear. Enroll in your courses first, then wait for lecturers to create check-ins.</p>
-        <a href="/student_courses" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <h2 class="text-xl font-black text-gray-900 mb-1">
+            No attendance sessions yet
+        </h2>
+        <p class="text-gray-500 max-w-md mx-auto mb-6">
+            This is where all your lecture attendance sessions will appear.
+            Enroll in your courses first, then wait for lecturers to create
+            check-ins.
+        </p>
+        <a
+            href="/student_courses"
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
+        >
             <i class="fas fa-book mr-2"></i>Enroll in Courses Now
         </a>
     </div>
@@ -339,33 +541,57 @@
                     const statusColor = status === 'Active' ? '#10b981' : (status === 'Upcoming' ? '#6366f1' : '#ef4444');
 
                     const containerId = 'mini-map-' + sid;
-                    if (!document.getElementById(containerId)) return;
+                    const el = document.getElementById(containerId);
+                    if (!el) return;
 
                     const mini = L.map(containerId, {
                         zoomControl: false,
-                        attributionControl: false,
+                        attributionControl: true,
                         scrollWheelZoom: false,
-                        dragging: false,
-                    }).setView([lat, lon], 16);
+                        dragging: true,
+                    }).setView([lat, lon], 17);
 
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(mini);
-
-                    const hallIcon = L.divIcon({
-                        className: '',
-                        html: `<div style="transform: translate(-50%, -100%);">
-                            <div style="background:${statusColor};color:#fff;border:2px solid #fff;border-radius:50% 50% 50% 0;padding:5px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);box-shadow:0 4px 10px rgba(0,0,0,0.2);">
-                                <i class="fas fa-graduation-cap" style="transform:rotate(45deg);font-size:11px;"></i>
-                            </div>
-                        </div>`,
-                        iconSize: [24, 32], iconAnchor: [12, 32],
-                    });
-                    L.marker([lat, lon], { icon: hallIcon }).addTo(mini);
-                    L.circle([lat, lon], {
-                        color: statusColor, fillColor: statusColor, weight: 1.5,
-                        fillOpacity: 0.12, radius: radius, dashArray: '4 3'
+                    /* CartoDB Voyager — high quality tiles */
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        maxZoom: 22,
+                        attribution: '© OSM © CARTO'
                     }).addTo(mini);
 
-                    mini.fitBounds(L.latLng([lat, lon]).toBounds(radius * 3));
+                    /* Hall pin */
+                    const hallIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="transform:translate(-50%,-100%)">
+                                 <div style="background:${statusColor};color:#fff;border:2.5px solid #fff;border-radius:50% 50% 50% 0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+                                   <i class="fas fa-building" style="transform:rotate(45deg);font-size:11px;"></i>
+                                 </div>
+                                 <div style="width:2px;height:6px;background:${statusColor};margin:0 auto;"></div>
+                               </div>`,
+                        iconSize: [26, 38], iconAnchor: [13, 38]
+                    });
+                    L.marker([lat, lon], { icon: hallIcon }).addTo(mini)
+                        .bindPopup(`<div style="font-weight:800;color:${statusColor};margin-bottom:3px">🏫 ${hall}</div>
+                                    <div style="font-size:11px;color:#6b7280">Geofence: ${radius}m · ${status}</div>`);
+
+                    /* Geofence circle */
+                    const circle = L.circle([lat, lon], {
+                        color: statusColor, fillColor: statusColor, weight: 2,
+                        fillOpacity: 0.12, radius: radius, dashArray: '5 4'
+                    }).addTo(mini);
+
+                    mini.fitBounds(circle.getBounds(), { padding: [8, 8] });
+
+                    /* Navigation overlay buttons */
+                    const overlay = document.createElement('div');
+                    overlay.className = 'map-nav-overlay';
+                    overlay.style.cssText = 'position:absolute;bottom:8px;left:8px;z-index:1000;display:flex;gap:4px;';
+                    overlay.innerHTML = `
+                        <a class="map-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&dir_action=navigate&travelmode=walking" target="_blank" rel="noopener" style="background:white;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;box-shadow:0 1px 2px rgba(0,0,0,0.2)">
+                            <i class="fab fa-google" style="margin-right:2px"></i>Maps
+                        </a>
+                        <a class="map-nav-btn" href="https://www.waze.com/ul?ll=${lat},${lon}&navigate=yes" target="_blank" rel="noopener" style="background:white;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;box-shadow:0 1px 2px rgba(0,0,0,0.2)">
+                            <i class="fas fa-route" style="margin-right:2px"></i>Waze
+                        </a>`;
+                    el.appendChild(overlay);
                 })();
             {% endif %}
         {% endfor %}

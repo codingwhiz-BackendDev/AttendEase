@@ -618,7 +618,7 @@
         const heroHall = "{{ next_session.lecture_hall|escapejs }}";
         if (heroLat && heroLon) {
             const heroMap = L.map('hero-mini-map', { scrollWheelZoom: false, dragging: false, zoomControl: false, attributionControl: false }).setView([heroLat, heroLon], 17);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(heroMap);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(heroMap);
             const heroIcon = L.divIcon({
                 className: '',
                 html: '<div style="background:linear-gradient(135deg,#4f46e5,#9333ea);color:white;border:3px solid white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(79,70,229,0.45);"><i class="fas fa-graduation-cap text-xs"></i></div>',

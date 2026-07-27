@@ -1,172 +1,344 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-<div class="p-8">
-    <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Course Management</h1>
-        <p class="text-gray-600">Search and manage the courses you teach</p>
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="p-6 md:p-8 max-w-7xl mx-auto">
+    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <p
+                class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2"
+            >
+                Lecturer workspace
+            </p>
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-2">
+                Course Management
+            </h1>
+            <p class="text-gray-600 max-w-2xl">
+                Search available courses, assign them to your teaching profile,
+                and keep your attendance session catalog organized.
+            </p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div
+                class="rounded-2xl border border-indigo-100 bg-white px-4 py-3 shadow-sm"
+            >
+                <p
+                    class="text-[11px] font-black uppercase tracking-wide text-indigo-600"
+                >
+                    Teaching
+                </p>
+                <p class="text-2xl font-black text-gray-900">
+                    {{ courses_taught|length }}
+                </p>
+            </div>
+            <div
+                class="rounded-2xl border border-purple-100 bg-white px-4 py-3 shadow-sm"
+            >
+                <p
+                    class="text-[11px] font-black uppercase tracking-wide text-purple-600"
+                >
+                    Results
+                </p>
+                <p class="text-2xl font-black text-gray-900">
+                    {{ results|length|default:0 }}
+                </p>
+            </div>
+        </div>
     </div>
 
-    <!-- Messages -->
     {% if messages %}
     <div class="mb-6 space-y-2">
         {% for message in messages %}
-        <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
-            <div class="flex items-center">
-                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
-                {{ message }}
+        <div
+            class="px-4 py-3 rounded-2xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}"
+        >
+            <div class="flex items-center gap-2">
+                <i
+                    class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"
+                ></i>
+                <span>{{ message }}</span>
             </div>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Search Bar -->
-    <div class="bg-white rounded-2xl shadow-xl p-6 mb-8 card-hover">
-        <form action="" method="post" class="flex gap-4" id="search-form">
+    <div
+        class="mb-8 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+    >
+        <div
+            class="border-b border-gray-100 bg-gradient-to-r from-indigo-50 via-white to-purple-50 px-5 py-4 md:px-6"
+        >
+            <h2 class="text-lg md:text-xl font-black text-gray-900">
+                Search courses
+            </h2>
+            <p class="mt-1 text-sm text-gray-600">
+                Find a course and attach it to your lecturer profile.
+            </p>
+        </div>
+        <form action="" method="post" class="p-5 md:p-6" id="search-form">
             {% csrf_token %}
-            <div class="flex-1 relative">
-                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" required id="course" name="course"
-                    placeholder="Search for a course by title..."
-                    class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+            <div
+                class="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+            >
+                <div>
+                    <label
+                        for="course"
+                        class="mb-2 block text-[11px] font-black uppercase tracking-[0.18em] text-gray-500"
+                        >Course title</label
+                    >
+                    <div class="group relative">
+                        <span
+                            class="pointer-events-none absolute inset-y-0 left-0 flex w-14 items-center justify-center text-gray-400 group-focus-within:text-indigo-600"
+                        >
+                            <i class="fas fa-search text-base"></i>
+                        </span>
+                        <input
+                            type="text"
+                            required
+                            id="course"
+                            name="course"
+                            placeholder="Search for a course by title..."
+                            class="h-14 w-full rounded-2xl border border-gray-200 bg-white pl-14 pr-4 text-sm font-medium text-gray-900 shadow-sm outline-none transition-all placeholder:text-gray-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+                        />
+                    </div>
+                </div>
+                <button
+                    type="submit"
+                    id="search-btn"
+                    class="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 text-sm font-black text-white shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-xl"
+                >
+                    <i class="fas fa-search"></i>Search Courses
+                </button>
             </div>
-            <button type="submit" id="search-btn" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg">
-                <i class="fas fa-search mr-2"></i>Search
-            </button>
         </form>
     </div>
 
-    <!-- Search Results -->
     {% if results %}
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Search Results</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <section class="mb-10">
+        <div class="mb-4 flex items-center justify-between gap-3 flex-wrap">
+            <div>
+                <h2 class="text-xl font-black text-gray-900">Search Results</h2>
+                <p class="text-sm text-gray-500">
+                    Add any course you teach to your lecturer profile.
+                </p>
+            </div>
+            <span
+                class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-black text-indigo-700 border border-indigo-100"
+                >{{ results|length }} result{{ results|length|pluralize }}</span
+            >
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for course in results %}
-            <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                        <i class="fas fa-book text-white text-xl"></i>
+            <div
+                class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+            >
+                <div class="mb-5 flex items-start justify-between gap-4">
+                    <div
+                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg shadow-indigo-200"
+                    >
+                        <i class="fas fa-book text-white text-lg"></i>
                     </div>
-                    <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">{{ course.credit }} Units</span>
+                    <span
+                        class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-black text-indigo-700"
+                        >{{ course.credit }} Units</span
+                    >
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ course.course_title }}</h3>
-                <p class="text-gray-600 mb-4"><i class="fas fa-code mr-2 text-indigo-500"></i>{{ course.course_code }}</p>
-                <form method="POST" action="/lecturer_course_enrollment" class="enroll-form" data-course-title="{{ course.course_title }}">
+                <p
+                    class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600 mb-2"
+                >
+                    {{ course.course_code }}
+                </p>
+                <h3 class="text-lg font-black text-gray-900 mb-4 leading-snug">
+                    {{ course.course_title }}
+                </h3>
+                <form
+                    method="POST"
+                    action="/lecturer_course_enrollment"
+                    class="enroll-form"
+                    data-course-title="{{ course.course_title }}"
+                >
                     {% csrf_token %}
-                    <input type="hidden" name="course" value="{{course.course_title}}">
-                    <input type="hidden" name="lecturer" value="{{request.user}}">
-                    <button type="submit" class="enroll-btn w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all">
-                        <i class="fas fa-plus mr-2"></i>Enroll as Lecturer
+                    <input
+                        type="hidden"
+                        name="course"
+                        value="{{ course.course_title }}"
+                    />
+                    <input
+                        type="hidden"
+                        name="lecturer"
+                        value="{{ request.user }}"
+                    />
+                    <button
+                        type="submit"
+                        class="enroll-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-sm font-black text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                        <i class="fas fa-plus"></i>Assign to Me
                     </button>
                 </form>
             </div>
             {% endfor %}
         </div>
-    </div>
+    </section>
     {% endif %}
 
-    <!-- Enrolled Courses -->
-    <div>
-        <h2 class="text-xl font-bold text-gray-900 mb-4">My Courses</h2>
+    <section>
+        <div class="mb-4 flex items-center justify-between gap-3 flex-wrap">
+            <div>
+                <h2 class="text-xl font-black text-gray-900">My Courses</h2>
+                <p class="text-sm text-gray-500">
+                    These courses are available for attendance creation and
+                    reporting.
+                </p>
+            </div>
+            <span
+                class="rounded-full bg-white px-3 py-1 text-xs font-black text-gray-700 border border-gray-200 shadow-sm"
+                >{{ courses_taught|length }} active</span
+            >
+        </div>
+
         {% if courses_taught %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for course in courses_taught %}
-            <div class="bg-white rounded-2xl shadow-xl p-6 card-hover border-2 border-indigo-100">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                        <i class="fas fa-book text-white text-xl"></i>
+            <div
+                class="rounded-3xl border border-indigo-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+            >
+                <div class="mb-5 flex items-start justify-between gap-4">
+                    <div
+                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg shadow-indigo-200"
+                    >
+                        <i class="fas fa-book text-white text-lg"></i>
                     </div>
-                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">Enrolled</span>
+                    <span
+                        class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-black text-indigo-700"
+                        >Assigned</span
+                    >
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ course.course_title }}</h3>
-                <p class="text-gray-600 mb-4"><i class="fas fa-code mr-2 text-emerald-500"></i>{{ course.course_code }}</p>
-                <form method="POST" action="/lecturer_course_unenrollment" class="unenroll-form" data-course-title="{{ course.course_title }}">
-                    {% csrf_token %}
-                    <input type="hidden" name="course" value="{{ course.course_title }}">
-                    <input type="hidden" name="lecturer" value="{{ request.user }}">
-                    <button type="submit" class="unenroll-btn w-full py-3 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-all">
-                        <i class="fas fa-times mr-2"></i>Unenroll
-                    </button>
-                </form>
+                <p
+                    class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600 mb-2"
+                >
+                    {{ course.course_code }}
+                </p>
+                <h3 class="text-lg font-black text-gray-900 mb-2 leading-snug">
+                    {{ course.course_title }}
+                </h3>
+                <p class="text-sm text-gray-500 mb-5">
+                    {{ course.credit }} credit unit{{ course.credit|pluralize }}
+                </p>
+                <div class="grid grid-cols-2 gap-3">
+                    <a
+                        href="/lecturer/create-attendance/"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-50 border border-indigo-100 px-4 py-3 text-sm font-black text-indigo-700 hover:bg-indigo-100 transition-all"
+                    >
+                        <i class="fas fa-plus-circle"></i>Session
+                    </a>
+                    <form
+                        method="POST"
+                        action="/lecturer_course_unenrollment"
+                        class="unenroll-form"
+                        data-course-title="{{ course.course_title }}"
+                    >
+                        {% csrf_token %}
+                        <input
+                            type="hidden"
+                            name="course"
+                            value="{{ course.course_title }}"
+                        />
+                        <input
+                            type="hidden"
+                            name="lecturer"
+                            value="{{ request.user }}"
+                        />
+                        <button
+                            type="submit"
+                            class="unenroll-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500 px-4 py-3 text-sm font-black text-white hover:bg-red-600 transition-all"
+                        >
+                            <i class="fas fa-times"></i>Remove
+                        </button>
+                    </form>
+                </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <i class="fas fa-book-open text-2xl text-gray-400"></i>
+        <div
+            class="rounded-3xl border border-dashed border-gray-300 bg-white p-12 text-center shadow-sm"
+        >
+            <div
+                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 text-gray-400"
+            >
+                <i class="fas fa-book-open text-2xl"></i>
             </div>
-            <p class="text-gray-500">No courses enrolled yet</p>
-            <p class="text-sm text-gray-400 mt-1">Search and enroll in courses above</p>
+            <h3 class="text-lg font-black text-gray-900 mb-1">
+                No teaching courses yet
+            </h3>
+            <p class="text-sm text-gray-500 max-w-md mx-auto">
+                Search above and assign courses to your lecturer profile so you
+                can start creating attendance sessions.
+            </p>
         </div>
         {% endif %}
-    </div>
+    </section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Enroll form handling
-    document.querySelectorAll('.enroll-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
+    document.querySelectorAll(".enroll-form").forEach((form) => {
+        form.addEventListener("submit", function (e) {
             e.preventDefault();
             const courseTitle = this.dataset.courseTitle;
-            const btn = this.querySelector('.enroll-btn');
-            
+            const btn = this.querySelector(".enroll-btn");
+
             Swal.fire({
-                title: 'Enroll in Course',
-                text: `Are you sure you want to enroll as a lecturer for "${courseTitle}"?`,
-                icon: 'question',
+                title: "Assign course",
+                text: `Are you sure you want to assign "${courseTitle}" to your lecturer profile?`,
+                icon: "question",
                 showCancelButton: true,
-                confirmButtonColor: '#10b981',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, Enroll',
-                cancelButtonText: 'Cancel'
+                confirmButtonColor: "#4f46e5",
+                cancelButtonColor: "#6b7280",
+                confirmButtonText: "Yes, assign",
+                cancelButtonText: "Cancel",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enrolling...';
+                    btn.innerHTML =
+                        '<i class="fas fa-spinner fa-spin"></i> Assigning...';
                     btn.disabled = true;
-                    
                     this.submit();
                 }
             });
         });
     });
 
-    // Unenroll form handling
-    document.querySelectorAll('.unenroll-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
+    document.querySelectorAll(".unenroll-form").forEach((form) => {
+        form.addEventListener("submit", function (e) {
             e.preventDefault();
             const courseTitle = this.dataset.courseTitle;
-            const btn = this.querySelector('.unenroll-btn');
-            
+            const btn = this.querySelector(".unenroll-btn");
+
             Swal.fire({
-                title: 'Unenroll from Course',
-                text: `Are you sure you want to unenroll from "${courseTitle}"? This action cannot be undone.`,
-                icon: 'warning',
+                title: "Remove course",
+                text: `Are you sure you want to remove "${courseTitle}" from your teaching list?`,
+                icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, Unenroll',
-                cancelButtonText: 'Cancel'
+                confirmButtonColor: "#ef4444",
+                cancelButtonColor: "#6b7280",
+                confirmButtonText: "Yes, remove",
+                cancelButtonText: "Cancel",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Unenrolling...';
+                    btn.innerHTML =
+                        '<i class="fas fa-spinner fa-spin"></i> Removing...';
                     btn.disabled = true;
-                    
                     this.submit();
                 }
             });
         });
     });
 
-    // Search form handling
-    document.getElementById('search-form').addEventListener('submit', function(e) {
-        const btn = document.getElementById('search-btn');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Searching...';
-        btn.disabled = true;
-    });
+    const searchForm = document.getElementById("search-form");
+    if (searchForm) {
+        searchForm.addEventListener("submit", function () {
+            const btn = document.getElementById("search-btn");
+            btn.innerHTML =
+                '<i class="fas fa-spinner fa-spin"></i> Searching...';
+            btn.disabled = true;
+        });
+    }
 </script>
 {% endblock content %}
