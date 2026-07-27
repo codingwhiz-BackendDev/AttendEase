@@ -75,13 +75,23 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-clock mr-2 text-indigo-600"></i>Start Time
                         </label>
-                        <input type="datetime-local" name="start_time" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+                        <input type="datetime-local" id="start_time_local" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+                        <input type="hidden" name="start_time" id="start_time_utc">
+                        <p class="mt-2 text-xs text-gray-500 flex items-center" id="start_time_preview">
+                            <i class="fas fa-circle-info mr-1 text-gray-400"></i>
+                            <span>Select a date & time (uses your computer's local timezone).</span>
+                        </p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-clock mr-2 text-indigo-600"></i>End Time
                         </label>
-                        <input type="datetime-local" name="end_time" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+                        <input type="datetime-local" id="end_time_local" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+                        <input type="hidden" name="end_time" id="end_time_utc">
+                        <p class="mt-2 text-xs text-gray-500 flex items-center" id="end_time_preview">
+                            <i class="fas fa-circle-info mr-1 text-gray-400"></i>
+                            <span>Must be later than the start time.</span>
+                        </p>
                     </div>
                 </div>
 
@@ -120,5 +130,154 @@
         }
     }
     getLocation();
+
+    // ============================================================
+    // TIMEZONE FIX (v2 - robust) - NO silent validation failures
+    // Strategy:
+    //   1. Keep datetime-local inputs visible, user picks LOCAL times.
+    //   2. On input change, instantly mirror → UTC in HIDDEN inputs named start_time / end_time.
+    //   3. On submit, if the mirror isn't available, build it right there.
+    //   4. Also update a visible Lagos/WAT preview so user confirms before clicking.
+    // ============================================================
+    (function () {
+        const form = document.querySelector('form');
+        if (!form) return;
+
+        const startLocalEl = document.getElementById('start_time_local');
+        const endLocalEl = document.getElementById('end_time_local');
+        const startUtcEl = document.getElementById('start_time_utc');
+        const endUtcEl = document.getElementById('end_time_utc');
+        const startPreviewEl = document.getElementById('start_time_preview');
+        const endPreviewEl = document.getElementById('end_time_preview');
+
+        // ------------------------------------------------------------
+        // Lagos (WAT, UTC+1) display helper. We show this in the preview
+        // so the lecturer can verify the *actual* time that will be
+        // stored & used by the server.
+        // ------------------------------------------------------------
+        function formatAsLagos(dateObj) {
+            try {
+                return dateObj.toLocaleString('en-NG', {
+                    timeZone: 'Africa/Lagos',
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }) + ' (Lagos/WAT)';
+            } catch (e) {
+                // Fallback if timeZone isn't supported (older browsers)
+                const utcMs = dateObj.getTime() + dateObj.getTimezoneOffset() * 60000;
+                const lagos = new Date(utcMs + 3600000); // UTC+1
+                return lagos.toLocaleString() + ' (Lagos/WAT approx)';
+            }
+        }
+
+        function updateMirror(which) {
+            const localEl = which === 'start' ? startLocalEl : endLocalEl;
+            const utcEl = which === 'start' ? startUtcEl : endUtcEl;
+            const previewEl = which === 'start' ? startPreviewEl : endPreviewEl;
+
+            const raw = localEl.value;
+            if (!raw) {
+                utcEl.value = '';
+                previewEl.innerHTML = `<i class="fas fa-circle-info mr-1 text-gray-400"></i><span>${which === 'start' ? 'Select a start date & time (your local timezone).' : 'Must be later than the start time.'}</span>`;
+                return { ok: false };
+            }
+
+            // Parse as LOCAL datetime using the browser's OS timezone
+            // datetime-local format "YYYY-MM-DDTHH:MM" is local by spec when given to Date as-is
+            // Adding the browser's local offset marker ensures correct parsing:
+            const asLocal = new Date(raw);
+            if (isNaN(asLocal.getTime())) {
+                previewEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1 text-red-500"></i><span class="text-red-600">Invalid date/time format.</span>`;
+                utcEl.value = '';
+                return { ok: false };
+            }
+
+            const utcStr = asLocal.toISOString(); // e.g. "2026-07-27T01:18:00.000Z"
+            utcEl.value = utcStr;
+
+            const lagosStr = formatAsLagos(asLocal);
+            previewEl.innerHTML = `<i class="fas fa-check-circle mr-1 text-green-500"></i><span class="text-green-700 font-mono">➜ ${lagosStr}</span>`;
+
+            // Extra check: start < end for end-time input
+            if (which === 'end' && startUtcEl.value) {
+                const start = new Date(startUtcEl.value);
+                if (asLocal <= start) {
+                    previewEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1 text-orange-500"></i><span class="text-orange-600">End (${lagosStr}) must be AFTER start time.</span>`;
+                }
+            }
+
+            return { ok: true, asLocal, utcStr, lagosStr };
+        }
+
+        // Live updates — mirror as the lecturer types / picks times
+        startLocalEl.addEventListener('input', function () { updateMirror('start'); updateMirror('end'); });
+        endLocalEl.addEventListener('input',   function () { updateMirror('end'); });
+        startLocalEl.addEventListener('change', function () { updateMirror('start'); updateMirror('end'); });
+        endLocalEl.addEventListener('change',   function () { updateMirror('end'); });
+
+        // Initialize previews
+        updateMirror('start');
+        updateMirror('end');
+
+        // ------------------------------------------------------------
+        // Submit handler — final sanity check before sending to server
+        // ------------------------------------------------------------
+        form.addEventListener('submit', function (e) {
+            // Ensure mirrors are up-to-date
+            const r1 = updateMirror('start');
+            const r2 = updateMirror('end');
+
+            if (!r1.ok || !r2.ok) {
+                alert('Please select both a valid start time and end time.');
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
+            if (r1.asLocal >= r2.asLocal) {
+                alert('End time must be strictly AFTER start time.\n\nStart: ' + r1.lagosStr + '\nEnd:   ' + r2.lagosStr);
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
+            // Confirm hidden inputs actually carry data (the server reads name=start_time / end_time)
+            if (!startUtcEl.value || !endUtcEl.value) {
+                alert('Internal error: time conversion failed. Please refresh and try again.');
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
+            // Debug log
+            console.log('[CREATE_ATTENDANCE_SUBMIT] UTC values being sent:');
+            console.log('  start_time =', startUtcEl.value);
+            console.log('  end_time   =', endUtcEl.value);
+            console.log('  Your browser timezone offset (min ahead of UTC → negative means ahead):', new Date().getTimezoneOffset());
+        });
+
+        // ------------------------------------------------------------
+        // Summary banner shown below the time section
+        // ------------------------------------------------------------
+        const banner = document.createElement('div');
+        banner.className = 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-800 flex items-start mt-4';
+        banner.innerHTML = '<i class="fas fa-circle-info mr-2 mt-0.5 text-blue-600"></i>' +
+            '<div>' +
+                '<p class="font-semibold mb-1">✅ Timezone-safe submission is active</p>' +
+                '<ul class="list-disc ml-5 space-y-0.5 text-blue-700">' +
+                    '<li>Pick start &amp; end times using <strong>your PC clock / timezone</strong>.</li>' +
+                    '<li>Each input shows the equivalent <strong>Lagos/WAT (Africa/Lagos)</strong> time below it — double-check this matches your lecture hours.</li>' +
+                    '<li>Times are automatically converted to UTC before sending, so no Windows / OS timezone misconfiguration can corrupt the session window.</li>' +
+                '</ul>' +
+            '</div>';
+        const timeSection = document.querySelector('#start_time_local').closest('.grid');
+        if (timeSection && timeSection.parentNode) {
+            timeSection.parentNode.insertBefore(banner, timeSection.nextSibling);
+        }
+    })();
 </script>
 {% endblock content %}

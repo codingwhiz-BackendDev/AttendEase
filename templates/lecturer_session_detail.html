@@ -63,10 +63,20 @@
                     <div class="flex items-start">
                         <i class="fas fa-clock text-indigo-500 w-5 mt-0.5"></i>
                         <div>
-                            <p class="text-gray-900 font-semibold">Scheduled Time</p>
-                            <p class="text-gray-600">{{ session.start_time|date:"M d, H:i" }} - {{ session.end_time|date:"H:i" }}</p>
+                            <p class="text-gray-900 font-semibold">Scheduled Time (Lagos/WAT)</p>
+                            <p class="text-gray-600 font-bold">{{ session.formatted_start }} → {{ session.formatted_end }}</p>
                         </div>
                     </div>
+
+                    <!-- LIVE COUNTDOWN -->
+                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100">
+                        <p class="text-indigo-700 font-black text-xs uppercase tracking-wide mb-1 flex items-center">
+                            <i class="fas fa-stopwatch mr-1.5"></i>Session Time Remaining
+                        </p>
+                        <div id="session-countdown" class="text-indigo-900 font-black text-2xl font-mono tracking-tight">--:--:--</div>
+                        <p id="session-countdown-caption" class="text-xs text-indigo-600 mt-1">Calculating…</p>
+                    </div>
+
                     <div class="flex items-start">
                         <i class="fas fa-compress-arrows-alt text-indigo-500 w-5 mt-0.5"></i>
                         <div>
@@ -76,13 +86,32 @@
                     </div>
                     {% if session.notes %}
                     <div class="flex items-start">
-                        <i class="fas fa-sticky-note text-indigo-500 w-5 mt-0.5"></i>
+                        <i class="fas fa-sticky-note text-amber-500 w-5 mt-0.5"></i>
                         <div>
                             <p class="text-gray-900 font-semibold">Lecturer's Notes</p>
                             <p class="text-gray-600 italic">"{{ session.notes }}"</p>
                         </div>
                     </div>
                     {% endif %}
+
+                    <!-- Quick hall share / directions -->
+                    <div class="pt-2">
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wide mb-2">Share / Navigate</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="openDirections('google')" class="flex flex-col items-center gap-1 p-3 rounded-xl bg-blue-50 border border-blue-100 hover:bg-blue-100 hover:shadow transition-all">
+                                <i class="fab fa-google text-blue-600 text-xl"></i>
+                                <span class="text-[11px] font-black text-blue-700">Maps</span>
+                            </button>
+                            <button onclick="openDirections('waze')" class="flex flex-col items-center gap-1 p-3 rounded-xl bg-cyan-50 border border-cyan-100 hover:bg-cyan-100 hover:shadow transition-all">
+                                <i class="fas fa-route text-cyan-600 text-xl"></i>
+                                <span class="text-[11px] font-black text-cyan-700">Waze</span>
+                            </button>
+                            <button onclick="copyHallCoords()" class="flex flex-col items-center gap-1 p-3 rounded-xl bg-purple-50 border border-purple-100 hover:bg-purple-100 hover:shadow transition-all">
+                                <i class="fas fa-copy text-purple-600 text-xl"></i>
+                                <span class="text-[11px] font-black text-purple-700">Share</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -178,8 +207,96 @@
 </div>
 
 <script>
+    const SESSION_LAT = {{ session.latitude|default:0 }};
+    const SESSION_LON = {{ session.longitude|default:0 }};
+    const SESSION_HALL = "{{ session.lecture_hall|escapejs }}";
+    const SESSION_START_ISO = "{{ session.start_time_iso }}";
+    const SESSION_END_ISO = "{{ session.end_time_iso }}";
+
+    function openDirections(provider) {
+        if (!SESSION_LAT || !SESSION_LON) {
+            alert('No GPS coordinates available for this session.');
+            return;
+        }
+        if (provider === 'google') {
+            window.open(
+                'https://www.google.com/maps/dir/?api=1&destination=' + SESSION_LAT + ',' + SESSION_LON +
+                '&dir_action=navigate&travelmode=walking',
+                '_blank'
+            );
+        } else if (provider === 'waze') {
+            window.open(
+                'https://www.waze.com/ul?ll=' + SESSION_LAT + ',' + SESSION_LON + '&navigate=yes',
+                '_blank'
+            );
+        }
+    }
+
+    function copyHallCoords() {
+        const text = SESSION_HALL + ' (' + Number(SESSION_LAT).toFixed(6) + ', ' + Number(SESSION_LON).toFixed(6) + ')';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+                const btn = event.target.closest('button');
+                const oldHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check text-green-600 text-xl"></i><span class="text-[11px] font-black text-green-700">Copied!</span>';
+                setTimeout(function () { btn.innerHTML = oldHTML; }, 1800);
+            }).catch(function () { alert('Copied: ' + text); });
+        } else {
+            prompt('Copy this link:', text);
+        }
+    }
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function tickCountdown() {
+        const el = document.getElementById('session-countdown');
+        const cap = document.getElementById('session-countdown-caption');
+        if (!el || !cap) return;
+        const now = new Date();
+        const start = new Date(SESSION_START_ISO);
+        const end = new Date(SESSION_END_ISO);
+        let msLeft, caption, cls;
+
+        if (now < start) {
+            msLeft = start - now;
+            caption = 'Session starts in…';
+            cls = 'text-indigo-900';
+        } else if (now <= end) {
+            msLeft = end - now;
+            const totalMs = end - start;
+            const pct = totalMs > 0 ? (msLeft / totalMs) : 0;
+            if (pct < 0.1) {
+                caption = '⚠️ LAST CALL — session ending very soon!';
+                cls = 'text-red-600';
+            } else if (pct < 0.3) {
+                caption = '⏰ Final stretch — encourage late students to mark now';
+                cls = 'text-orange-600';
+            } else {
+                caption = 'Session active — students are marking attendance';
+                cls = 'text-emerald-700';
+            }
+        } else {
+            el.textContent = '00:00:00';
+            el.className = 'text-red-600 font-black text-2xl font-mono tracking-tight';
+            cap.textContent = 'Session ended';
+            cap.className = 'text-xs text-red-600 mt-1';
+            return;
+        }
+
+        const s = Math.floor(msLeft / 1000);
+        const hh = Math.floor(s / 3600);
+        const mm = Math.floor((s % 3600) / 60);
+        const ss = s % 60;
+        el.textContent = pad(hh) + ':' + pad(mm) + ':' + pad(ss);
+        el.className = cls + ' font-black text-2xl font-mono tracking-tight';
+        cap.textContent = caption;
+    }
+
     // Initialize Leaflet Interactive Map
     document.addEventListener("DOMContentLoaded", function () {
+        tickCountdown();
+        setInterval(tickCountdown, 1000);
+
         const lat = {{ session.latitude|default:0 }};
         const lon = {{ session.longitude|default:0 }};
         const radius = {{ session.radius|default:100 }};
@@ -192,39 +309,43 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
 
-            // Lecturer Lecture Center Marker
-            const centerMarker = L.marker([lat, lon]).addTo(map)
-                .bindPopup('<b>Lecture Location Center</b><br>Hall: {{ session.lecture_hall }}')
+            const hallIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div style="background:#4f46e5;color:white;border:3px solid white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(79,70,229,0.4);"><i class="fas fa-graduation-cap text-sm"></i></div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+                popupAnchor: [0, -18]
+            });
+            const centerMarker = L.marker([lat, lon], { icon: hallIcon }).addTo(map)
+                .bindPopup('<div style="font-weight:700;color:#4f46e5;margin-bottom:4px;">📍 ' + SESSION_HALL + '</div><div style="font-size:12px;color:#4b5563;">Session ID: #{{ session.id }}<br>{{ records.count }} student(s) checked in</div>')
                 .openPopup();
 
-            // Geofence Circle Boundary
             const circle = L.circle([lat, lon], {
                 color: '#4f46e5',
                 fillColor: '#818cf8',
                 fillOpacity: 0.15,
-                radius: radius
+                radius: radius,
+                dashArray: '6 6'
             }).addTo(map);
 
-            // Fit boundary
-            map.fitBounds(circle.getBounds());
-            
-            // Add student marker coordinates dynamically
+            map.fitBounds(circle.getBounds(), { padding: [30, 30] });
+
             {% for rec in records %}
                 L.circleMarker([{{ rec.latitude }}, {{ rec.longitude }}], {
-                    radius: 6,
+                    radius: 7,
                     fillColor: "#10b981",
                     color: "#ffffff",
                     weight: 2,
                     opacity: 1,
-                    fillOpacity: 0.8
+                    fillOpacity: 0.85
                 }).addTo(map)
-                .bindPopup('<b>{{ rec.student.get_full_name|default:rec.student.username }}</b><br>Distance: {{ rec.distance|floatformat:1 }}m');
+                .bindPopup('<div style="font-weight:700;font-size:13px;">{{ rec.student.get_full_name|default:rec.student.username|escapejs }}</div><div style="font-size:11px;color:#6b7280;">{{ rec.department|default:"N/A"|escapejs }}<br>Distance: {{ rec.distance|floatformat:1 }}m</div>');
             {% endfor %}
         }
     });
 
     function confirmClose(event) {
-        if (!confirm("Are you sure you want to end this attendance session early? Students will not be able to mark attendance after this.")) {
+        if (!confirm("⚠️ Are you sure you want to END this attendance session early?\n\nStudents will NOT be able to mark attendance after this action.")) {
             event.preventDefault();
             return false;
         }

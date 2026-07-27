@@ -2,11 +2,25 @@
 {% load static %}
 
 {% block content %}
-<div class="p-8">
+<!-- Leaflet.js map assets -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+    .mini-map { border-radius: 0.75rem; overflow: hidden; background: #e5e7eb; border: 1px solid #e5e7eb; }
+    .leaflet-container { z-index: 1; }
+    .countdown-cell { font-variant-numeric: tabular-nums; }
+</style>
+
+<div class="p-6 lg:p-8 max-w-[1600px] mx-auto">
     <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Attendance History</h1>
-        <p class="text-gray-600">View your attendance records and upcoming classes</p>
+    <div class="mb-8 flex items-end justify-between flex-wrap gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">📚 My Attendance</h1>
+            <p class="text-gray-600">Track every session, never miss a class, know exactly where to go — in real-time.</p>
+        </div>
+        <div class="text-xs text-gray-500 bg-white border border-gray-200 rounded-xl px-4 py-2 shadow-sm">
+            <i class="fas fa-clock mr-1 text-gray-400"></i>Server Time: <span class="font-mono text-gray-800 font-bold">{{ server_now_lagos|default:"N/A" }}</span>
+        </div>
     </div>
 
     <!-- Messages -->
@@ -23,106 +37,390 @@
     </div>
     {% endif %}
 
-    <!-- Stats Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+    <!-- ======== TOP: KILLER STATS OVERVIEW ======== -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-xl card-hover">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-emerald-100 text-sm font-medium mb-1">Total Sessions</p>
-                    <p class="text-3xl font-bold">{{ attendances.count }}</p>
+                    <p class="text-emerald-100 text-xs font-bold uppercase tracking-wide mb-1">Attendance Rate</p>
+                    <p class="text-3xl font-black">{{ attendance_rate_pct }}<span class="text-lg">%</span></p>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                    <i class="fas fa-calendar text-2xl"></i>
+                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-chart-pie text-xl"></i>
                 </div>
             </div>
+            <p class="text-xs text-emerald-100 mt-2 font-semibold">{{ total_attended }}/{{ total_eligible }} sessions attended</p>
         </div>
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+        <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-5 text-white shadow-xl card-hover">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-indigo-100 text-sm font-medium mb-1">Attendance Rate</p>
-                    <p class="text-3xl font-bold">85%</p>
+                    <p class="text-green-100 text-xs font-bold uppercase tracking-wide mb-1">✅ Sessions Attended</p>
+                    <p class="text-3xl font-black">{{ total_attended }}</p>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                    <i class="fas fa-chart-line text-2xl"></i>
+                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-circle-check text-xl"></i>
                 </div>
             </div>
+            <p class="text-xs text-green-100 mt-2 font-semibold">Present count</p>
         </div>
-        <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white shadow-xl card-hover">
+        <div class="bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-5 text-white shadow-xl card-hover">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-orange-100 text-sm font-medium mb-1">Upcoming</p>
-                    <p class="text-3xl font-bold">{{ attendances.count }}</p>
+                    <p class="text-rose-100 text-xs font-bold uppercase tracking-wide mb-1">❌ Sessions Missed</p>
+                    <p class="text-3xl font-black">{{ missed_count }}</p>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                    <i class="fas fa-clock text-2xl"></i>
+                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-xmark text-xl"></i>
                 </div>
             </div>
+            <p class="text-xs text-rose-100 mt-2 font-semibold">Improve this — never miss another!</p>
+        </div>
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-xl card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-indigo-100 text-xs font-bold uppercase tracking-wide mb-1">🔔 Active / Upcoming</p>
+                    <p class="text-3xl font-black"><span id="live-active-count">{{ active_count }}</span> / {{ upcoming_count }}</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-bell text-xl"></i>
+                </div>
+            </div>
+            <p class="text-xs text-indigo-100 mt-2 font-semibold">{{ attendances.count }} total sessions tracked</p>
         </div>
     </div>
 
-    <!-- Attendance List -->
-    <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900">Attendance Sessions</h2>
-            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">{{ attendances.count }} Sessions</span>
-        </div>
-        
-        {% if attendances %}
-        <div class="space-y-4">
-            {% for attendance in attendances %}
-            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-emerald-200 transition-all">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <div class="flex items-center mb-2 gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center mr-1">
-                                <i class="fas fa-book text-white"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">{{ attendance.course.course_title }}</h3>
-                                <p class="text-sm text-gray-600">{{ attendance.course.course_code }}</p>
-                            </div>
-                            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-{{ attendance.status_color }}-100 text-{{ attendance.status_color }}-800">
-                                {{ attendance.status_label }}
-                            </span>
-                        </div>
-                        <div class="flex items-center space-x-4 text-sm text-gray-600">
-                            <span class="flex items-center"><i class="fas fa-clock mr-2 text-emerald-500"></i>{{ attendance.start_time|date:"H:i" }} - {{ attendance.end_time|date:"H:i" }}</span>
-                            <span class="flex items-center"><i class="fas fa-building mr-2 text-emerald-500"></i>{{ attendance.lecture_hall }}</span>
-                            <span class="flex items-center"><i class="fas fa-calendar mr-2 text-emerald-500"></i>{{ attendance.start_time|date:"M d, Y" }}</span>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-end space-y-2">
-                        {% if attendance.has_attended %}
-                        <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-xl text-sm font-semibold">
-                            <i class="fas fa-check-circle mr-1"></i>Attended
-                        </span>
-                        {% elif attendance.status_label == 'Active' %}
-                        <a href="/student/mark-attendance/{{attendance.id}}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all text-sm font-semibold shadow-md">
-                            <i class="fas fa-check-circle mr-1"></i>Mark Attendance
-                        </a>
-                        {% elif attendance.status_label == 'Expired' %}
-                        <span class="px-3 py-1.5 bg-red-50 text-red-500 rounded-xl text-sm font-semibold border border-red-100">
-                            <i class="fas fa-times-circle mr-1"></i>Missed
-                        </span>
-                        {% else %}
-                        <span class="px-3 py-1.5 bg-indigo-50 text-indigo-500 rounded-xl text-sm font-semibold border border-indigo-100">
-                            <i class="fas fa-calendar mr-1"></i>Upcoming
-                        </span>
-                        {% endif %}
-                    </div>
+    <!-- Filter tabs -->
+    <div class="flex gap-2 mb-6 flex-wrap">
+        <button onclick="filterCards('all')" class="filter-btn active px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-md">
+            <i class="fas fa-layer-group mr-1"></i>All Sessions
+        </button>
+        <button onclick="filterCards('Active')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+            🟢 Active Now
+        </button>
+        <button onclick="filterCards('Upcoming')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+            🔵 Upcoming
+        </button>
+        <button onclick="filterCards('marked')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+            ✅ I've Marked
+        </button>
+        <button onclick="filterCards('Expired')" class="filter-btn px-4 py-2 rounded-xl bg-white text-gray-700 text-sm font-bold border border-gray-200 hover:bg-gray-50">
+            🔴 Past / Expired
+        </button>
+    </div>
+
+    <!-- Attendance Sessions Grid (beautiful cards!) -->
+    {% if attendances %}
+    <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for att in attendances %}
+        <div class="card-item bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden card-hover transition-all duration-300 hover:-translate-y-1"
+             data-status="{{ att.status_label }}"
+             data-marked="{% if att.has_attended %}1{% else %}0{% endif %}"
+             data-start="{{ att.start_time_iso }}"
+             data-end="{{ att.end_time_iso }}"
+             data-sid="{{ att.session_id }}"
+             data-lat="{{ att.latitude|default:'' }}"
+             data-lon="{{ att.longitude|default:'' }}"
+             data-radius="{{ att.radius|default:100 }}">
+
+            <!-- Top status bar -->
+            <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                <span class="px-2.5 py-1 text-[11px] font-black rounded-full bg-{{ att.status_color }}-100 text-{{ att.status_color }}-800 uppercase tracking-wider">
+                    {{ att.status_label }}
+                </span>
+                <div class="flex items-center gap-3">
+                    <span class="text-[11px] font-bold text-gray-400">ID: #{{ att.session_id }}</span>
+                    {% if att.has_attended %}
+                    <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-[11px] font-black">
+                        <i class="fas fa-check-double mr-1 text-green-500"></i>Marked
+                    </span>
+                    {% endif %}
                 </div>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-12">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <i class="fas fa-calendar-times text-2xl text-gray-400"></i>
+
+            <!-- Mini map (if we have coords) -->
+            {% if att.latitude and att.longitude %}
+            <div id="mini-map-{{ att.session_id }}" class="mini-map w-full h-40 border-b border-gray-100"></div>
+            {% else %}
+            <div class="w-full h-40 bg-gradient-to-br from-gray-100 to-gray-50 border-b border-gray-100 flex flex-col items-center justify-center text-gray-400">
+                <i class="fas fa-map-marker-slash text-4xl mb-2"></i>
+                <p class="text-xs font-bold">No GPS data from lecturer</p>
             </div>
-            <p class="text-gray-500">No attendance sessions found</p>
-            <p class="text-sm text-gray-400 mt-1">Enroll in courses to see attendance sessions here</p>
+            {% endif %}
+
+            <!-- Card body -->
+            <div class="p-5 space-y-3">
+                <div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <i class="fas fa-book text-white"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-extrabold text-gray-900 text-base leading-tight truncate" title="{{ att.course.course_title }}">
+                                {{ att.course.course_title }}
+                            </h3>
+                            <p class="text-xs text-gray-500 font-bold mt-0.5">{{ att.course.course_code }} · {{ att.course.credit }} Credits</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-100">
+                        <p class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1">Hall</p>
+                        <p class="font-bold text-gray-900 truncate" title="{{ att.hall }}">
+                            <i class="fas fa-building text-indigo-500 mr-1"></i>{{ att.hall }}
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-100">
+                        <p class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1">Students Here</p>
+                        <p class="font-bold text-gray-900">
+                            <i class="fas fa-users text-indigo-500 mr-1"></i>{{ att.attendance_count }} marked
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-gray-500 uppercase tracking-wider font-black text-[10px] mb-1">Session Window (Lagos/WAT)</p>
+                    <p class="font-bold text-gray-900 text-sm">
+                        <i class="fas fa-clock text-indigo-500 mr-1"></i>{{ att.formatted_start|slice:"11:16" }} → {{ att.formatted_end|slice:"11:16" }}
+                    </p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ att.formatted_start|slice:":11" }} · Radius {{ att.radius }}m</p>
+                </div>
+
+                <!-- Live countdown or "Marked" info -->
+                <div id="card-countdown-{{ att.session_id }}" class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100 min-h-[68px]">
+                    {% if att.has_attended %}
+                        <p class="text-[11px] text-green-700 font-black uppercase tracking-wide mb-1">✅ You marked attendance</p>
+                        <p class="text-xs text-gray-800 font-bold">
+                            Time: {{ att.student_marked_time|default:"N/A"|slice:"11:19" }}
+                        </p>
+                        {% if att.student_distance is not None %}
+                        <p class="text-[11px] text-gray-600 mt-0.5 font-semibold">
+                            You were {{ att.student_distance }}m from the hall center.
+                        </p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-[11px] text-indigo-700 font-black uppercase tracking-wide mb-1 countdown-caption-{{ att.session_id }}">Loading…</p>
+                        <p class="font-black text-indigo-900 text-lg font-mono countdown-cell countdown-value-{{ att.session_id }}">--:--:--</p>
+                    {% endif %}
+                </div>
+
+                <!-- Lecturer note -->
+                {% if att.notes %}
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                    <p class="text-[11px] font-black text-amber-800 uppercase tracking-wide mb-1 flex items-center">
+                        <i class="fas fa-sticky-note mr-1"></i>Lecturer's Note
+                    </p>
+                    <p class="text-xs text-amber-900 italic">"{{ att.notes }}"</p>
+                </div>
+                {% endif %}
+
+                <!-- Action buttons -->
+                <div class="pt-2 border-t border-gray-100 flex gap-2 items-stretch">
+                    {% if att.status_label == 'Active' and not att.has_attended %}
+                        <a href="/student/mark-attendance/{{ att.session_id }}"
+                           class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-black text-xs shadow-md hover:shadow-lg transition-all">
+                            <i class="fas fa-camera"></i>Mark Now
+                        </a>
+                    {% elif att.status_label == 'Upcoming' %}
+                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-indigo-50 text-indigo-700 rounded-xl font-black text-xs border border-indigo-100">
+                            <i class="fas fa-calendar"></i>Starts Soon
+                        </span>
+                    {% elif att.status_label == 'Expired' and att.has_attended %}
+                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-green-50 text-green-700 rounded-xl font-black text-xs border border-green-200">
+                            <i class="fas fa-check"></i>Present ✓
+                        </span>
+                    {% elif att.status_label == 'Expired' %}
+                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-red-50 text-red-700 rounded-xl font-black text-xs border border-red-200">
+                            <i class="fas fa-xmark"></i>Missed
+                        </span>
+                    {% elif att.has_attended %}
+                        <span class="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-green-50 text-green-700 rounded-xl font-black text-xs border border-green-200">
+                            <i class="fas fa-check-double"></i>Already Marked
+                        </span>
+                    {% endif %}
+
+                    <!-- Directions (if coords) -->
+                    {% if att.latitude and att.longitude %}
+                    <div class="flex gap-1.5">
+                        <button title="Get Google Maps directions to hall" onclick="openCardDirections('google', {{ att.session_id }})"
+                                class="w-10 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 border border-blue-100 font-bold shadow-sm transition-all">
+                            <i class="fab fa-google"></i>
+                        </button>
+                        <button title="Waze navigation" onclick="openCardDirections('waze', {{ att.session_id }})"
+                                class="w-10 flex items-center justify-center bg-cyan-50 text-cyan-600 rounded-xl hover:bg-cyan-100 border border-cyan-100 font-bold shadow-sm transition-all">
+                            <i class="fas fa-route"></i>
+                        </button>
+                        <button title="Open mark page (map & details)"
+                                {% if att.status_label == 'Active' %}
+                                onclick="location.href='/student/mark-attendance/{{ att.session_id }}'"
+                                {% elif att.latitude and att.longitude %}
+                                onclick="openCardMapInNewTab({{ att.session_id }})"
+                                {% endif %}
+                                class="w-10 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 border border-indigo-100 font-bold shadow-sm transition-all">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        {% endif %}
+        {% endfor %}
     </div>
+
+    {% else %}
+    <div class="text-center py-20 bg-white rounded-2xl shadow-xl border border-gray-100">
+        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+            <i class="fas fa-calendar-days text-4xl text-indigo-500"></i>
+        </div>
+        <h2 class="text-xl font-black text-gray-900 mb-1">No attendance sessions yet</h2>
+        <p class="text-gray-500 max-w-md mx-auto mb-6">This is where all your lecture attendance sessions will appear. Enroll in your courses first, then wait for lecturers to create check-ins.</p>
+        <a href="/student_courses" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all">
+            <i class="fas fa-book mr-2"></i>Enroll in Courses Now
+        </a>
+    </div>
+    {% endif %}
 </div>
+
+<script>
+    // =========================================================
+    // Card filter (tabs)
+    // =========================================================
+    function filterCards(kind) {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'active');
+            btn.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-200');
+        });
+        event.target.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200');
+        event.target.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'active');
+
+        document.querySelectorAll('.card-item').forEach(card => {
+            const status = card.dataset.status;
+            const marked = card.dataset.marked === '1';
+            let show = false;
+            if (kind === 'all') show = true;
+            else if (kind === 'marked') show = marked;
+            else show = (status === kind);
+            card.style.display = show ? '' : 'none';
+        });
+    }
+
+    // =========================================================
+    // Directions helpers per card
+    // =========================================================
+    function openCardDirections(provider, sid) {
+        const card = document.querySelector(`.card-item[data-sid="${sid}"]`);
+        if (!card) return;
+        const lat = parseFloat(card.dataset.lat);
+        const lon = parseFloat(card.dataset.lon);
+        if (!lat || !lon) { Swal.fire({icon:'warning',title:'No GPS coords for this session.'}); return; }
+        let url;
+        if (provider === 'google') url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&dir_action=navigate&travelmode=walking`;
+        else url = `https://www.waze.com/ul?ll=${lat},${lon}&navigate=yes`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+    function openCardMapInNewTab(sid) {
+        // Just open the mark-attendance page which has a FULL map + directions
+        window.open('/student/mark-attendance/' + sid, '_blank');
+    }
+
+    // =========================================================
+    // Initialize mini maps per card that has coordinates
+    // =========================================================
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for att in attendances %}
+            {% if att.latitude and att.longitude %}
+                (function () {
+                    const sid = {{ att.session_id }};
+                    const lat = {{ att.latitude }};
+                    const lon = {{ att.longitude }};
+                    const radius = {{ att.radius|default:100 }};
+                    const hall = "{{ att.hall|default:'Lecture Hall'|escapejs }}";
+                    const status = "{{ att.status_label }}";
+                    const statusColor = status === 'Active' ? '#10b981' : (status === 'Upcoming' ? '#6366f1' : '#ef4444');
+
+                    const containerId = 'mini-map-' + sid;
+                    if (!document.getElementById(containerId)) return;
+
+                    const mini = L.map(containerId, {
+                        zoomControl: false,
+                        attributionControl: false,
+                        scrollWheelZoom: false,
+                        dragging: false,
+                    }).setView([lat, lon], 16);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(mini);
+
+                    const hallIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="transform: translate(-50%, -100%);">
+                            <div style="background:${statusColor};color:#fff;border:2px solid #fff;border-radius:50% 50% 50% 0;padding:5px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+                                <i class="fas fa-graduation-cap" style="transform:rotate(45deg);font-size:11px;"></i>
+                            </div>
+                        </div>`,
+                        iconSize: [24, 32], iconAnchor: [12, 32],
+                    });
+                    L.marker([lat, lon], { icon: hallIcon }).addTo(mini);
+                    L.circle([lat, lon], {
+                        color: statusColor, fillColor: statusColor, weight: 1.5,
+                        fillOpacity: 0.12, radius: radius, dashArray: '4 3'
+                    }).addTo(mini);
+
+                    mini.fitBounds(L.latLng([lat, lon]).toBounds(radius * 3));
+                })();
+            {% endif %}
+        {% endfor %}
+
+        // =========================================================
+        // Live countdowns per card
+        // =========================================================
+        function fmt(ms) {
+            const s = Math.max(0, Math.floor(ms / 1000));
+            const h = String(Math.floor(s / 3600)).padStart(2, '0');
+            const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+            const sec = String(s % 60).padStart(2, '0');
+            return `${h}:${m}:${sec}`;
+        }
+        function updateAllCountdowns() {
+            const now = new Date();
+            let liveActiveCounter = 0;
+
+            document.querySelectorAll('.card-item').forEach(card => {
+                const sid = card.dataset.sid;
+                const start = card.dataset.start ? new Date(card.dataset.start) : null;
+                const end   = card.dataset.end ? new Date(card.dataset.end) : null;
+                const valEl = document.querySelector(`.countdown-value-${sid}`);
+                const capEl = document.querySelector(`.countdown-caption-${sid}`);
+                if (!valEl || !capEl) return;
+
+                // Skip if already marked (we have different content there)
+                if (card.dataset.marked === '1') return;
+
+                if (!start || !end) return;
+
+                if (now < start) {
+                    valEl.textContent = fmt(start - now);
+                    valEl.className = valEl.className.replace(/text-(indigo|red|green)-\d+/g, '') + ' text-indigo-900';
+                    capEl.textContent = '⏳ Starts in (arrive early!)';
+                } else if (now <= end) {
+                    liveActiveCounter++;
+                    valEl.textContent = fmt(end - now);
+                    valEl.className = valEl.className.replace(/text-(indigo|red|green)-\d+/g, '') + ' text-green-700';
+                    const pct = Math.max(0, Math.min(1, (end - now) / Math.max(1, end - start)));
+                    if (pct > 0.3) capEl.textContent = '🔥 Active — plenty of time left';
+                    else if (pct > 0.1) capEl.textContent = '⚠️ Hurry, window closing';
+                    else capEl.textContent = '🚨 LAST CALL! Mark NOW';
+                } else {
+                    valEl.textContent = '00:00:00';
+                    valEl.className = valEl.className.replace(/text-(indigo|red|green)-\d+/g, '') + ' text-red-700';
+                    capEl.textContent = '🔴 Session ended';
+                }
+            });
+
+            const liveEl = document.getElementById('live-active-count');
+            if (liveEl) liveEl.textContent = liveActiveCounter;
+        }
+        updateAllCountdowns();
+        setInterval(updateAllCountdowns, 1000);
+    });
+</script>
 {% endblock content %}

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from datetime import datetime 
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -59,7 +59,7 @@ class AttendanceSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lecturer = models.ForeignKey(LecturerProfile, on_delete=models.CASCADE)
     lecture_hall = models.CharField(max_length=255)
-    start_time = models.DateTimeField(default=datetime.now)
+    start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True, null=True)

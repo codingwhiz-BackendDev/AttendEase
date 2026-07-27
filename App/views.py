@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import StudentProfile, LecturerProfile, Course, User, AttendanceSession, AttendanceRecord
-from django.utils.timezone import is_naive, make_aware
+from django.utils.timezone import is_naive, make_aware, is_aware, localtime, get_default_timezone
 
 from django.contrib import messages
 from datetime import datetime
@@ -14,7 +14,7 @@ import base64
 import numpy as np
 import cv2 
 from django.utils.timezone import now
-from datetime import datetime 
+from datetime import datetime, timezone as dt_timezone
 from PIL import Image
 import math 
 import tempfile
@@ -140,21 +140,61 @@ def student_dashboard(request):
     
     # Annotate attendance session status and check if student has marked attendance
     current_time = now()
+    total_eligible = 0  # sessions that are expired (past the end time)
+    total_attended = 0
+    active_count = 0
+    upcoming_count = 0
+
     for att in attendances:
         att.has_attended = att.records.filter(student=user).exists()
+        att.formatted_start = format_lagos_time(att.start_time)
+        att.formatted_end = format_lagos_time(att.end_time)
+        # Pass raw UTC ISO timestamps to JS for countdowns
+        att.start_time_iso = att.start_time.isoformat()
+        att.end_time_iso = att.end_time.isoformat()
+        att.attendance_count = att.records.count()
+        att.hall = att.lecture_hall
+        att.latitude = att.latitude
+        att.longitude = att.longitude
+        att.radius = att.radius
+
         if current_time < att.start_time:
             att.status_label = 'Upcoming'
             att.status_color = 'indigo'
+            upcoming_count += 1
         elif current_time > att.end_time:
             att.status_label = 'Expired'
             att.status_color = 'red'
+            total_eligible += 1
+            if att.has_attended:
+                total_attended += 1
         else:
             att.status_label = 'Active'
             att.status_color = 'green'
-            
+            active_count += 1
+
+    # Overall attendance rate (only count sessions that have ended)
+    attendance_rate_pct = round((total_attended / total_eligible * 100), 1) if total_eligible > 0 else 100
+
+    # Next upcoming session for the "Next Class" hero widget
+    upcoming_sessions = sorted(
+        [a for a in attendances if a.status_label in ('Upcoming', 'Active')],
+        key=lambda x: x.start_time
+    )
+    next_session = upcoming_sessions[0] if upcoming_sessions else None
+
     context = {
         'user_role': user_role,
-        'attendances': attendances 
+        'attendances': attendances,
+        'server_now_lagos': format_lagos_time(current_time),
+        'enrolled_courses_count': enrolled_courses.count(),
+        'active_count': active_count,
+        'upcoming_count': upcoming_count,
+        'attendance_rate_pct': attendance_rate_pct,
+        'total_eligible': total_eligible,
+        'total_attended': total_attended,
+        'next_session': next_session,
+        'student_profile': student_profile,
     }  
     return render(request, "student_dashboard.html", context)
 
@@ -173,11 +213,24 @@ def lecturer_dashboard(request):
     # Annotate session status and calculate metrics
     current_time = now()
     active_count = 0
+    upcoming_count = 0
+    total_marked_all = 0
     for class_obj in scheduled_lectures:
         class_obj.marked_count = class_obj.records.count()
+        class_obj.formatted_start = format_lagos_time(class_obj.start_time)
+        class_obj.formatted_end = format_lagos_time(class_obj.end_time)
+        class_obj.start_time_iso = class_obj.start_time.isoformat()
+        class_obj.end_time_iso = class_obj.end_time.isoformat()
+        class_obj.latitude = class_obj.latitude
+        class_obj.longitude = class_obj.longitude
+        class_obj.radius = class_obj.radius
+        class_obj.hall = class_obj.lecture_hall
+        class_obj.notes = class_obj.notes or ''
+        total_marked_all += class_obj.marked_count
         if current_time < class_obj.start_time:
             class_obj.status_label = 'Upcoming'
             class_obj.status_color = 'indigo'
+            upcoming_count += 1
         elif current_time > class_obj.end_time:
             class_obj.status_label = 'Expired'
             class_obj.status_color = 'red'
@@ -185,12 +238,23 @@ def lecturer_dashboard(request):
             class_obj.status_label = 'Active'
             class_obj.status_color = 'green'
             active_count += 1
-            
+
+    # Next active / upcoming session hero widget
+    sorted_next = sorted(
+        [c for c in scheduled_lectures if c.status_label in ('Upcoming', 'Active')],
+        key=lambda x: x.start_time
+    )
+    next_session = sorted_next[0] if sorted_next else None
+
     context = {
         'user_role': user_role,
         'scheduled_lectures': scheduled_lectures,
         'lecturer': lecturer,
         'active_count': active_count,
+        'upcoming_count': upcoming_count,
+        'total_marked_all': total_marked_all,
+        'next_session': next_session,
+        'server_now_lagos': format_lagos_time(current_time),
     }  
     logger.info(f"Lecturer dashboard accessed by {user.username}")
     return render(request, "lecturer_dashboard.html", context) 
@@ -390,10 +454,54 @@ def lecturer_course_unenrollment(request):
         messages.success(request, f"You've successfully unenrolled for '{course}' as a Lecturer") 
         return redirect('lecturer_courses')
 
+def format_lagos_time(aware_dt):
+    """Convert an aware datetime to Africa/Lagos (project TZ) and format as string."""
+    if aware_dt is None:
+        return "N/A"
+    try:
+        local_dt = localtime(aware_dt, timezone=get_default_timezone())
+        return local_dt.strftime("%Y-%m-%d %H:%M:%S (Lagos/WAT)")
+    except Exception:
+        return aware_dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
 def get_aware_datetime(dt_str):
+    """
+    Parse a datetime string and return a timezone-aware datetime.
+    
+    Supports two formats from the client:
+    1. UTC ISO string with 'Z' suffix (preferred, sent by client-side conversion JS)
+       e.g. "2026-07-27T01:18:00.000Z"
+    2. Naive datetime-local string (legacy, fallback):
+       e.g. "2026-07-27T02:18" - interpreted as project default timezone (Africa/Lagos)
+    """
+    if not dt_str:
+        raise ValueError("Empty datetime string provided")
+
+    dt_str = dt_str.strip()
+
+    # Case 1: Explicit UTC ISO format (ends with Z) or has explicit timezone offset
+    if dt_str.endswith('Z'):
+        # Replace Z with +00:00 for fromisoformat compatibility (Python <3.11)
+        iso_str = dt_str[:-1] + "+00:00"
+        dt = datetime.fromisoformat(iso_str)
+        if is_naive(dt):
+            dt = dt.replace(tzinfo=dt_timezone.utc)
+        return dt
+
+    # Case 2: Has explicit +HH:MM or -HH:MM offset
+    try:
+        dt = datetime.fromisoformat(dt_str)
+        if is_aware(dt):
+            return dt
+    except ValueError:
+        pass
+
+    # Case 3: Naive datetime-local string from the browser
+    # Interpret it as being in the project's default timezone (Africa/Lagos)
     dt = datetime.fromisoformat(dt_str)
     if is_naive(dt):
-        return make_aware(dt)
+        dt = make_aware(dt, timezone=get_default_timezone())
     return dt
 
 @lecturer_required
@@ -404,57 +512,157 @@ def create_attendance(request):
     lecturer_profile = get_object_or_404(LecturerProfile, user=user_object)
     courses = lecturer_profile.courses_taught.all()  # Get only courses the lecturer teaches
     
-    logger.info(f"Lecturer {request.user.username} has {courses.count()} courses taught")
+    logger.info(f"[CREATE_ATTENDANCE] Lecturer {request.user.username} has {courses.count()} courses taught")
     for course in courses:
-        logger.info(f"Course: {course.course_title}")
+        logger.info(f"[CREATE_ATTENDANCE] Course available: id={course.id} title={course.course_title}")
 
     if request.method == "POST":
-        course_id = request.POST['course']
-        lecture_hall = request.POST['lecture_hall']
-        start_time = request.POST['start_time']
-        end_time = request.POST['end_time']
+        logger.info("[CREATE_ATTENDANCE] ========== POST received (create session) ==========")
+        logger.debug("[CREATE_ATTENDANCE] POST keys: %s", list(request.POST.keys()))
+
+        # Use .get() with graceful error messages (don't raise KeyError silently)
+        course_id = request.POST.get('course')
+        lecture_hall = request.POST.get('lecture_hall')
+        start_time_raw = request.POST.get('start_time')
+        end_time_raw = request.POST.get('end_time')
         notes = request.POST.get('notes', '')
         radius = request.POST.get('radius', '100')
-
         latitude = request.POST.get('latitude')
         longitude = request.POST.get('longitude')
 
-        if not latitude or not longitude:
-            messages.error(request, "Location data missing! Please allow location access.")
-            return redirect("create_attendance")
-
-        course = get_object_or_404(Course, id=course_id)
-
-        try:
-            start_dt = get_aware_datetime(start_time)
-            end_dt = get_aware_datetime(end_time)
-        except ValueError:
-            messages.error(request, "Invalid date/time values provided.")
-            return redirect("create_attendance")
-
-        if start_dt >= end_dt:
-            messages.error(request, "Start time must be before end time.")
-            return redirect("create_attendance")
-
-        # Create the session
-        session = AttendanceSession.objects.create(
-            course=course,
-            lecturer=lecturer_profile,
-            lecture_hall=lecture_hall,
-            start_time=start_dt,
-            end_time=end_dt,
-            notes=notes,
-            latitude=latitude,  # Store latitude
-            longitude=longitude,  # Store longitude
-            radius=int(radius) if radius else 100
+        logger.info(
+            "[CREATE_ATTENDANCE] Raw params received: course_id=%s hall=%s "
+            "start=%s end=%s radius=%s lat=%s lon=%s",
+            course_id, lecture_hall, start_time_raw, end_time_raw, radius, latitude, longitude,
         )
 
-        # Pre-generate the CSV spreadsheet template
-        generate_session_csv(session)
+        # ---- Validate each field and show user-friendly specific errors ----
+        errors = []
 
-        messages.success(request, "Attendance session created successfully!")
+        if not course_id:
+            errors.append("Please select a course from the dropdown.")
+        if not lecture_hall or not lecture_hall.strip():
+            errors.append("Please enter the lecture hall name.")
+        if not start_time_raw:
+            errors.append("Please select the session start time.")
+        if not end_time_raw:
+            errors.append("Please select the session end time.")
+        if not latitude or not longitude:
+            errors.append("Location data missing! Please allow location access (GPS) in your browser and refresh the page.")
+        else:
+            try:
+                latitude = float(latitude)
+                longitude = float(longitude)
+            except ValueError:
+                errors.append(f"Invalid GPS coordinates received (lat={latitude!r}, lon={longitude!r}).")
+
+        if errors:
+            combined = " ".join(f"• {e}" for e in errors)
+            logger.warning("[CREATE_ATTENDANCE] VALIDATION FAILED: %s", combined)
+            messages.error(request, "Could not create attendance session. " + combined)
+            # Pass courses back so form re-renders correctly with dropdown
+            context = {'courses': courses}
+            return render(request, 'lecturer_create_attendance.html', context)
+
+        # ---- Fetch course ----
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            logger.error("[CREATE_ATTENDANCE] Course id=%s not found", course_id)
+            messages.error(request, f"Course with ID {course_id} does not exist.")
+            context = {'courses': courses}
+            return render(request, 'lecturer_create_attendance.html', context)
+
+        # ---- Parse and validate times ----
+        try:
+            start_dt = get_aware_datetime(start_time_raw)
+            end_dt = get_aware_datetime(end_time_raw)
+            logger.info(
+                "[CREATE_ATTENDANCE] Times parsed: start(aware)=%s end(aware)=%s | "
+                "start(Lagos)=%s end(Lagos)=%s",
+                start_dt.isoformat(), end_dt.isoformat(),
+                format_lagos_time(start_dt), format_lagos_time(end_dt),
+            )
+        except ValueError as ve:
+            logger.exception("[CREATE_ATTENDANCE] Time parsing error: %s", ve)
+            messages.error(
+                request,
+                f"Invalid date/time values. Start={start_time_raw!r}, End={end_time_raw!r}. "
+                "Please try selecting times again."
+            )
+            context = {'courses': courses}
+            return render(request, 'lecturer_create_attendance.html', context)
+        except Exception as ex:
+            logger.exception("[CREATE_ATTENDANCE] Unexpected time parsing failure.")
+            messages.error(request, f"Date/time error: {ex}")
+            context = {'courses': courses}
+            return render(request, 'lecturer_create_attendance.html', context)
+
+        if start_dt >= end_dt:
+            logger.warning(
+                "[CREATE_ATTENDANCE] start >= end rejected. start=%s end=%s (Lagos: %s vs %s)",
+                start_dt, end_dt, format_lagos_time(start_dt), format_lagos_time(end_dt),
+            )
+            messages.error(
+                request,
+                f"Start time ({format_lagos_time(start_dt)}) must be BEFORE end time ({format_lagos_time(end_dt)})."
+            )
+            context = {'courses': courses}
+            return render(request, 'lecturer_create_attendance.html', context)
+
+        # ---- Parse radius safely ----
+        try:
+            radius_int = int(radius) if radius else 100
+            if radius_int < 10 or radius_int > 5000:
+                raise ValueError("radius out of range")
+        except (ValueError, TypeError):
+            logger.warning("[CREATE_ATTENDANCE] Bad radius value: %r", radius)
+            messages.error(request, "Geofencing radius must be between 10 and 5000 meters.")
+            context = {'courses': courses}
+            return render(request, 'lecturer_create_attendance.html', context)
+
+        # ---- Create the session ----
+        try:
+            session = AttendanceSession.objects.create(
+                course=course,
+                lecturer=lecturer_profile,
+                lecture_hall=lecture_hall.strip(),
+                start_time=start_dt,
+                end_time=end_dt,
+                notes=notes.strip(),
+                latitude=latitude,
+                longitude=longitude,
+                radius=radius_int,
+            )
+            logger.info(
+                "[CREATE_ATTENDANCE] SUCCESS: session id=%s created for course '%s' by lecturer %s. "
+                "Lagos window: %s → %s",
+                session.id, course.course_title, request.user.username,
+                format_lagos_time(session.start_time), format_lagos_time(session.end_time),
+            )
+        except Exception as ex:
+            logger.exception("[CREATE_ATTENDANCE] DB creation failed.")
+            messages.error(request, f"Failed to save attendance session to database: {ex}")
+            context = {'courses': courses}
+            return render(request, 'lecturer_create_attendance.html', context)
+
+        # Pre-generate the CSV spreadsheet template
+        try:
+            csv_path = generate_session_csv(session)
+            logger.info("[CREATE_ATTENDANCE] CSV pre-generated at: %s", csv_path)
+        except Exception as ex:
+            logger.warning("[CREATE_ATTENDANCE] CSV generation failed (non-fatal): %s", ex)
+            # Not fatal — session is created, CSV regenerated on download
+
+        messages.success(
+            request,
+            f"Attendance session created successfully! 🎉 "
+            f"Course: {course.course_title}. Window (Lagos): {format_lagos_time(start_dt)} → {format_lagos_time(end_dt)}"
+        )
         return redirect('lecturer_dashboard')
 
+    # GET request — fresh form
+    logger.info("[CREATE_ATTENDANCE] Rendering create form for lecturer %s", request.user.username)
     context = {'courses': courses}
     return render(request, 'lecturer_create_attendance.html', context)
 
@@ -544,12 +752,40 @@ def mark_attendance(request, pk):
 
     # 1. Expiration and time checks
     current_time = now()
+    current_time_lagos = format_lagos_time(current_time)
+    start_lagos = format_lagos_time(attendance_session.start_time)
+    end_lagos = format_lagos_time(attendance_session.end_time)
+
+    logger.info(
+        f"[MARK_ATTENDANCE_TIME_CHECK] Session %s: "
+        "server_now=%s | session_start=%s | session_end=%s | "
+        "raw_now=%s | raw_start=%s | raw_end=%s",
+        pk, current_time_lagos, start_lagos, end_lagos,
+        current_time.isoformat(),
+        attendance_session.start_time.isoformat(),
+        attendance_session.end_time.isoformat(),
+    )
+
     if current_time < attendance_session.start_time:
-        messages.error(request, f"This attendance session has not started yet. Starts at {attendance_session.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        err = (
+            f"This attendance session has not started yet. "
+            f"Starts at {start_lagos}. "
+            f"Current server time: {current_time_lagos}. "
+            f"Session ends at {end_lagos}."
+        )
+        logger.warning("[MARK_ATTENDANCE_REJECTED_NOT_STARTED] %s", err)
+        messages.error(request, err)
         return redirect('view_attendance')
         
     if current_time > attendance_session.end_time:
-        messages.error(request, "This attendance session has expired.")
+        err = (
+            f"This attendance session has expired. "
+            f"It ended at {end_lagos}. "
+            f"Current server time: {current_time_lagos}. "
+            f"(Started at {start_lagos}."
+        )
+        logger.warning("[MARK_ATTENDANCE_REJECTED_EXPIRED] %s", err)
+        messages.error(request, err)
         return redirect('view_attendance')
 
     # 2. Check if student has already marked attendance
@@ -563,14 +799,24 @@ def mark_attendance(request, pk):
 
         if not student_lat or not student_lon:
             messages.error(request, "Location data is missing. Please enable GPS and try again.")
-            return render(request, 'mark_attendance.html')
+            return render(request, 'mark_attendance.html', {
+                'attendance_session': attendance_session,
+                'session_start_lagos': format_lagos_time(attendance_session.start_time),
+                'session_end_lagos': format_lagos_time(attendance_session.end_time),
+                'server_now_lagos': current_time_lagos,
+            })
 
         try:
             student_lat = float(student_lat)
             student_lon = float(student_lon)
         except ValueError:
             messages.error(request, "Invalid location data received.")
-            return render(request, 'mark_attendance.html')
+            return render(request, 'mark_attendance.html', {
+                'attendance_session': attendance_session,
+                'session_start_lagos': format_lagos_time(attendance_session.start_time),
+                'session_end_lagos': format_lagos_time(attendance_session.end_time),
+                'server_now_lagos': current_time_lagos,
+            })
 
         hall_lat = attendance_session.latitude
         hall_lon = attendance_session.longitude
@@ -582,12 +828,22 @@ def mark_attendance(request, pk):
         # 3. Check geofence
         if distance > radius:
             messages.error(request, f"You are not in the lecture hall! You are {distance:.1f} meters away (allowed radius: {radius}m).")
-            return render(request, 'mark_attendance.html')
+            return render(request, 'mark_attendance.html', {
+                'attendance_session': attendance_session,
+                'session_start_lagos': format_lagos_time(attendance_session.start_time),
+                'session_end_lagos': format_lagos_time(attendance_session.end_time),
+                'server_now_lagos': current_time_lagos,
+            })
 
         captured_image_data = request.FILES.get('captured_image')
         if not captured_image_data:
             messages.error(request, "No captured image provided.")
-            return render(request, 'mark_attendance.html')
+            return render(request, 'mark_attendance.html', {
+                'attendance_session': attendance_session,
+                'session_start_lagos': format_lagos_time(attendance_session.start_time),
+                'session_end_lagos': format_lagos_time(attendance_session.end_time),
+                'server_now_lagos': current_time_lagos,
+            })
 
         # Create a temporary file for the captured image
         with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as temp_file:
@@ -614,7 +870,12 @@ def mark_attendance(request, pk):
                 
                 if captured_embedding is None:
                     messages.error(request, "Could not detect face in captured image. Please ensure your face is clearly visible and well-lit.")
-                    return render(request, 'mark_attendance.html')
+                    return render(request, 'mark_attendance.html', {
+                        'attendance_session': attendance_session,
+                        'session_start_lagos': format_lagos_time(attendance_session.start_time),
+                        'session_end_lagos': format_lagos_time(attendance_session.end_time),
+                        'server_now_lagos': current_time_lagos,
+                    })
                 
                 # Compare faces and get similarity score
                 match, face_dist = compare_faces_with_distance(profile_embedding, captured_embedding)
@@ -651,9 +912,19 @@ def mark_attendance(request, pk):
             if os.path.exists(temp_captured_path):
                 os.unlink(temp_captured_path)
 
-        return render(request, 'mark_attendance.html')
+        return render(request, 'mark_attendance.html', {
+            'attendance_session': attendance_session,
+            'session_start_lagos': format_lagos_time(attendance_session.start_time),
+            'session_end_lagos': format_lagos_time(attendance_session.end_time),
+            'server_now_lagos': current_time_lagos,
+        })
 
-    return render(request, 'mark_attendance.html')
+    return render(request, 'mark_attendance.html', {
+        'attendance_session': attendance_session,
+        'session_start_lagos': format_lagos_time(attendance_session.start_time),
+        'session_end_lagos': format_lagos_time(attendance_session.end_time),
+        'server_now_lagos': current_time_lagos,
+    })
 
 
 
@@ -741,21 +1012,63 @@ def view_attendance(request):
     
     # Annotate attendance session status and check if student has marked attendance
     current_time = now()
+    total_eligible = 0
+    total_attended = 0
+    active_count = 0
+    upcoming_count = 0
+    missed_count = 0
+
     for att in attendances:
         att.has_attended = att.records.filter(student=user).exists()
+        att.formatted_start = format_lagos_time(att.start_time)
+        att.formatted_end = format_lagos_time(att.end_time)
+        att.start_time_iso = att.start_time.isoformat()
+        att.end_time_iso = att.end_time.isoformat()
+        att.attendance_count = att.records.count()
+        att.hall = att.lecture_hall
+        att.latitude = att.latitude
+        att.longitude = att.longitude
+        att.radius = att.radius
+        att.session_id = att.id
+        att.notes = att.notes or ''
+
+        # Record for student: get their AttendanceRecord (if marked) to show distance / time
+        if att.has_attended:
+            rec = att.records.filter(student=user).first()
+            if rec:
+                att.student_marked_time = format_lagos_time(rec.marked_time)
+                att.student_distance = round(rec.distance, 1)
+                att.face_similarity = round(rec.face_similarity, 4) if rec.face_similarity is not None else None
+
         if current_time < att.start_time:
             att.status_label = 'Upcoming'
             att.status_color = 'indigo'
+            upcoming_count += 1
         elif current_time > att.end_time:
             att.status_label = 'Expired'
             att.status_color = 'red'
+            total_eligible += 1
+            if att.has_attended:
+                total_attended += 1
+            else:
+                missed_count += 1
         else:
             att.status_label = 'Active'
             att.status_color = 'green'
-            
+            active_count += 1
+
+    attendance_rate_pct = round((total_attended / total_eligible * 100), 1) if total_eligible > 0 else 100
+
     context = {
         'user_role': user_role,
-        'attendances': attendances 
+        'attendances': attendances,
+        'server_now_lagos': format_lagos_time(current_time),
+        'total_eligible': total_eligible,
+        'total_attended': total_attended,
+        'missed_count': missed_count,
+        'active_count': active_count,
+        'upcoming_count': upcoming_count,
+        'attendance_rate_pct': attendance_rate_pct,
     }  
     return render(request, 'view_attendace.html', context)
 
@@ -769,6 +1082,11 @@ def lecturer_session_detail(request, pk):
     
     # Annotate session status
     current_time = now()
+    session.formatted_start = format_lagos_time(session.start_time)
+    session.formatted_end = format_lagos_time(session.end_time)
+    session.start_time_iso = session.start_time.isoformat()
+    session.end_time_iso = session.end_time.isoformat()
+    session.attendance_count = session.records.count()
     if current_time < session.start_time:
         session.status_label = 'Upcoming'
         session.status_color = 'indigo'
@@ -799,6 +1117,7 @@ def lecturer_session_detail(request, pk):
         'session': session,
         'records': records,
         'user_role': 'lecturer',
+        'server_now_lagos': format_lagos_time(current_time),
     }
     return render(request, 'lecturer_session_detail.html', context)
 
