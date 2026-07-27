@@ -1,19 +1,52 @@
 {% extends 'base.html' %} 
 {% block content %}
-<div class="p-6 md:p-8 max-w-7xl mx-auto">
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .float-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
+        <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative p-6 md:p-8 max-w-7xl mx-auto">
     <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1
-                class="text-3xl md:text-4xl font-black text-gray-900 mb-2 flex items-center gap-3"
+                class="text-3xl md:text-4xl font-black text-white mb-2 flex items-center gap-3"
             >
                 <span
-                    class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg"
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg"
                 >
                     <i class="fas fa-users-rectangle"></i>
                 </span>
                 Course Roster
             </h1>
-            <p class="text-gray-600 max-w-3xl">
+            <p class="text-gray-400 max-w-3xl">
                 All students enrolled in your courses. Click any student to
                 deep-dive into attendance history, face verification readiness,
                 and course-level performance.
@@ -21,22 +54,22 @@
         </div>
         <div class="flex items-center gap-3 flex-wrap">
             <div
-                class="rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-xs text-gray-500"
+                class="rounded-2xl border border-white/10 glass-card px-4 py-3 shadow-sm text-xs text-gray-500"
             >
                 Server time:
-                <span class="font-mono font-bold text-indigo-700 ml-1"
+                <span class="font-mono font-bold text-indigo-400 ml-1"
                     >{{ server_now_lagos }}</span
                 >
             </div>
             <a
                 href="/reports/"
-                class="inline-flex items-center gap-2 rounded-2xl bg-white border border-indigo-100 px-4 py-3 text-sm font-black text-indigo-700 shadow-sm hover:bg-indigo-50 transition-all"
+                class="inline-flex items-center gap-2 rounded-2xl glass-card border border-white/10 px-4 py-3 text-sm font-black text-white shadow-sm hover:bg-white/10 transition-all"
             >
                 <i class="fas fa-chart-column"></i>View Reports
             </a>
             <a
                 href="/lecturer/create-attendance/"
-                class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-emerald-200 hover:-translate-y-0.5 hover:shadow-xl transition-all"
+                class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-black text-white shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all"
             >
                 <i class="fas fa-plus-circle"></i>New Session
             </a>
@@ -45,35 +78,35 @@
 
     {% if not courses %}
     <div
-        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-14 text-center"
+        class="glass-card rounded-3xl shadow-sm border border-white/10 p-14 text-center"
     >
         <div
-            class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center"
+            class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center"
         >
-            <i class="fas fa-book-open text-4xl text-emerald-600"></i>
+            <i class="fas fa-book-open text-4xl text-emerald-400"></i>
         </div>
-        <h2 class="text-2xl font-black text-gray-900 mb-2">
+        <h2 class="text-2xl font-black text-white mb-2">
             No courses assigned yet
         </h2>
-        <p class="text-gray-500 max-w-md mx-auto mb-6">
+        <p class="text-gray-400 max-w-md mx-auto mb-6">
             You haven't added any courses to your lecturer profile. Assign
             courses first to see your student rosters.
         </p>
         <a
             href="/lecturer_courses"
-            class="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-black shadow-lg shadow-emerald-200 hover:-translate-y-0.5 hover:shadow-xl transition-all"
+            class="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl font-black shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all"
         >
             <i class="fas fa-book-plus"></i>Assign Courses
         </a>
     </div>
     {% else %}
     <div
-        class="mb-6 flex flex-wrap gap-2 rounded-3xl border border-gray-200 bg-white p-2 shadow-sm"
+        class="mb-6 flex flex-wrap gap-2 rounded-3xl border border-white/10 glass-card p-2 shadow-sm"
     >
         {% for c in courses %}
         <a
             href="?course={{ c.id }}"
-            class="px-4 py-2.5 rounded-2xl text-sm font-black transition-all {% if c.id == selected_course_id %}bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-50{% endif %}"
+            class="px-4 py-2.5 rounded-2xl text-sm font-black transition-all {% if c.id == selected_course_id %}bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md{% else %}text-gray-400 hover:bg-white/10{% endif %}"
         >
             <span class="inline-flex items-center gap-1.5">
                 <span>{{ c.course_code }}</span>
@@ -88,7 +121,7 @@
     {% if selected_course %}
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+            class="bg-white/5 rounded-2xl p-5 border border-white/10 shadow-sm card-hover transition-all"
         >
             <div class="flex items-center justify-between mb-2">
                 <p
@@ -97,12 +130,12 @@
                     Enrolled
                 </p>
                 <div
-                    class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"
+                    class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center"
                 >
                     <i class="fas fa-user-graduate text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black text-gray-900">
+            <p class="text-3xl font-black text-white">
                 {{ total_enrolled }}
             </p>
             <p class="text-[11px] text-gray-500 mt-1 font-bold">
@@ -110,7 +143,7 @@
             </p>
         </div>
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+            class="bg-white/5 rounded-2xl p-5 border border-white/10 shadow-sm card-hover transition-all"
         >
             <div class="flex items-center justify-between mb-2">
                 <p
@@ -119,12 +152,12 @@
                     Sessions Held
                 </p>
                 <div
-                    class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"
+                    class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center"
                 >
                     <i class="fas fa-calendar-check text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black text-blue-700">
+            <p class="text-3xl font-black text-blue-300">
                 {{ course_sessions_held }}
             </p>
             <p class="text-[11px] text-gray-500 mt-1 font-bold">
@@ -132,7 +165,7 @@
             </p>
         </div>
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+            class="bg-white/5 rounded-2xl p-5 border border-white/10 shadow-sm card-hover transition-all"
         >
             <div class="flex items-center justify-between mb-2">
                 <p
@@ -141,12 +174,12 @@
                     Total Check-ins
                 </p>
                 <div
-                    class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"
+                    class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"
                 >
                     <i class="fas fa-user-check text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black text-emerald-700">
+            <p class="text-3xl font-black text-emerald-300">
                 {{ course_total_present }}
             </p>
             <p class="text-[11px] text-gray-500 mt-1 font-bold">
@@ -154,7 +187,7 @@
             </p>
         </div>
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+            class="bg-white/5 rounded-2xl p-5 border border-white/10 shadow-sm card-hover transition-all"
         >
             <div class="flex items-center justify-between mb-2">
                 <p
@@ -163,18 +196,18 @@
                     Overall %
                 </p>
                 <div
-                    class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"
+                    class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center"
                 >
                     <i class="fas fa-percentage text-sm"></i>
                 </div>
             </div>
             <p
-                class="text-3xl font-black {% if course_overall_pct >= 80 %}text-emerald-700{% elif course_overall_pct >= 60 %}text-orange-600{% else %}text-red-600{% endif %}"
+                class="text-3xl font-black {% if course_overall_pct >= 80 %}text-emerald-400{% elif course_overall_pct >= 60 %}text-orange-400{% else %}text-red-400{% endif %}"
             >
                 {{ course_overall_pct }}%
             </p>
             <div
-                class="w-full h-1.5 rounded-full bg-gray-100 mt-1.5 overflow-hidden"
+                class="w-full h-1.5 rounded-full bg-white/10 mt-1.5 overflow-hidden"
             >
                 <div
                     class="h-full {% if course_overall_pct >= 80 %}bg-emerald-500{% elif course_overall_pct >= 60 %}bg-orange-500{% else %}bg-red-500{% endif %}"
@@ -183,7 +216,7 @@
             </div>
         </div>
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+            class="bg-white/5 rounded-2xl p-5 border border-white/10 shadow-sm card-hover transition-all"
         >
             <div class="flex items-center justify-between mb-2">
                 <p
@@ -192,18 +225,18 @@
                     On Track
                 </p>
                 <div
-                    class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"
+                    class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"
                 >
                     <i class="fas fa-check text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black text-emerald-700">{{ good_count }}</p>
+            <p class="text-3xl font-black text-emerald-300">{{ good_count }}</p>
             <p class="text-[11px] text-gray-500 mt-1 font-bold">
                 ≥ 80% attendance
             </p>
         </div>
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all"
+            class="bg-white/5 rounded-2xl p-5 border border-white/10 shadow-sm card-hover transition-all"
         >
             <div class="flex items-center justify-between mb-2">
                 <p
@@ -212,15 +245,15 @@
                     At Risk
                 </p>
                 <div
-                    class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"
+                    class="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center"
                 >
                     <i class="fas fa-triangle-exclamation text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black text-red-700">
+            <p class="text-3xl font-black text-red-300">
                 {{ warn_count|add:danger_count }}
             </p>
-            <p class="text-[11px] text-red-500 mt-1 font-bold">
+            <p class="text-[11px] text-red-400 mt-1 font-bold">
                 {{ danger_count }} failing · {{ warn_count }} at risk
             </p>
         </div>
@@ -229,30 +262,30 @@
     <form method="GET" class="mb-6">
         <input type="hidden" name="course" value="{{ selected_course_id }}" />
         <div
-            class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center"
+            class="glass-card rounded-3xl shadow-sm border border-white/10 p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center"
         >
             <div class="relative flex-1">
                 <i
-                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
                 ></i>
                 <input
                     type="text"
                     name="q"
                     value="{{ search_q }}"
                     placeholder="Search students by name, matric, email, or department..."
-                    class="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none text-sm font-medium"
+                    class="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-white/10 bg-white/5 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm font-medium text-white placeholder:text-gray-500"
                 />
             </div>
             <div class="flex gap-2">
                 <button
                     type="submit"
-                    class="px-4 py-3 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-md hover:bg-emerald-700 transition-all"
+                    class="px-4 py-3 bg-emerald-500 text-white rounded-2xl font-black text-sm shadow-md hover:bg-emerald-600 transition-all"
                 >
                     <i class="fas fa-filter mr-1"></i>Search
                 </button>
                 <a
                     href="?course={{ selected_course_id }}"
-                    class="px-4 py-3 bg-white text-gray-600 border border-gray-200 rounded-2xl font-black text-sm hover:bg-gray-50 transition-all"
+                    class="px-4 py-3 bg-white/5 text-gray-400 border border-white/10 rounded-2xl font-black text-sm hover:bg-white/10 transition-all"
                     ><i class="fas fa-times mr-1"></i>Clear</a
                 >
             </div>
@@ -260,13 +293,13 @@
     </form>
 
     <div class="flex flex-wrap items-center justify-between mb-3 px-1 gap-3">
-        <p class="text-sm font-bold text-gray-600">
+        <p class="text-sm font-bold text-gray-400">
             Showing
-            <span class="text-emerald-700 text-lg font-black"
+            <span class="text-emerald-400 text-lg font-black"
                 >{{ students|length }}</span
             >
             of {{ total_enrolled }} enrolled students{% if search_q %} matching
-            "<b class="text-emerald-700">{{ search_q }}</b>"{% endif %}
+            "<b class="text-emerald-400">{{ search_q }}</b>"{% endif %}
         </p>
         <p class="text-xs text-gray-500 font-bold hidden md:block">
             Click a student's name to view full attendance history,
@@ -276,13 +309,13 @@
 
     {% if students %}
     <div
-        class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden"
+        class="glass-card rounded-3xl shadow-sm border border-white/10 overflow-hidden"
     >
         <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr
-                        class="bg-gradient-to-r from-gray-50 to-slate-50 text-[11px] text-gray-600 uppercase tracking-wider border-b border-gray-100"
+                        class="bg-gradient-to-r from-white/5 to-slate-500/5 text-[11px] text-gray-400 uppercase tracking-wider border-b border-white/10"
                     >
                         <th class="text-left p-4 font-black">Student</th>
                         <th class="text-left p-4 font-black">Matric · Dept</th>
@@ -296,9 +329,9 @@
                         <th class="p-4"></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody class="divide-y divide-white/10">
                     {% for stu in students %}
-                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                    <tr class="hover:bg-white/5 transition-colors">
                         <td class="p-4">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div
@@ -309,7 +342,7 @@
                                 <div class="min-w-0">
                                     <a
                                         href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
-                                        class="font-black text-gray-900 hover:text-emerald-700 transition-colors block truncate"
+                                        class="font-black text-white hover:text-emerald-400 transition-colors block truncate"
                                         >{{ stu.full_name }}</a
                                     >
                                     <p
@@ -322,7 +355,7 @@
                         </td>
                         <td class="p-4">
                             <p
-                                class="font-mono font-black text-gray-800 text-xs"
+                                class="font-mono font-black text-gray-300 text-xs"
                             >
                                 {{ stu.matric }}
                             </p>
@@ -334,25 +367,25 @@
                         </td>
                         <td class="p-4 text-center">
                             <span
-                                class="px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 font-bold text-xs"
+                                class="px-2 py-1 rounded-md bg-indigo-500/20 text-indigo-300 font-bold text-xs"
                                 >{% if stu.year_of_study == 'N/A' %}—{% else
                                 %}{{ stu.year_of_study }} L{% endif %}</span
                             >
                         </td>
                         <td class="p-4 text-center">
-                            <p class="text-lg font-black text-emerald-700">
+                            <p class="text-lg font-black text-emerald-300">
                                 {{ stu.present_count }}
                             </p>
                         </td>
                         <td class="p-4 text-center">
-                            <p class="text-lg font-black text-red-600">
+                            <p class="text-lg font-black text-red-300">
                                 {{ stu.absent_count }}
                             </p>
                         </td>
                         <td class="p-4 min-w-[180px]">
                             <div class="flex items-center gap-2.5">
                                 <div
-                                    class="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden"
+                                    class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden"
                                 >
                                     <div
                                         class="h-full rounded-full {% if stu.risk_level == 'good' %}bg-gradient-to-r from-emerald-400 to-emerald-600{% elif stu.risk_level == 'warn' %}bg-gradient-to-r from-orange-400 to-orange-600{% elif stu.risk_level == 'danger' %}bg-gradient-to-r from-red-400 to-red-600{% else %}bg-gray-300{% endif %}"
@@ -360,7 +393,7 @@
                                     ></div>
                                 </div>
                                 <p
-                                    class="text-sm font-black {% if stu.risk_level == 'good' %}text-emerald-700{% elif stu.risk_level == 'warn' %}text-orange-600{% elif stu.risk_level == 'danger' %}text-red-600{% else %}text-gray-500{% endif %} w-12 text-right"
+                                    class="text-sm font-black {% if stu.risk_level == 'good' %}text-emerald-300{% elif stu.risk_level == 'warn' %}text-orange-300{% elif stu.risk_level == 'danger' %}text-red-300{% else %}text-gray-500{% endif %} w-12 text-right"
                                 >
                                     {{ stu.attendance_pct }}%
                                 </p>
@@ -370,13 +403,13 @@
                             >
                                 {% if stu.avg_distance is not None %}
                                 <span
-                                    class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700"
+                                    class="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300"
                                 >
                                     📍{{ stu.avg_distance }}m avg
                                 </span>
                                 {% endif %} {% if stu.avg_face_similarity is not None %}
                                 <span
-                                    class="px-1.5 py-0.5 rounded bg-purple-50 text-purple-700"
+                                    class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300"
                                 >
                                     👤{{ stu.avg_face_similarity }}
                                 </span>
@@ -385,17 +418,17 @@
                         </td>
                         <td class="p-4 text-xs">
                             {% if stu.last_seen == 'Never' %}<span
-                                class="text-gray-400 font-bold italic"
+                                class="text-gray-500 font-bold italic"
                                 >Never</span
                             >{% else %}
-                            <p class="font-bold text-gray-700 leading-tight">
+                            <p class="font-bold text-gray-300 leading-tight">
                                 {{ stu.last_seen|slice:"0:22" }}
                             </p>
                             {% endif %}
                         </td>
                         <td class="p-4">
                             <span
-                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black {% if stu.risk_level == 'good' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif stu.risk_level == 'warn' %}bg-orange-50 text-orange-700 border border-orange-200{% elif stu.risk_level == 'danger' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-gray-100 text-gray-600 border border-gray-200{% endif %}"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black {% if stu.risk_level == 'good' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif stu.risk_level == 'warn' %}bg-orange-500/20 text-orange-300 border border-orange-500/30{% elif stu.risk_level == 'danger' %}bg-red-500/20 text-red-300 border border-red-500/30{% else %}bg-gray-500/20 text-gray-300 border border-gray-500/30{% endif %}"
                             >
                                 {% if stu.risk_level == 'good' %}<i
                                     class="fas fa-star text-[10px]"
@@ -414,11 +447,11 @@
                         </td>
                         <td class="p-4 text-right">
                             {% if stu.has_face_image %}<span
-                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-bold"
+                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold"
                                 ><i class="fas fa-circle-check"></i
                                 >Enrolled</span
                             >{% else %}<span
-                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 text-red-700 border border-red-100 text-xs font-bold"
+                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold"
                                 ><i class="fas fa-circle-xmark"></i>No
                                 Face</span
                             >{% endif %}
@@ -426,7 +459,7 @@
                         <td class="p-4 text-right">
                             <a
                                 href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-100 rounded-lg font-bold text-xs hover:bg-emerald-50 transition-all"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-white/5 text-emerald-300 border border-emerald-500/30 rounded-lg font-bold text-xs hover:bg-emerald-500/20 transition-all"
                                 ><i class="fas fa-eye"></i>Profile</a
                             >
                         </td>
@@ -436,7 +469,7 @@
             </table>
         </div>
 
-        <div class="md:hidden divide-y divide-gray-100">
+        <div class="md:hidden divide-y divide-white/10">
             {% for stu in students %}
             <div class="p-4">
                 <div class="flex items-start gap-3 mb-3">
@@ -448,56 +481,56 @@
                     <div class="flex-1 min-w-0">
                         <a
                             href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
-                            class="font-black text-gray-900 hover:text-emerald-700 block truncate"
+                            class="font-black text-white hover:text-emerald-400 block truncate"
                             >{{ stu.full_name }}</a
                         >
                         <p class="text-[11px] text-gray-500 font-bold truncate">
                             {{ stu.email }}
                         </p>
                         <p
-                            class="text-[11px] font-mono font-bold text-gray-700 mt-0.5"
+                            class="text-[11px] font-mono font-bold text-gray-300 mt-0.5"
                         >
                             {{ stu.matric }}
                         </p>
                     </div>
                     <span
-                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black shrink-0 {% if stu.risk_level == 'good' %}bg-emerald-50 text-emerald-700{% elif stu.risk_level == 'warn' %}bg-orange-50 text-orange-700{% elif stu.risk_level == 'danger' %}bg-red-50 text-red-700{% else %}bg-gray-100 text-gray-600{% endif %}"
+                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black shrink-0 {% if stu.risk_level == 'good' %}bg-emerald-500/20 text-emerald-300{% elif stu.risk_level == 'warn' %}bg-orange-500/20 text-orange-300{% elif stu.risk_level == 'danger' %}bg-red-500/20 text-red-300{% else %}bg-gray-500/20 text-gray-300{% endif %}"
                         >{{ stu.risk_label }}</span
                     >
                 </div>
                 <div class="grid grid-cols-3 gap-2 mb-3 text-[10px]">
-                    <div class="p-2 rounded-lg bg-emerald-50 text-center">
+                    <div class="p-2 rounded-lg bg-emerald-500/20 text-center">
                         <p
-                            class="font-black text-emerald-700 text-lg leading-tight"
+                            class="font-black text-emerald-300 text-lg leading-tight"
                         >
                             {{ stu.present_count }}
                         </p>
-                        <p class="text-emerald-700 uppercase font-bold">
+                        <p class="text-emerald-300 uppercase font-bold">
                             Present
                         </p>
                     </div>
-                    <div class="p-2 rounded-lg bg-red-50 text-center">
+                    <div class="p-2 rounded-lg bg-red-500/20 text-center">
                         <p
-                            class="font-black text-red-700 text-lg leading-tight"
+                            class="font-black text-red-300 text-lg leading-tight"
                         >
                             {{ stu.absent_count }}
                         </p>
-                        <p class="text-red-700 uppercase font-bold">Absent</p>
+                        <p class="text-red-300 uppercase font-bold">Absent</p>
                     </div>
-                    <div class="p-2 rounded-lg bg-indigo-50 text-center">
+                    <div class="p-2 rounded-lg bg-indigo-500/20 text-center">
                         <p
-                            class="font-black text-indigo-700 text-lg leading-tight"
+                            class="font-black text-indigo-300 text-lg leading-tight"
                         >
                             {{ stu.attendance_pct }}%
                         </p>
-                        <p class="text-indigo-700 uppercase font-bold">
+                        <p class="text-indigo-300 uppercase font-bold">
                             Attendance
                         </p>
                     </div>
                 </div>
                 <a
                     href="/lecturer/student/{{ stu.student_user_id }}/course/{{ selected_course_id }}/"
-                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-sm hover:bg-emerald-700 transition-all"
+                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-2xl font-black text-xs shadow-sm hover:bg-emerald-600 transition-all"
                     ><i class="fas fa-eye"></i>View Full Profile</a
                 >
             </div>
@@ -506,27 +539,28 @@
     </div>
     {% else %}
     <div
-        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-14 text-center"
+        class="glass-card rounded-3xl shadow-sm border border-white/10 p-14 text-center"
     >
         <div
-            class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-gray-100 to-slate-100 flex items-center justify-center"
+            class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-gray-500/20 to-slate-500/20 flex items-center justify-center"
         >
-            <i class="fas fa-magnifying-glass text-4xl text-gray-500"></i>
+            <i class="fas fa-magnifying-glass text-4xl text-gray-400"></i>
         </div>
-        <h2 class="text-2xl font-black text-gray-900 mb-2">
+        <h2 class="text-2xl font-black text-white mb-2">
             No students match
         </h2>
-        <p class="text-gray-500 max-w-md mx-auto">
+        <p class="text-gray-400 max-w-md mx-auto">
             Try adjusting your search or filter to find the student you're
             looking for.
         </p>
     </div>
     {% endif %} {% else %}
     <div
-        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-10 text-center text-gray-500"
+        class="glass-card rounded-3xl shadow-sm border border-white/10 p-10 text-center text-gray-500"
     >
         Select a course above to view its roster.
     </div>
     {% endif %} {% endif %}
+</div>
 </div>
 {% endblock content %}

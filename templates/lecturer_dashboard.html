@@ -6,54 +6,103 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<div class="p-8">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between flex-wrap gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">
-                    Welcome back, {{ lecturer.academic_rank|default:'Dr.' }} {{ user.get_full_name|default:user.username }} 👋
-                </h1>
-                <p class="text-gray-600">
-                    Server time (Lagos/WAT):
-                    <span class="font-mono font-bold text-indigo-700">{{ server_now_lagos }}</span>
-                </p>
-            </div>
-            <div class="flex items-center space-x-4">
-                <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                    <i class="fas fa-bolt text-indigo-500"></i>
-                    <div class="text-xs">
-                        <p class="font-black text-indigo-700 uppercase tracking-wide">Live Mode</p>
-                        <p class="text-indigo-500">Sessions auto-refresh</p>
-                    </div>
-                </div>
-                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    {{ user.username|first|upper }}
-                </div>
-            </div>
-        </div>
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+    }
+    
+    .float-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
+        <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
     </div>
 
-    <!-- Messages -->
-    {% if messages %}
-    <div class="mb-6 space-y-2">
-        {% for message in messages %}
-        <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
-            <div class="flex items-center">
-                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
-                {{ message }}
+    <div class="relative p-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white mb-2">
+                        Welcome back, {{ lecturer.academic_rank|default:'Dr.' }} {{ user.get_full_name|default:user.username }} 👋
+                    </h1>
+                    <p class="text-gray-400">
+                        Server time (Lagos/WAT):
+                        <span class="font-mono font-bold text-indigo-400">{{ server_now_lagos }}</span>
+                    </p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center gap-2 px-4 py-2 glass-card rounded-xl border border-white/10">
+                        <i class="fas fa-bolt text-indigo-400"></i>
+                        <div class="text-xs">
+                            <p class="font-black text-indigo-300 uppercase tracking-wide">Live Mode</p>
+                            <p class="text-indigo-400">Sessions auto-refresh</p>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                        {{ user.username|first|upper }}
+                    </div>
+                </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-300 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-300 border border-blue-500/30{% endif %}">
+                <div class="flex items-center">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                    {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
     <!-- =============== HERO "NEXT CLASS" WIDGET =============== -->
     {% if next_session %}
-    <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden mb-8">
+    <div class="glass-card rounded-3xl shadow-2xl border border-white/10 overflow-hidden mb-8">
         <div class="grid grid-cols-1 lg:grid-cols-5">
             <!-- Left: Hero info -->
-            <div class="lg:col-span-3 p-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600 text-white relative overflow-hidden">
+            <div class="lg:col-span-3 p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 text-white relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4"></div>
                 <div class="absolute bottom-0 left-0 w-60 h-60 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/4"></div>
 
@@ -153,26 +202,26 @@
             </div>
 
             <!-- Right: Hero Mini-Map -->
-            <div class="lg:col-span-2 p-6 flex flex-col bg-gradient-to-br from-slate-50 to-indigo-50/30">
+            <div class="lg:col-span-2 p-6 flex flex-col bg-gradient-to-br from-gray-800 to-gray-900">
                 <div class="flex items-center justify-between mb-3">
-                    <p class="text-sm font-black text-gray-700 uppercase tracking-wide">
-                        <i class="fas fa-map-marked-alt text-indigo-600 mr-1.5"></i>Venue Preview
+                    <p class="text-sm font-black text-white uppercase tracking-wide">
+                        <i class="fas fa-map-marked-alt text-indigo-400 mr-1.5"></i>Venue Preview
                     </p>
                     <span class="text-[10px] font-bold text-gray-500">OpenStreetMap</span>
                 </div>
-                <div id="hero-mini-map" class="w-full flex-1 min-h-[280px] rounded-2xl border border-indigo-100 overflow-hidden shadow-inner bg-white z-10"></div>
+                <div id="hero-mini-map" class="w-full flex-1 min-h-[280px] rounded-2xl border border-white/10 overflow-hidden shadow-inner bg-gray-800 z-10"></div>
                 <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
-                    <div class="bg-white rounded-xl p-2.5 border border-gray-100 text-center">
-                        <p class="font-black text-indigo-700 text-[10px] uppercase tracking-wide">Latitude</p>
-                        <p class="font-mono text-gray-700 font-bold">{{ next_session.latitude|default:"—" }}</p>
+                    <div class="bg-white/5 rounded-xl p-2.5 border border-white/10 text-center">
+                        <p class="font-black text-indigo-300 text-[10px] uppercase tracking-wide">Latitude</p>
+                        <p class="font-mono text-white font-bold">{{ next_session.latitude|default:"—" }}</p>
                     </div>
-                    <div class="bg-white rounded-xl p-2.5 border border-gray-100 text-center">
-                        <p class="font-black text-indigo-700 text-[10px] uppercase tracking-wide">Longitude</p>
-                        <p class="font-mono text-gray-700 font-bold">{{ next_session.longitude|default:"—" }}</p>
+                    <div class="bg-white/5 rounded-xl p-2.5 border border-white/10 text-center">
+                        <p class="font-black text-indigo-300 text-[10px] uppercase tracking-wide">Longitude</p>
+                        <p class="font-mono text-white font-bold">{{ next_session.longitude|default:"—" }}</p>
                     </div>
-                    <div class="bg-white rounded-xl p-2.5 border border-gray-100 text-center">
-                        <p class="font-black text-indigo-700 text-[10px] uppercase tracking-wide">Radius</p>
-                        <p class="font-mono text-gray-700 font-bold">{{ next_session.radius }}m</p>
+                    <div class="bg-white/5 rounded-xl p-2.5 border border-white/10 text-center">
+                        <p class="font-black text-indigo-300 text-[10px] uppercase tracking-wide">Radius</p>
+                        <p class="font-mono text-white font-bold">{{ next_session.radius }}m</p>
                     </div>
                 </div>
             </div>
@@ -182,77 +231,77 @@
 
     <!-- =============== STATS CARDS =============== -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all">
+        <div class="glass-card rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-indigo-100 text-xs font-black uppercase tracking-wider">Courses</p>
-                <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                <p class="text-gray-400 text-xs font-black uppercase tracking-wider">Courses</p>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
                     <i class="fas fa-book"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black">{{ lecturer.courses_taught.count }}</p>
-            <p class="text-xs text-indigo-100/80 mt-1">Taught this semester</p>
+            <p class="text-3xl font-black gradient-text">{{ lecturer.courses_taught.count }}</p>
+            <p class="text-xs text-gray-400 mt-1">Taught this semester</p>
         </div>
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all">
+        <div class="glass-card rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-emerald-100 text-xs font-black uppercase tracking-wider">Total Check-Ins</p>
-                <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                <p class="text-gray-400 text-xs font-black uppercase tracking-wider">Total Check-Ins</p>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
                     <i class="fas fa-user-check"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black">{{ total_marked_all }}</p>
-            <p class="text-xs text-emerald-100/80 mt-1">Across all sessions</p>
+            <p class="text-3xl font-black text-emerald-400">{{ total_marked_all }}</p>
+            <p class="text-xs text-gray-400 mt-1">Across all sessions</p>
         </div>
-        <div class="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all">
+        <div class="glass-card rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-orange-100 text-xs font-black uppercase tracking-wider">Active Now</p>
-                <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                <p class="text-gray-400 text-xs font-black uppercase tracking-wider">Active Now</p>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
                     <i class="fas fa-circle text-xs animate-pulse"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black">{{ active_count }}</p>
-            <p class="text-xs text-orange-100/80 mt-1">Live sessions marking</p>
+            <p class="text-3xl font-black text-orange-400">{{ active_count }}</p>
+            <p class="text-xs text-gray-400 mt-1">Live sessions marking</p>
         </div>
-        <div class="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all">
+        <div class="glass-card rounded-2xl p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-blue-100 text-xs font-black uppercase tracking-wider">Upcoming</p>
-                <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                <p class="text-gray-400 text-xs font-black uppercase tracking-wider">Upcoming</p>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                     <i class="fas fa-calendar-day"></i>
                 </div>
             </div>
-            <p class="text-3xl font-black">{{ upcoming_count }}</p>
-            <p class="text-xs text-blue-100/80 mt-1">Sessions scheduled</p>
+            <p class="text-3xl font-black text-blue-400">{{ upcoming_count }}</p>
+            <p class="text-xs text-gray-400 mt-1">Sessions scheduled</p>
         </div>
     </div>
 
     <!-- =============== MAIN GRID =============== -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- Scheduled Lectures (main area) -->
-        <div class="lg:col-span-3 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
-                <h2 class="text-lg font-black text-gray-900">
-                    <i class="fas fa-calendar-alt text-indigo-600 mr-2"></i>
+        <div class="lg:col-span-3 glass-card rounded-2xl shadow-xl border border-white/10 overflow-hidden">
+            <div class="p-6 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+                <h2 class="text-lg font-black text-white">
+                    <i class="fas fa-calendar-alt text-indigo-400 mr-2"></i>
                     All Sessions
                 </h2>
                 <div class="flex items-center gap-2 flex-wrap">
-                    <button data-filter="all" class="filter-tab active px-3.5 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-md transition-all">
+                    <button data-filter="all" class="filter-tab active px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md transition-all">
                         <i class="fas fa-globe mr-1"></i>All
                     </button>
-                    <button data-filter="Active" class="filter-tab px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <button data-filter="Active" class="filter-tab px-3.5 py-1.5 text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all">
                         🟢 Active
                     </button>
-                    <button data-filter="Upcoming" class="filter-tab px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <button data-filter="Upcoming" class="filter-tab px-3.5 py-1.5 text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all">
                         🔵 Upcoming
                     </button>
-                    <button data-filter="Expired" class="filter-tab px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <button data-filter="Expired" class="filter-tab px-3.5 py-1.5 text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all">
                         🔴 Past
                     </button>
                 </div>
             </div>
 
             {% if scheduled_lectures %}
-            <div class="divide-y divide-gray-100" id="session-list">
+            <div class="divide-y divide-white/10" id="session-list">
                 {% for class in scheduled_lectures %}
-                <div class="session-item p-5 hover:bg-indigo-50/30 transition-colors"
+                <div class="session-item p-5 hover:bg-white/5 transition-colors"
                      data-status="{{ class.status_label }}"
                      data-start="{{ class.start_time_iso }}"
                      data-end="{{ class.end_time_iso }}"
@@ -265,7 +314,7 @@
                         <div class="md:w-48 shrink-0">
                             <div class="flex md:flex-col gap-3 items-start">
                                 <div class="flex-1 md:w-full">
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-{{ class.status_color }}-100 text-{{ class.status_color }}-800 mb-2">
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">
                                         {% if class.status_label == 'Active' %}
                                         <i class="fas fa-circle text-[8px] animate-pulse"></i>
                                         {% elif class.status_label == 'Upcoming' %}
@@ -275,9 +324,9 @@
                                         {% endif %}
                                         {{ class.status_label }}
                                     </span>
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Session #{{ class.id }}</p>
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-wider">Session #{{ class.id }}</p>
                                 </div>
-                                <div id="row-map-{{ class.id }}" class="w-40 h-28 md:w-full rounded-xl border border-gray-200 overflow-hidden bg-slate-50 shrink-0 z-10"></div>
+                                <div id="row-map-{{ class.id }}" class="w-40 h-28 md:w-full rounded-xl border border-white/10 overflow-hidden bg-gray-800 shrink-0 z-10"></div>
                             </div>
                         </div>
 
@@ -285,67 +334,67 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
                                 <div class="min-w-0">
-                                    <p class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-0.5">{{ class.course.course_code }}</p>
-                                    <h3 class="font-black text-gray-900 text-lg truncate">{{ class.course.course_title }}</h3>
+                                    <p class="text-xs font-black text-indigo-400 uppercase tracking-wider mb-0.5">{{ class.course.course_code }}</p>
+                                    <h3 class="font-black text-white text-lg truncate">{{ class.course.course_title }}</h3>
                                 </div>
                                 <div class="flex items-center gap-2 shrink-0">
-                                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+                                    <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
                                         <i class="fas fa-users mr-1"></i>{{ class.marked_count }} marked
                                     </span>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-4">
-                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
-                                    <i class="fas fa-building text-indigo-500 text-sm"></i>
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-white/5">
+                                    <i class="fas fa-building text-indigo-400 text-sm"></i>
                                     <div class="min-w-0">
-                                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-wide">Hall</p>
-                                        <p class="text-sm font-bold text-gray-800 truncate">{{ class.lecture_hall }}</p>
+                                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-wide">Hall</p>
+                                        <p class="text-sm font-bold text-white truncate">{{ class.lecture_hall }}</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
-                                    <i class="fas fa-clock text-indigo-500 text-sm"></i>
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-white/5">
+                                    <i class="fas fa-clock text-indigo-400 text-sm"></i>
                                     <div class="min-w-0">
-                                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-wide">Date</p>
-                                        <p class="text-sm font-bold text-gray-800">{{ class.start_time|date:"M d, Y" }}</p>
+                                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-wide">Date</p>
+                                        <p class="text-sm font-bold text-white">{{ class.start_time|date:"M d, Y" }}</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
-                                    <i class="fas fa-hourglass-start text-indigo-500 text-sm"></i>
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-white/5">
+                                    <i class="fas fa-hourglass-start text-indigo-400 text-sm"></i>
                                     <div class="min-w-0">
-                                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-wide">Window</p>
-                                        <p class="text-sm font-bold text-gray-800 font-mono">{{ class.start_time|date:"H:i" }}–{{ class.end_time|date:"H:i" }}</p>
+                                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-wide">Window</p>
+                                        <p class="text-sm font-bold text-white font-mono">{{ class.start_time|date:"H:i" }}–{{ class.end_time|date:"H:i" }}</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
-                                    <i class="fas fa-compress-arrows-alt text-indigo-500 text-sm"></i>
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-white/5">
+                                    <i class="fas fa-compress-arrows-alt text-indigo-400 text-sm"></i>
                                     <div class="min-w-0">
-                                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-wide">Fence</p>
-                                        <p class="text-sm font-bold text-gray-800">{{ class.radius }} meters</p>
+                                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-wide">Fence</p>
+                                        <p class="text-sm font-bold text-white">{{ class.radius }} meters</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Live countdown row -->
                             <div class="flex flex-wrap items-center justify-between gap-3">
-                                <div class="flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 px-3.5 py-2 rounded-xl border border-indigo-100">
-                                    <i class="fas fa-stopwatch text-indigo-600"></i>
+                                <div class="flex items-center gap-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-3.5 py-2 rounded-xl border border-indigo-500/30">
+                                    <i class="fas fa-stopwatch text-indigo-400"></i>
                                     <div>
-                                        <p id="row-countdown-time-{{ class.id }}" class="font-black text-indigo-900 font-mono text-sm leading-tight">--:--:--</p>
-                                        <p id="row-countdown-caption-{{ class.id }}" class="text-[10px] text-indigo-600 font-bold leading-tight">Calculating…</p>
+                                        <p id="row-countdown-time-{{ class.id }}" class="font-black text-white font-mono text-sm leading-tight">--:--:--</p>
+                                        <p id="row-countdown-caption-{{ class.id }}" class="text-[10px] text-indigo-300 font-bold leading-tight">Calculating…</p>
                                     </div>
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <button onclick="openRowDirections('google', {{ class.id }})" class="inline-flex items-center gap-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-bold text-xs border border-blue-100 hover:bg-blue-100 transition-all" title="Navigate via Google Maps">
+                                    <button onclick="openRowDirections('google', {{ class.id }})" class="inline-flex items-center gap-1 px-3 py-2 bg-blue-500/20 text-blue-300 rounded-lg font-bold text-xs border border-blue-500/30 hover:bg-blue-500/30 transition-all" title="Navigate via Google Maps">
                                         <i class="fab fa-google"></i>
                                         <span class="hidden sm:inline">Maps</span>
                                     </button>
-                                    <button onclick="openRowDirections('waze', {{ class.id }})" class="inline-flex items-center gap-1 px-3 py-2 bg-cyan-50 text-cyan-700 rounded-lg font-bold text-xs border border-cyan-100 hover:bg-cyan-100 transition-all" title="Navigate via Waze">
+                                    <button onclick="openRowDirections('waze', {{ class.id }})" class="inline-flex items-center gap-1 px-3 py-2 bg-cyan-500/20 text-cyan-300 rounded-lg font-bold text-xs border border-cyan-500/30 hover:bg-cyan-500/30 transition-all" title="Navigate via Waze">
                                         <i class="fas fa-route"></i>
                                         <span class="hidden sm:inline">Waze</span>
                                     </button>
-                                    <a href="/lecturer/session/{{ class.id }}/" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold text-xs shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all">
+                                    <a href="/lecturer/session/{{ class.id }}/" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg font-bold text-xs shadow-md hover:shadow-lg transition-all">
                                         <i class="fas fa-arrow-right"></i>
                                         View Details
                                     </a>
@@ -353,11 +402,11 @@
                             </div>
 
                             {% if class.notes %}
-                            <div class="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-100">
-                                <p class="text-[10px] font-black text-amber-700 uppercase tracking-wider mb-1">
+                            <div class="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                                <p class="text-[10px] font-black text-amber-300 uppercase tracking-wider mb-1">
                                     <i class="fas fa-sticky-note mr-1"></i>Lecturer's Note
                                 </p>
-                                <p class="text-sm text-amber-900 italic">"{{ class.notes }}"</p>
+                                <p class="text-sm text-amber-200 italic">"{{ class.notes }}"</p>
                             </div>
                             {% endif %}
                         </div>
@@ -367,14 +416,14 @@
             </div>
             {% else %}
             <div class="text-center py-20 px-6">
-                <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
-                    <i class="fas fa-calendar-plus text-3xl text-indigo-500"></i>
+                <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
+                    <i class="fas fa-calendar-plus text-3xl text-indigo-400"></i>
                 </div>
-                <h3 class="font-black text-gray-900 text-xl mb-2">No Sessions Yet</h3>
-                <p class="text-gray-500 max-w-sm mx-auto mb-6">
+                <h3 class="font-black text-white text-xl mb-2">No Sessions Yet</h3>
+                <p class="text-gray-400 max-w-sm mx-auto mb-6">
                     Create your first attendance session to start tracking student attendance with GPS geofencing and face verification.
                 </p>
-                <a href="/lecturer/create-attendance/" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                <a href="/lecturer/create-attendance/" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
                     <i class="fas fa-plus-circle"></i>Create Your First Session
                 </a>
             </div>
@@ -384,12 +433,12 @@
         <!-- Right sidebar: Quick Actions + Pro Tips -->
         <div class="space-y-6">
             <!-- Quick Actions -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                <h2 class="text-base font-black text-gray-900 mb-4 uppercase tracking-wide">
-                    <i class="fas fa-bolt text-indigo-600 mr-2"></i>Quick Actions
+            <div class="glass-card rounded-2xl shadow-xl p-6 border border-white/10">
+                <h2 class="text-base font-black text-white mb-4 uppercase tracking-wide">
+                    <i class="fas fa-bolt text-indigo-400 mr-2"></i>Quick Actions
                 </h2>
                 <div class="space-y-2.5">
-                    <a href="/lecturer/create-attendance/" class="flex items-center gap-3 p-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group">
+                    <a href="/lecturer/create-attendance/" class="flex items-center gap-3 p-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group">
                         <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-plus text-lg"></i>
                         </div>
@@ -398,62 +447,63 @@
                             <p class="text-[11px] text-white/80">Geofence + Face ID</p>
                         </div>
                     </a>
-                    <a href="/lecturer_courses" class="flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 hover:bg-emerald-50 hover:border-emerald-100 border border-gray-100 transition-all group">
-                        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                    <a href="/lecturer_courses" class="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 hover:bg-emerald-500/10 hover:border-emerald-500/30 border border-white/10 transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-book"></i>
                         </div>
                         <div>
-                            <p class="font-black text-sm text-gray-900">Manage Courses</p>
-                            <p class="text-[11px] text-gray-500">Add / remove courses</p>
+                            <p class="font-black text-sm text-white">Manage Courses</p>
+                            <p class="text-[11px] text-gray-400">Add / remove courses</p>
                         </div>
                     </a>
-                    <a href="/lecturer/settings/" class="flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 hover:bg-orange-50 hover:border-orange-100 border border-gray-100 transition-all group">
-                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                    <a href="/lecturer/settings/" class="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 hover:bg-orange-500/10 hover:border-orange-500/30 border border-white/10 transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-cog"></i>
                         </div>
                         <div>
-                            <p class="font-black text-sm text-gray-900">Profile Settings</p>
-                            <p class="text-[11px] text-gray-500">Rank, office, phone</p>
+                            <p class="font-black text-sm text-white">Profile Settings</p>
+                            <p class="text-[11px] text-gray-400">Rank, office, phone</p>
                         </div>
                     </a>
-                    <a href="/lecturer/profile/" class="flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 hover:bg-blue-50 hover:border-blue-100 border border-gray-100 transition-all group">
-                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                    <a href="/lecturer/profile/" class="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 hover:bg-blue-500/10 hover:border-blue-500/30 border border-white/10 transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                             <i class="fas fa-id-card"></i>
                         </div>
                         <div>
-                            <p class="font-black text-sm text-gray-900">My Profile</p>
-                            <p class="text-[11px] text-gray-500">View public profile</p>
+                            <p class="font-black text-sm text-white">My Profile</p>
+                            <p class="text-[11px] text-gray-400">View public profile</p>
                         </div>
                     </a>
                 </div>
             </div>
 
             <!-- AttendEase Pro Tips -->
-            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-100 shadow-sm">
-                <h3 class="text-xs font-black uppercase tracking-wider text-amber-800 mb-3 flex items-center gap-1.5">
+            <div class="bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-2xl p-6 border border-amber-500/30 shadow-sm">
+                <h3 class="text-xs font-black uppercase tracking-wider text-amber-300 mb-3 flex items-center gap-1.5">
                     <i class="fas fa-lightbulb"></i>AttendEase Pro Tips
                 </h3>
                 <ul class="space-y-2.5 text-sm">
                     <li class="flex gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
-                        <span class="text-amber-900"><b>Stand near the GPS pin</b> when creating sessions for accurate fence center.</span>
+                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0"></i>
+                        <span class="text-amber-200"><b>Stand near the GPS pin</b> when creating sessions for accurate fence center.</span>
                     </li>
                     <li class="flex gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
-                        <span class="text-amber-900"><b>Default 100m radius</b> fits most lecture halls. Use 200–300m for open-air venues.</span>
+                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0"></i>
+                        <span class="text-amber-200"><b>Default 100m radius</b> fits most lecture halls. Use 200–300m for open-air venues.</span>
                     </li>
                     <li class="flex gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
-                        <span class="text-amber-900"><b>Add notes</b> with seating rows, test reminders, or material links.</span>
+                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0"></i>
+                        <span class="text-amber-200"><b>Add notes</b> with seating rows, test reminders, or material links.</span>
                     </li>
                     <li class="flex gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
-                        <span class="text-amber-900"><b>Download Excel</b> from session detail to export verified attendance CSV.</span>
+                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0"></i>
+                        <span class="text-amber-200"><b>Download Excel</b> from session detail to export verified attendance CSV.</span>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <style>
@@ -496,11 +546,11 @@
     document.querySelectorAll('.filter-tab').forEach(function (btn) {
         btn.addEventListener('click', function () {
             document.querySelectorAll('.filter-tab').forEach(function (b) {
-                b.classList.remove('active', 'bg-indigo-600', 'text-white', 'shadow-md');
-                b.classList.add('bg-gray-100', 'text-gray-700');
+                b.classList.remove('active', 'bg-gradient-to-r', 'from-indigo-500', 'to-purple-500', 'text-white', 'shadow-md');
+                b.classList.add('glass-card', 'text-gray-300', 'border', 'border-white/10');
             });
-            btn.classList.add('active', 'bg-indigo-600', 'text-white', 'shadow-md');
-            btn.classList.remove('bg-gray-100', 'text-gray-700');
+            btn.classList.add('active', 'bg-gradient-to-r', 'from-indigo-500', 'to-purple-500', 'text-white', 'shadow-md');
+            btn.classList.remove('glass-card', 'text-gray-300', 'border', 'border-white/10');
 
             const filter = btn.dataset.filter;
             document.querySelectorAll('.session-item').forEach(function (item) {
@@ -550,26 +600,26 @@
 
         let timeCls, capCls, caption;
         if (st.state === 'upcoming') {
-            timeCls = 'text-indigo-900';
-            capCls = 'text-indigo-600';
+            timeCls = 'text-white';
+            capCls = 'text-indigo-300';
             caption = 'Starts in…';
         } else if (st.state === 'active') {
             if (st.pct < 0.1) {
-                timeCls = 'text-red-600';
-                capCls = 'text-red-600';
+                timeCls = 'text-red-400';
+                capCls = 'text-red-400';
                 caption = '⚠️ LAST CALL — ending very soon';
             } else if (st.pct < 0.3) {
-                timeCls = 'text-orange-600';
-                capCls = 'text-orange-600';
+                timeCls = 'text-orange-400';
+                capCls = 'text-orange-400';
                 caption = '⏰ Final stretch';
             } else {
-                timeCls = 'text-emerald-700';
-                capCls = 'text-emerald-600';
+                timeCls = 'text-emerald-400';
+                capCls = 'text-emerald-300';
                 caption = '✅ Session active — marking live';
             }
         } else {
-            timeCls = 'text-red-600';
-            capCls = 'text-red-600';
+            timeCls = 'text-red-400';
+            capCls = 'text-red-400';
             caption = 'Session ended';
         }
         // Apply classes while keeping base classes
@@ -618,7 +668,7 @@
         const heroHall = "{{ next_session.lecture_hall|escapejs }}";
         if (heroLat && heroLon) {
             const heroMap = L.map('hero-mini-map', { scrollWheelZoom: false, dragging: false, zoomControl: false, attributionControl: false }).setView([heroLat, heroLon], 17);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(heroMap);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(heroMap);
             const heroIcon = L.divIcon({
                 className: '',
                 html: '<div style="background:linear-gradient(135deg,#4f46e5,#9333ea);color:white;border:3px solid white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(79,70,229,0.45);"><i class="fas fa-graduation-cap text-xs"></i></div>',
@@ -644,7 +694,7 @@
             if (!lat || !lon) {
                 const el = document.getElementById('row-map-' + sid);
                 if (el) {
-                    el.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-gray-400 text-xs font-bold bg-gray-50"><i class="fas fa-map-marker-slash text-xl mb-1"></i><span>No GPS</span></div>';
+                    el.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-gray-500 text-xs font-bold bg-gray-800"><i class="fas fa-map-marker-slash text-xl mb-1"></i><span>No GPS</span></div>';
                 }
                 return;
             }
@@ -653,7 +703,7 @@
             if (!mapEl) return;
             try {
                 const m = L.map(mapEl, { scrollWheelZoom: false, dragging: false, zoomControl: false, attributionControl: false }).setView([lat, lon], 17);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(m);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(m);
                 const pinIcon = L.divIcon({
                     className: '',
                     html: '<div style="background:' + color + ';color:white;border:2px solid white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,0.3);"><i class="fas fa-graduation-cap" style="font-size:9px;"></i></div>',

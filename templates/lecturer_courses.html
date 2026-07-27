@@ -1,53 +1,86 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
-<div class="p-6 md:p-8 max-w-7xl mx-auto">
-    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-            <p
-                class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2"
-            >
-                Lecturer workspace
-            </p>
-            <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-2">
-                Course Management
-            </h1>
-            <p class="text-gray-600 max-w-2xl">
-                Search available courses, assign them to your teaching profile,
-                and keep your attendance session catalog organized.
-            </p>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div
-                class="rounded-2xl border border-indigo-100 bg-white px-4 py-3 shadow-sm"
-            >
-                <p
-                    class="text-[11px] font-black uppercase tracking-wide text-indigo-600"
-                >
-                    Teaching
-                </p>
-                <p class="text-2xl font-black text-gray-900">
-                    {{ courses_taught|length }}
-                </p>
-            </div>
-            <div
-                class="rounded-2xl border border-purple-100 bg-white px-4 py-3 shadow-sm"
-            >
-                <p
-                    class="text-[11px] font-black uppercase tracking-wide text-purple-600"
-                >
-                    Results
-                </p>
-                <p class="text-2xl font-black text-gray-900">
-                    {{ results|length|default:0 }}
-                </p>
-            </div>
-        </div>
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .float-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
+        <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
     </div>
+
+    <div class="relative p-6 md:p-8 max-w-7xl mx-auto">
+        <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <p
+                    class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-400 mb-2"
+                >
+                    Lecturer workspace
+                </p>
+                <h1 class="text-3xl md:text-4xl font-black text-white mb-2">
+                    Course Management
+                </h1>
+                <p class="text-gray-400 max-w-2xl">
+                    Search available courses, assign them to your teaching profile,
+                    and keep your attendance session catalog organized.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div
+                    class="rounded-2xl border border-white/10 glass-card px-4 py-3 shadow-sm"
+                >
+                    <p
+                        class="text-[11px] font-black uppercase tracking-wide text-indigo-400"
+                    >
+                        Teaching
+                    </p>
+                    <p class="text-2xl font-black text-white">
+                        {{ courses_taught|length }}
+                    </p>
+                </div>
+                <div
+                    class="rounded-2xl border border-white/10 glass-card px-4 py-3 shadow-sm"
+                >
+                    <p
+                        class="text-[11px] font-black uppercase tracking-wide text-purple-400"
+                    >
+                        Results
+                    </p>
+                    <p class="text-2xl font-black text-white">
+                        {{ results|length|default:0 }}
+                    </p>
+                </div>
+            </div>
+        </div>
 
     {% if messages %}
     <div class="mb-6 space-y-2">
         {% for message in messages %}
         <div
-            class="px-4 py-3 rounded-2xl {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}"
+            class="px-4 py-3 rounded-2xl {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-300 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-300 border border-blue-500/30{% endif %}"
         >
             <div class="flex items-center gap-2">
                 <i
@@ -61,15 +94,15 @@
     {% endif %}
 
     <div
-        class="mb-8 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+        class="mb-8 overflow-hidden rounded-3xl border border-white/10 glass-card shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
     >
         <div
-            class="border-b border-gray-100 bg-gradient-to-r from-indigo-50 via-white to-purple-50 px-5 py-4 md:px-6"
+            class="border-b border-white/10 bg-gradient-to-r from-indigo-500/10 via-white/5 to-purple-500/10 px-5 py-4 md:px-6"
         >
-            <h2 class="text-lg md:text-xl font-black text-gray-900">
+            <h2 class="text-lg md:text-xl font-black text-white">
                 Search courses
             </h2>
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-gray-400">
                 Find a course and attach it to your lecturer profile.
             </p>
         </div>
@@ -86,7 +119,7 @@
                     >
                     <div class="group relative">
                         <span
-                            class="pointer-events-none absolute inset-y-0 left-0 flex w-14 items-center justify-center text-gray-400 group-focus-within:text-indigo-600"
+                            class="pointer-events-none absolute inset-y-0 left-0 flex w-14 items-center justify-center text-gray-500 group-focus-within:text-indigo-400"
                         >
                             <i class="fas fa-search text-base"></i>
                         </span>
@@ -96,14 +129,14 @@
                             id="course"
                             name="course"
                             placeholder="Search for a course by title..."
-                            class="h-14 w-full rounded-2xl border border-gray-200 bg-white pl-14 pr-4 text-sm font-medium text-gray-900 shadow-sm outline-none transition-all placeholder:text-gray-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+                            class="h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-14 pr-4 text-sm font-medium text-white shadow-sm outline-none transition-all placeholder:text-gray-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20"
                         />
                     </div>
                 </div>
                 <button
                     type="submit"
                     id="search-btn"
-                    class="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 text-sm font-black text-white shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-xl"
+                    class="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 px-6 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
                 >
                     <i class="fas fa-search"></i>Search Courses
                 </button>
@@ -115,38 +148,38 @@
     <section class="mb-10">
         <div class="mb-4 flex items-center justify-between gap-3 flex-wrap">
             <div>
-                <h2 class="text-xl font-black text-gray-900">Search Results</h2>
-                <p class="text-sm text-gray-500">
+                <h2 class="text-xl font-black text-white">Search Results</h2>
+                <p class="text-sm text-gray-400">
                     Add any course you teach to your lecturer profile.
                 </p>
             </div>
             <span
-                class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-black text-indigo-700 border border-indigo-100"
+                class="rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 text-xs font-black"
                 >{{ results|length }} result{{ results|length|pluralize }}</span
             >
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for course in results %}
             <div
-                class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+                class="rounded-3xl border border-white/10 glass-card p-6 shadow-sm card-hover transition-all"
             >
                 <div class="mb-5 flex items-start justify-between gap-4">
                     <div
-                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg shadow-indigo-200"
+                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg"
                     >
                         <i class="fas fa-book text-white text-lg"></i>
                     </div>
                     <span
-                        class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-black text-indigo-700"
+                        class="rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 text-xs font-black"
                         >{{ course.credit }} Units</span
                     >
                 </div>
                 <p
-                    class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600 mb-2"
+                    class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-400 mb-2"
                 >
                     {{ course.course_code }}
                 </p>
-                <h3 class="text-lg font-black text-gray-900 mb-4 leading-snug">
+                <h3 class="text-lg font-black text-white mb-4 leading-snug">
                     {{ course.course_title }}
                 </h3>
                 <form
@@ -168,7 +201,7 @@
                     />
                     <button
                         type="submit"
-                        class="enroll-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-sm font-black text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                        class="enroll-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-sm font-black text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
                     >
                         <i class="fas fa-plus"></i>Assign to Me
                     </button>
@@ -182,14 +215,14 @@
     <section>
         <div class="mb-4 flex items-center justify-between gap-3 flex-wrap">
             <div>
-                <h2 class="text-xl font-black text-gray-900">My Courses</h2>
-                <p class="text-sm text-gray-500">
+                <h2 class="text-xl font-black text-white">My Courses</h2>
+                <p class="text-sm text-gray-400">
                     These courses are available for attendance creation and
                     reporting.
                 </p>
             </div>
             <span
-                class="rounded-full bg-white px-3 py-1 text-xs font-black text-gray-700 border border-gray-200 shadow-sm"
+                class="rounded-full bg-white/5 text-white border border-white/10 px-3 py-1 text-xs font-black shadow-sm"
                 >{{ courses_taught|length }} active</span
             >
         </div>
@@ -198,34 +231,34 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for course in courses_taught %}
             <div
-                class="rounded-3xl border border-indigo-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+                class="rounded-3xl border border-white/10 glass-card p-6 shadow-sm card-hover transition-all"
             >
                 <div class="mb-5 flex items-start justify-between gap-4">
                     <div
-                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg shadow-indigo-200"
+                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg"
                     >
                         <i class="fas fa-book text-white text-lg"></i>
                     </div>
                     <span
-                        class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-black text-indigo-700"
+                        class="rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 text-xs font-black"
                         >Assigned</span
                     >
                 </div>
                 <p
-                    class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600 mb-2"
+                    class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-400 mb-2"
                 >
                     {{ course.course_code }}
                 </p>
-                <h3 class="text-lg font-black text-gray-900 mb-2 leading-snug">
+                <h3 class="text-lg font-black text-white mb-2 leading-snug">
                     {{ course.course_title }}
                 </h3>
-                <p class="text-sm text-gray-500 mb-5">
+                <p class="text-sm text-gray-400 mb-5">
                     {{ course.credit }} credit unit{{ course.credit|pluralize }}
                 </p>
                 <div class="grid grid-cols-2 gap-3">
                     <a
                         href="/lecturer/create-attendance/"
-                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-50 border border-indigo-100 px-4 py-3 text-sm font-black text-indigo-700 hover:bg-indigo-100 transition-all"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 px-4 py-3 text-sm font-black text-indigo-300 hover:bg-indigo-500/30 transition-all"
                     >
                         <i class="fas fa-plus-circle"></i>Session
                     </a>
@@ -248,7 +281,7 @@
                         />
                         <button
                             type="submit"
-                            class="unenroll-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500 px-4 py-3 text-sm font-black text-white hover:bg-red-600 transition-all"
+                            class="unenroll-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500/20 border border-red-500/30 px-4 py-3 text-sm font-black text-red-300 hover:bg-red-500/30 transition-all"
                         >
                             <i class="fas fa-times"></i>Remove
                         </button>
@@ -259,23 +292,24 @@
         </div>
         {% else %}
         <div
-            class="rounded-3xl border border-dashed border-gray-300 bg-white p-12 text-center shadow-sm"
+            class="rounded-3xl border border-dashed border-white/20 bg-white/5 p-12 text-center shadow-sm"
         >
             <div
-                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 text-gray-400"
+                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-gray-500"
             >
                 <i class="fas fa-book-open text-2xl"></i>
             </div>
-            <h3 class="text-lg font-black text-gray-900 mb-1">
+            <h3 class="text-lg font-black text-white mb-1">
                 No teaching courses yet
             </h3>
-            <p class="text-sm text-gray-500 max-w-md mx-auto">
+            <p class="text-sm text-gray-400 max-w-md mx-auto">
                 Search above and assign courses to your lecturer profile so you
                 can start creating attendance sessions.
             </p>
         </div>
         {% endif %}
     </section>
+</div>
 </div>
 
 <script>

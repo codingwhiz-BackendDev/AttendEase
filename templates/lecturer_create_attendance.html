@@ -2,65 +2,98 @@
 {% load static %}
 
 {% block content %}
-<div class="p-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Create Attendance Session</h1>
-            <p class="text-gray-600">Set up a new attendance session with geofencing for your course</p>
-        </div>
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .float-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
 
-        <!-- Main Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
-            <form method="POST" class="space-y-6">
-                {% csrf_token %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
+        <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
+    </div>
 
-                <!-- Course Selection -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-book mr-2 text-indigo-600"></i>Course Title
-                    </label>
-                    <select name="course" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
-                        <option value="">Select a course</option>
-                        {% for course in courses %}
-                        <option value="{{ course.id }}">{{ course.course_title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+    <div class="relative p-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white mb-2">Create Attendance Session</h1>
+                <p class="text-gray-400">Set up a new attendance session with geofencing for your course</p>
+            </div>
 
-                <!-- Lecture Hall -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-building mr-2 text-indigo-600"></i>Lecture Hall
-                    </label>
-                    <input type="text" name="lecture_hall" placeholder="Enter lecture hall" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
-                </div>
+            <!-- Main Card -->
+            <div class="glass-card rounded-2xl shadow-xl p-8 card-hover">
+                <form method="POST" class="space-y-6">
+                    {% csrf_token %}
 
-                <!-- Location Section -->
-                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-100">
-                    <label class="block text-sm font-semibold text-gray-700 mb-3">
-                        <i class="fas fa-map-marker-alt mr-2 text-indigo-600"></i>Lecture Location
-                    </label>
-                    <div class="grid grid-cols-2 gap-4 mb-3">
-                        <div>
-                            <input type="text" id="latitude" name="latitude" placeholder="Latitude" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-600">
+                    <!-- Course Selection -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-book mr-2 text-indigo-400"></i>Course Title
+                        </label>
+                        <select name="course" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
+                            <option value="">Select a course</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.course_title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Lecture Hall -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-building mr-2 text-indigo-400"></i>Lecture Hall
+                        </label>
+                        <input type="text" name="lecture_hall" placeholder="Enter lecture hall" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white placeholder:text-gray-500">
+                    </div>
+
+                    <!-- Location Section -->
+                    <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl p-6 border border-indigo-500/30">
+                        <label class="block text-sm font-semibold text-gray-300 mb-3">
+                            <i class="fas fa-map-marker-alt mr-2 text-indigo-400"></i>Lecture Location
+                        </label>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <input type="text" id="latitude" name="latitude" placeholder="Latitude" readonly class="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-gray-400">
+                            </div>
+                            <div>
+                                <input type="text" id="longitude" name="longitude" placeholder="Longitude" readonly class="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-gray-400">
+                            </div>
                         </div>
-                        <div>
-                            <input type="text" id="longitude" name="longitude" placeholder="Longitude" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-600">
+                        <div id="location-status" class="flex items-center text-sm">
+                            <i class="fas fa-spinner fa-spin mr-2 text-indigo-400"></i>
+                            <span class="text-gray-400">Fetching location...</span>
                         </div>
                     </div>
-                    <div id="location-status" class="flex items-center text-sm">
-                        <i class="fas fa-spinner fa-spin mr-2 text-indigo-600"></i>
-                        <span class="text-gray-600">Fetching location...</span>
-                    </div>
-                </div>
 
                 <!-- Geofencing Radius Section -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-dot-circle mr-2 text-indigo-600"></i>Geofencing Radius
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <i class="fas fa-dot-circle mr-2 text-indigo-400"></i>Geofencing Radius
                     </label>
-                    <select name="radius" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+                    <select name="radius" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
                         <option value="50">50 meters (Close range / Small classroom)</option>
                         <option value="100" selected>100 meters (Standard classroom / Lecture hall)</option>
                         <option value="200">200 meters (Large auditorium / Building wide)</option>
@@ -72,24 +105,24 @@
                 <!-- Time Selection -->
                 <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-clock mr-2 text-indigo-600"></i>Start Time
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-clock mr-2 text-indigo-400"></i>Start Time
                         </label>
-                        <input type="datetime-local" id="start_time_local" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+                        <input type="datetime-local" id="start_time_local" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
                         <input type="hidden" name="start_time" id="start_time_utc">
-                        <p class="mt-2 text-xs text-gray-500 flex items-center" id="start_time_preview">
-                            <i class="fas fa-circle-info mr-1 text-gray-400"></i>
+                        <p class="mt-2 text-xs text-gray-400 flex items-center" id="start_time_preview">
+                            <i class="fas fa-circle-info mr-1 text-gray-500"></i>
                             <span>Select a date & time (uses your computer's local timezone).</span>
                         </p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-clock mr-2 text-indigo-600"></i>End Time
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-clock mr-2 text-indigo-400"></i>End Time
                         </label>
-                        <input type="datetime-local" id="end_time_local" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50">
+                        <input type="datetime-local" id="end_time_local" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
                         <input type="hidden" name="end_time" id="end_time_utc">
-                        <p class="mt-2 text-xs text-gray-500 flex items-center" id="end_time_preview">
-                            <i class="fas fa-circle-info mr-1 text-gray-400"></i>
+                        <p class="mt-2 text-xs text-gray-400 flex items-center" id="end_time_preview">
+                            <i class="fas fa-circle-info mr-1 text-gray-500"></i>
                             <span>Must be later than the start time.</span>
                         </p>
                     </div>
@@ -97,19 +130,20 @@
 
                 <!-- Notes -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-sticky-note mr-2 text-indigo-600"></i>Additional Notes
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <i class="fas fa-sticky-note mr-2 text-indigo-400"></i>Additional Notes
                     </label>
-                    <textarea name="notes" placeholder="Enter any additional notes" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-gray-50 resize-none"></textarea>
+                    <textarea name="notes" placeholder="Enter any additional notes" rows="3" class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white placeholder:text-gray-500 resize-none"></textarea>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 focus:ring-4 focus:ring-indigo-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                     <i class="fas fa-plus-circle mr-2"></i>Create Attendance Session
                 </button>
             </form>
         </div>
     </div>
+</div>
 </div>
 
 <script>
@@ -119,14 +153,14 @@
                 function (position) {
                     document.getElementById("latitude").value = position.coords.latitude;
                     document.getElementById("longitude").value = position.coords.longitude;
-                    document.getElementById("location-status").innerHTML = '<i class="fas fa-check-circle mr-2 text-green-600"></i><span class="text-green-600">Location fetched successfully!</span>';
+                    document.getElementById("location-status").innerHTML = '<i class="fas fa-check-circle mr-2 text-emerald-400"></i><span class="text-emerald-300">Location fetched successfully!</span>';
                 },
                 function (error) {
-                    document.getElementById("location-status").innerHTML = '<i class="fas fa-exclamation-circle mr-2 text-red-600"></i><span class="text-red-600">Failed to fetch location. Please enable location access.</span>';
+                    document.getElementById("location-status").innerHTML = '<i class="fas fa-exclamation-circle mr-2 text-red-400"></i><span class="text-red-300">Failed to fetch location. Please enable location access.</span>';
                 }
             );
         } else {
-            document.getElementById("location-status").innerHTML = '<i class="fas fa-exclamation-circle mr-2 text-red-600"></i><span class="text-red-600">Geolocation is not supported by your browser.</span>';
+            document.getElementById("location-status").innerHTML = '<i class="fas fa-exclamation-circle mr-2 text-red-400"></i><span class="text-red-300">Geolocation is not supported by your browser.</span>';
         }
     }
     getLocation();
@@ -182,7 +216,7 @@
             const raw = localEl.value;
             if (!raw) {
                 utcEl.value = '';
-                previewEl.innerHTML = `<i class="fas fa-circle-info mr-1 text-gray-400"></i><span>${which === 'start' ? 'Select a start date & time (your local timezone).' : 'Must be later than the start time.'}</span>`;
+                previewEl.innerHTML = `<i class="fas fa-circle-info mr-1 text-gray-500"></i><span>${which === 'start' ? 'Select a start date & time (your local timezone).' : 'Must be later than the start time.'}</span>`;
                 return { ok: false };
             }
 
@@ -191,7 +225,7 @@
             // Adding the browser's local offset marker ensures correct parsing:
             const asLocal = new Date(raw);
             if (isNaN(asLocal.getTime())) {
-                previewEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1 text-red-500"></i><span class="text-red-600">Invalid date/time format.</span>`;
+                previewEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1 text-red-400"></i><span class="text-red-300">Invalid date/time format.</span>`;
                 utcEl.value = '';
                 return { ok: false };
             }
@@ -200,13 +234,13 @@
             utcEl.value = utcStr;
 
             const lagosStr = formatAsLagos(asLocal);
-            previewEl.innerHTML = `<i class="fas fa-check-circle mr-1 text-green-500"></i><span class="text-green-700 font-mono">➜ ${lagosStr}</span>`;
+            previewEl.innerHTML = `<i class="fas fa-check-circle mr-1 text-emerald-400"></i><span class="text-emerald-300 font-mono">➜ ${lagosStr}</span>`;
 
             // Extra check: start < end for end-time input
             if (which === 'end' && startUtcEl.value) {
                 const start = new Date(startUtcEl.value);
                 if (asLocal <= start) {
-                    previewEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1 text-orange-500"></i><span class="text-orange-600">End (${lagosStr}) must be AFTER start time.</span>`;
+                    previewEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1 text-orange-400"></i><span class="text-orange-300">End (${lagosStr}) must be AFTER start time.</span>`;
                 }
             }
 
@@ -264,11 +298,11 @@
         // Summary banner shown below the time section
         // ------------------------------------------------------------
         const banner = document.createElement('div');
-        banner.className = 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-800 flex items-start mt-4';
-        banner.innerHTML = '<i class="fas fa-circle-info mr-2 mt-0.5 text-blue-600"></i>' +
+        banner.className = 'bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/30 rounded-xl p-4 text-sm text-blue-300 flex items-start mt-4';
+        banner.innerHTML = '<i class="fas fa-circle-info mr-2 mt-0.5 text-blue-400"></i>' +
             '<div>' +
                 '<p class="font-semibold mb-1">✅ Timezone-safe submission is active</p>' +
-                '<ul class="list-disc ml-5 space-y-0.5 text-blue-700">' +
+                '<ul class="list-disc ml-5 space-y-0.5 text-blue-200">' +
                     '<li>Pick start &amp; end times using <strong>your PC clock / timezone</strong>.</li>' +
                     '<li>Each input shows the equivalent <strong>Lagos/WAT (Africa/Lagos)</strong> time below it — double-check this matches your lecture hours.</li>' +
                     '<li>Times are automatically converted to UTC before sending, so no Windows / OS timezone misconfiguration can corrupt the session window.</li>' +
