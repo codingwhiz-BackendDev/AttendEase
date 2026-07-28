@@ -1,9 +1,11 @@
 Django>=5.0.7
 django-allauth>=0.61.0
 python-dotenv>=1.0.1
+mediapipe>=0.10.14
 opencv-python>=4.9.0.80
 numpy>=1.26.4
 Pillow>=10.3.0
-insightface>=0.7.3 
+insightface>=0.7.3
+onnxruntime>=1.17.1
 gunicorn>=21.2.0
 whitenoise>=6.6.0 
