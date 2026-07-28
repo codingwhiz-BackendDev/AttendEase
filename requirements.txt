@@ -2,7 +2,7 @@ Django>=5.0.7
 django-allauth>=0.61.0
 python-dotenv>=1.0.1
 mediapipe>=0.10.14
-opencv-python>=4.9.0.80
+opencv-python-headless>=4.9.0.80
 numpy>=1.26.4
 Pillow>=10.3.0
 insightface>=0.7.3
@@ -11,4 +11,8 @@ gunicorn>=21.2.0
 whitenoise>=6.6.0 
 PyJWT>=2.8.0
 cryptography>=42.0.0
+<<<<<<< HEAD
 requests
+=======
+requests
+>>>>>>> c013b3dd39c772a0cbe6a3256e62146e375c9e87
