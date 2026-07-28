@@ -14,8 +14,8 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env.local
-load_dotenv('.env.local')
+# Load environment variables from .env.local (optional for Docker)
+load_dotenv('.env.local', override=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

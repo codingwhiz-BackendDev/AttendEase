@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: gunicorn AttendEase.wsgi:application --bind 0.0.0.0:8000 --workers 2
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-k)g1y2#@at#=mu0-=q$s1s&w)j2c3%c8#0x-pa4yvdi9s^(6&^}
+      - DEBUG=${DEBUG:-False}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+    env_file:
+      - .env
+
+volumes:
+  static_volume:
+  media_volume:
