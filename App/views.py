@@ -9,7 +9,7 @@ from datetime import datetime
 from datetime import timezone as dt_timezone
 from functools import wraps
 
-import cv2
+
 import insightface
 import numpy as np
 from django.conf import settings
@@ -95,6 +95,7 @@ def lecturer_required(view_func):
 
 
 def get_face_encoding(image_path):
+    import cv2
     """Extract face encoding using InsightFace library"""
     try:
         # Initialize InsightFace model
