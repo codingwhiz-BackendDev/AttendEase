@@ -74,6 +74,17 @@ SOCIALACCOUNT_ADAPTER = "App.adapters.CustomSocialAccountAdapter"
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
+# Configure Google OAuth using environment variables
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.getenv('GOOGLE_CLIENT_ID', ''),
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET', ''),
+            'key': '',
+        }
+    }
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -205,4 +216,3 @@ LOGGING = {
         },
     },
 }
-  
