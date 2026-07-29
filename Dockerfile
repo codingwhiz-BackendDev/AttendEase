@@ -15,9 +15,15 @@ RUN apt-get update \
         g++ \
         libgomp1 \
         libglib2.0-0 \
+        libsm6 \
+        libxext6 \
+        libxrender1 \
         libgl1 \
+        libgl1-mesa-glx \
         libxcb1 \
         libx11-6 \
+        libxau6 \
+        libxdmcp6 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file
