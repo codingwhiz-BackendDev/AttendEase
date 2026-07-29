@@ -35,25 +35,25 @@
         <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
     </div>
 
-    <div class="relative p-8">
+    <div class="relative p-4 sm:p-6 md:p-8">
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-white mb-2">Create Attendance Session</h1>
-                <p class="text-gray-400">Set up a new attendance session with geofencing for your course</p>
+            <div class="mb-6 sm:mb-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Create Attendance Session</h1>
+                <p class="text-xs sm:text-sm text-gray-400">Set up a new attendance session with geofencing for your course</p>
             </div>
 
             <!-- Main Card -->
-            <div class="glass-card rounded-2xl shadow-xl p-8 card-hover">
-                <form method="POST" class="space-y-6">
+            <div class="glass-card rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 card-hover">
+                <form method="POST" class="space-y-4 sm:space-y-6">
                     {% csrf_token %}
 
                     <!-- Course Selection -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">
                             <i class="fas fa-book mr-2 text-indigo-400"></i>Course Title
                         </label>
-                        <select name="course" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
+                        <select name="course" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white text-xs sm:text-sm">
                             <option value="">Select a course</option>
                             {% for course in courses %}
                             <option value="{{ course.id }}">{{ course.course_title }}</option>
@@ -63,26 +63,26 @@
 
                     <!-- Lecture Hall -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">
                             <i class="fas fa-building mr-2 text-indigo-400"></i>Lecture Hall
                         </label>
-                        <input type="text" name="lecture_hall" placeholder="Enter lecture hall" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white placeholder:text-gray-500">
+                        <input type="text" name="lecture_hall" placeholder="Enter lecture hall" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white placeholder:text-gray-500 text-xs sm:text-sm">
                     </div>
 
                     <!-- Location Section -->
-                    <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl p-6 border border-indigo-500/30">
-                        <label class="block text-sm font-semibold text-gray-300 mb-3">
+                    <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl p-4 sm:p-6 border border-indigo-500/30">
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-300 mb-2 sm:mb-3">
                             <i class="fas fa-map-marker-alt mr-2 text-indigo-400"></i>Lecture Location
                         </label>
-                        <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-3">
                             <div>
-                                <input type="text" id="latitude" name="latitude" placeholder="Latitude" readonly class="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-gray-400">
+                                <input type="text" id="latitude" name="latitude" placeholder="Latitude" readonly class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 bg-white/5 text-gray-400 text-xs sm:text-sm">
                             </div>
                             <div>
-                                <input type="text" id="longitude" name="longitude" placeholder="Longitude" readonly class="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-gray-400">
+                                <input type="text" id="longitude" name="longitude" placeholder="Longitude" readonly class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 bg-white/5 text-gray-400 text-xs sm:text-sm">
                             </div>
                         </div>
-                        <div id="location-status" class="flex items-center text-sm">
+                        <div id="location-status" class="flex items-center text-xs sm:text-sm">
                             <i class="fas fa-spinner fa-spin mr-2 text-indigo-400"></i>
                             <span class="text-gray-400">Fetching location...</span>
                         </div>
@@ -90,10 +90,10 @@
 
                 <!-- Geofencing Radius Section -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">
                         <i class="fas fa-dot-circle mr-2 text-indigo-400"></i>Geofencing Radius
                     </label>
-                    <select name="radius" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
+                    <select name="radius" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white text-xs sm:text-sm">
                         <option value="50">50 meters (Close range / Small classroom)</option>
                         <option value="100" selected>100 meters (Standard classroom / Lecture hall)</option>
                         <option value="200">200 meters (Large auditorium / Building wide)</option>
@@ -103,25 +103,25 @@
 
 
                 <!-- Time Selection -->
-                <div class="grid grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">
                             <i class="fas fa-clock mr-2 text-indigo-400"></i>Start Time
                         </label>
-                        <input type="datetime-local" id="start_time_local" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
+                        <input type="datetime-local" id="start_time_local" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white text-xs sm:text-sm">
                         <input type="hidden" name="start_time" id="start_time_utc">
-                        <p class="mt-2 text-xs text-gray-400 flex items-center" id="start_time_preview">
+                        <p class="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400 flex items-center" id="start_time_preview">
                             <i class="fas fa-circle-info mr-1 text-gray-500"></i>
                             <span>Select a date & time (uses your computer's local timezone).</span>
                         </p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">
                             <i class="fas fa-clock mr-2 text-indigo-400"></i>End Time
                         </label>
-                        <input type="datetime-local" id="end_time_local" required class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white">
+                        <input type="datetime-local" id="end_time_local" required class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white text-xs sm:text-sm">
                         <input type="hidden" name="end_time" id="end_time_utc">
-                        <p class="mt-2 text-xs text-gray-400 flex items-center" id="end_time_preview">
+                        <p class="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400 flex items-center" id="end_time_preview">
                             <i class="fas fa-circle-info mr-1 text-gray-500"></i>
                             <span>Must be later than the start time.</span>
                         </p>
@@ -130,14 +130,14 @@
 
                 <!-- Notes -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-300 mb-2">
                         <i class="fas fa-sticky-note mr-2 text-indigo-400"></i>Additional Notes
                     </label>
-                    <textarea name="notes" placeholder="Enter any additional notes" rows="3" class="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white placeholder:text-gray-500 resize-none"></textarea>
+                    <textarea name="notes" placeholder="Enter any additional notes" rows="3" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white/5 text-white placeholder:text-gray-500 resize-none text-xs sm:text-sm"></textarea>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 focus:ring-4 focus:ring-indigo-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <button type="submit" class="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 focus:ring-4 focus:ring-indigo-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base">
                     <i class="fas fa-plus-circle mr-2"></i>Create Attendance Session
                 </button>
             </form>

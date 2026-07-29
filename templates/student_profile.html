@@ -56,58 +56,58 @@
         <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
     </div>
 
-    <div class="relative p-8 max-w-7xl mx-auto">
+    <div class="relative p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-4xl font-black text-white mb-2">My <span class="gradient-text">Profile</span></h1>
-            <p class="text-gray-400">View your student information and enrolled courses</p>
+        <div class="mb-6 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">My <span class="gradient-text">Profile</span></h1>
+            <p class="text-xs sm:text-sm text-gray-400">View your student information and enrolled courses</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Profile Card -->
             <div class="lg:col-span-1">
-                <div class="glass-card rounded-3xl shadow-2xl p-8 card-hover text-center border border-white/10">
-                    <div class="w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-black shadow-xl pulse-glow">
+                <div class="glass-card rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 card-hover text-center border border-white/10">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl sm:text-3xl md:text-4xl font-black shadow-xl pulse-glow">
                         {{ student_profile.student_name.username|first|upper }}
                     </div>
-                    <h2 class="text-2xl font-black text-white mb-2">{{ student_profile.student_name.username }}</h2>
-                    <p class="text-indigo-400 font-medium mb-6">Student</p>
-                    
-                    <div class="space-y-4 text-left">
-                        <div class="flex items-center p-4 bg-white/5 rounded-xl border border-white/10">
-                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mr-3">
-                                <i class="fas fa-id-card text-white"></i>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mb-2">{{ student_profile.student_name.username }}</h2>
+                    <p class="text-indigo-400 font-medium mb-4 sm:mb-6 text-sm sm:text-base">Student</p>
+
+                    <div class="space-y-3 sm:space-y-4 text-left">
+                        <div class="flex items-center p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mr-2 sm:mr-3 shrink-0">
+                                <i class="fas fa-id-card text-white text-sm sm:text-base"></i>
                             </div>
-                            <div class="ml-3">
-                                <p class="text-xs text-gray-400 uppercase tracking-wider font-black">Matric Number</p>
-                                <p class="font-semibold text-white">{{ student_profile.matric_number|default:"Not set" }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center p-4 bg-white/5 rounded-xl border border-white/10">
-                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mr-3">
-                                <i class="fas fa-building text-white"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-xs text-gray-400 uppercase tracking-wider font-black">Department</p>
-                                <p class="font-semibold text-white">{{ student_profile.department|default:"Not set" }}</p>
+                            <div class="ml-2 sm:ml-3 min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider font-black">Matric Number</p>
+                                <p class="font-semibold text-white text-xs sm:text-sm truncate">{{ student_profile.matric_number|default:"Not set" }}</p>
                             </div>
                         </div>
-                        <div class="flex items-center p-4 bg-white/5 rounded-xl border border-white/10">
-                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mr-3">
-                                <i class="fas fa-university text-white"></i>
+                        <div class="flex items-center p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mr-2 sm:mr-3 shrink-0">
+                                <i class="fas fa-building text-white text-sm sm:text-base"></i>
                             </div>
-                            <div class="ml-3">
-                                <p class="text-xs text-gray-400 uppercase tracking-wider font-black">Faculty</p>
-                                <p class="font-semibold text-white">{{ student_profile.faculty|default:"Not set" }}</p>
+                            <div class="ml-2 sm:ml-3 min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider font-black">Department</p>
+                                <p class="font-semibold text-white text-xs sm:text-sm truncate">{{ student_profile.department|default:"Not set" }}</p>
                             </div>
                         </div>
-                        <div class="flex items-center p-4 bg-white/5 rounded-xl border border-white/10">
-                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center mr-3">
-                                <i class="fas fa-graduation-cap text-white"></i>
+                        <div class="flex items-center p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mr-2 sm:mr-3 shrink-0">
+                                <i class="fas fa-university text-white text-sm sm:text-base"></i>
                             </div>
-                            <div class="ml-3">
-                                <p class="text-xs text-gray-400 uppercase tracking-wider font-black">Year of Study</p>
-                                <p class="font-semibold text-white">{{ student_profile.year_of_study|default:"Not set" }}</p>
+                            <div class="ml-2 sm:ml-3 min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider font-black">Faculty</p>
+                                <p class="font-semibold text-white text-xs sm:text-sm truncate">{{ student_profile.faculty|default:"Not set" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center mr-2 sm:mr-3 shrink-0">
+                                <i class="fas fa-graduation-cap text-white text-sm sm:text-base"></i>
+                            </div>
+                            <div class="ml-2 sm:ml-3 min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider font-black">Year of Study</p>
+                                <p class="font-semibold text-white text-xs sm:text-sm truncate">{{ student_profile.year_of_study|default:"Not set" }}</p>
                             </div>
                         </div>
                     </div>
@@ -116,39 +116,39 @@
 
             <!-- Courses Section -->
             <div class="lg:col-span-2">
-                <div class="glass-card rounded-3xl shadow-2xl p-8 card-hover border border-white/10">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-black text-white">Enrolled Courses</h2>
-                        <span class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full text-sm font-black">{{ enrolled_courses.count }} Courses</span>
+                <div class="glass-card rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 card-hover border border-white/10">
+                    <div class="flex items-center justify-between mb-4 sm:mb-6 gap-3 flex-wrap">
+                        <h2 class="text-xl sm:text-2xl font-black text-white">Enrolled Courses</h2>
+                        <span class="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full text-xs sm:text-sm font-black">{{ enrolled_courses.count }} Courses</span>
                     </div>
-                    
+
                     {% if enrolled_courses %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         {% for course in enrolled_courses %}
-                        <div class="p-5 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all group">
-                            <div class="flex items-center mb-3">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform shadow-lg">
-                                    <i class="fas fa-book text-white text-lg"></i>
+                        <div class="p-4 sm:p-5 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all group">
+                            <div class="flex items-center mb-2 sm:mb-3 gap-3 sm:gap-4">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg">
+                                    <i class="fas fa-book text-white text-base sm:text-lg"></i>
                                 </div>
-                                <div>
-                                    <h3 class="font-black text-white">{{ course.course_title }}</h3>
-                                    <p class="text-sm text-indigo-300">{{ course.course_code }}</p>
+                                <div class="min-w-0">
+                                    <h3 class="font-black text-white text-sm sm:text-base truncate">{{ course.course_title }}</h3>
+                                    <p class="text-xs sm:text-sm text-indigo-300">{{ course.course_code }}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center text-sm text-gray-400">
-                                <i class="fas fa-star text-yellow-500 mr-2"></i>
+                            <div class="flex items-center text-xs sm:text-sm text-gray-400">
+                                <i class="fas fa-star text-yellow-500 mr-1.5 sm:mr-2"></i>
                                 <span>{{ course.credit }} Credit Units</span>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="text-center py-12">
-                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-white/10 flex items-center justify-center">
-                            <i class="fas fa-book-open text-3xl text-gray-500"></i>
+                    <div class="text-center py-8 sm:py-12">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-full bg-white/10 flex items-center justify-center">
+                            <i class="fas fa-book-open text-2xl sm:text-3xl text-gray-500"></i>
                         </div>
-                        <p class="text-gray-400 font-semibold">No courses enrolled yet</p>
-                        <p class="text-sm text-gray-500 mt-1">Browse and enroll in courses to see them here</p>
+                        <p class="text-gray-400 font-semibold text-sm sm:text-base">No courses enrolled yet</p>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1">Browse and enroll in courses to see them here</p>
                     </div>
                     {% endif %}
                 </div>
