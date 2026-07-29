@@ -8,11 +8,9 @@ Pillow>=10.3.0
 insightface>=0.7.3
 onnxruntime>=1.17.1
 gunicorn>=21.2.0
-whitenoise>=6.6.0 
+whitenoise>=6.6.0
 PyJWT>=2.8.0
 cryptography>=42.0.0
-<<<<<<< HEAD
-requests
-=======
-requests
->>>>>>> c013b3dd39c772a0cbe6a3256e62146e375c9e87
+requests>=2.31.0
+psycopg2-binary>=2.9.9
+dj-database-url>=2.1.0

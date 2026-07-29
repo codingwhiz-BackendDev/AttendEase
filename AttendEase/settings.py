@@ -29,11 +29,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-k)g1y2#@at#=mu0-=q$s1s&w)j
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*'] 
-CSRF_TRUSTED_ORIGINS = [
-    'https://e7e7-197-211-63-35.ngrok-free.app',  # Update this with the new URL
-    'https://accounts.google.com',
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://accounts.google.com').split(',')
 
 
 
@@ -117,11 +115,15 @@ WSGI_APPLICATION = 'AttendEase.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+import dj_database_url
+
+# Use PostgreSQL on Render, SQLite for local development
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 

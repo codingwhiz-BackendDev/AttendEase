@@ -14,9 +14,6 @@ RUN apt-get update \
         gcc \
         g++ \
         libgomp1 \
-        libsm6 \
-        libxext6 \
-        libxrender-dev \
         libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
