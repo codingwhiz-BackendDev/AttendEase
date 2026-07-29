@@ -19,7 +19,7 @@ RUN apt-get update \
         libxext6 \
         libxrender1 \
         libgl1 \
-        libgl1-mesa-glx \
+        libglx-mesa0 \
         libxcb1 \
         libx11-6 \
         libxau6 \
