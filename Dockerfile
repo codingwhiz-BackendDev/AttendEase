@@ -15,6 +15,9 @@ RUN apt-get update \
         g++ \
         libgomp1 \
         libglib2.0-0 \
+        libgl1 \
+        libxcb1 \
+        libx11-6 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file

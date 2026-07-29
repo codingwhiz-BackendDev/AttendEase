@@ -10,7 +10,6 @@ from datetime import timezone as dt_timezone
 from functools import wraps
 
 
-import insightface
 import numpy as np
 from django.conf import settings
 from django.contrib import messages
@@ -57,6 +56,7 @@ def get_face_app():
     global _face_app
     if _face_app is None:
         try:
+            import insightface
             _face_app = insightface.app.FaceAnalysis(name="buffalo_l")
             _face_app.prepare(ctx_id=0, det_size=(640, 640))
             logger.info("InsightFace model loaded successfully")
