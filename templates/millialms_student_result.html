@@ -1,12 +1,21 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <style>
     @keyframes float-purple {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-14px); }
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-14px);
+        }
     }
-    .float-orb-1 { animation: float-purple 7s ease-in-out infinite; }
-    .float-orb-2 { animation: float-purple 9s ease-in-out infinite; animation-delay: 2s; }
+    .float-orb-1 {
+        animation: float-purple 7s ease-in-out infinite;
+    }
+    .float-orb-2 {
+        animation: float-purple 9s ease-in-out infinite;
+        animation-delay: 2s;
+    }
 
     .glass-card {
         background: rgba(255, 255, 255, 0.06);
@@ -31,7 +40,10 @@
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
         transition: all 0.25s ease;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(102, 126, 234, 0.5); }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 40px rgba(102, 126, 234, 0.5);
+    }
 
     .btn-outline-light {
         border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -39,408 +51,946 @@
         color: white;
         transition: all 0.2s ease;
     }
-    .btn-outline-light:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.45); }
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.45);
+    }
 </style>
 <style>
-    .purple-card { background:#ffffff; border:1px solid rgba(118,75,162,0.15); box-shadow:0 4px 20px rgba(102,126,234,0.08); }
-    .stat-card { background:linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.03) 100%); border:1px solid rgba(118,75,162,0.15); box-shadow:0 2px 12px rgba(102,126,234,0.06); transition:all 0.25s ease; }
-    .stat-card:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(102,126,234,0.15); border-color:rgba(139,92,246,0.35); }
-    .btn-purple { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); box-shadow:0 8px 24px rgba(102,126,234,0.25); transition:all 0.25s ease; }
-    .btn-purple:hover { transform:translateY(-1px); box-shadow:0 12px 32px rgba(102,126,234,0.35); }
-    .btn-outline-purple { border:1.5px solid rgba(118,75,162,0.3); background:white; color:#6d28d9; transition:all 0.2s ease; }
-    .btn-outline-purple:hover { background:rgba(139,92,246,0.06); border-color:#8b5cf6; }
-    .result-card-correct { background:linear-gradient(135deg,rgba(16,185,129,0.04),rgba(5,150,105,0.06)); border-color:rgba(16,185,129,0.25); }
-    .result-card-incorrect { background:linear-gradient(135deg,rgba(239,68,68,0.04),rgba(220,38,38,0.06)); border-color:rgba(239,68,68,0.25); }
-    .result-card-pending { background:linear-gradient(135deg,rgba(251,191,36,0.05),rgba(245,158,11,0.07)); border-color:rgba(251,191,36,0.3); }
-    .result-card-neutral { background:linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.02) 100%); border-color:rgba(118,75,162,0.15); }
-    .status-graded { background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.15)); color:#047857; border-color:rgba(16,185,129,0.35); }
-    .status-submitted { background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(245,158,11,0.15)); color:#92400e; border-color:rgba(251,191,36,0.35); }
-    .status-inprogress { background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(124,58,237,0.15)); color:#6d28d9; border-color:rgba(139,92,246,0.35); }
-    .q-type-chip-mcq { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
-    .q-type-chip-tf { background:rgba(99,102,241,0.1); color:#4338ca; border-color:rgba(99,102,241,0.3); }
-    .q-type-chip-fb { background:rgba(59,130,246,0.1); color:#1d4ed8; border-color:rgba(59,130,246,0.3); }
-    .q-type-chip-sa { background:rgba(245,158,11,0.1); color:#92400e; border-color:rgba(245,158,11,0.3); }
-    .q-type-chip-essay { background:rgba(168,85,247,0.12); color:#7e22ce; border-color:rgba(168,85,247,0.35); }
-    .q-num-badge { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; box-shadow:0 4px 12px rgba(102,126,234,0.3); }
-    .correct-answer { background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(5,150,105,0.12)); border-color:rgba(16,185,129,0.35) !important; color:#065f46; }
-    .incorrect-answer { background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(220,38,38,0.1)); border-color:rgba(239,68,68,0.3) !important; color:#991b1b; }
-    .feedback-box { background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(245,158,11,0.12)); border-color:rgba(251,191,36,0.4); }
-    .score-chip-auto { background:rgba(59,130,246,0.1); color:#1d4ed8; border-color:rgba(59,130,246,0.3); }
-    .score-chip-manual { background:rgba(245,158,11,0.1); color:#92400e; border-color:rgba(245,158,11,0.3); }
-    .score-chip-pts { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
-    .score-chip-pending { background:rgba(156,163,175,0.1); color:#4b5563; border-color:rgba(156,163,175,0.3); }
-    .bar-track { background:rgba(139,92,246,0.1); border-radius:999px; overflow:hidden; }
-    .bar-fill { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 1s ease; }
-    .score-ring-good { color:#047857; }
-    .score-ring-mid { color:#92400e; }
-    .score-ring-bad { color:#b91c1c; }
-    .divider-gradient { background:linear-gradient(90deg,transparent,rgba(139,92,246,0.2),transparent); }
-    .answer-placeholder { color:#9ca3af; font-style:italic; }
-    .notice-banner { background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(245,158,11,0.15)); border-color:rgba(251,191,36,0.35); color:#92400e; }
+    .purple-card {
+        background: #ffffff;
+        border: 1px solid rgba(118, 75, 162, 0.15);
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08);
+    }
+    .stat-card {
+        background: linear-gradient(
+            180deg,
+            #ffffff 0%,
+            rgba(139, 92, 246, 0.03) 100%
+        );
+        border: 1px solid rgba(118, 75, 162, 0.15);
+        box-shadow: 0 2px 12px rgba(102, 126, 234, 0.06);
+        transition: all 0.25s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        border-color: rgba(139, 92, 246, 0.35);
+    }
+    .btn-purple {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+        transition: all 0.25s ease;
+    }
+    .btn-purple:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.35);
+    }
+    .btn-outline-purple {
+        border: 1.5px solid rgba(118, 75, 162, 0.3);
+        background: white;
+        color: #6d28d9;
+        transition: all 0.2s ease;
+    }
+    .btn-outline-purple:hover {
+        background: rgba(139, 92, 246, 0.06);
+        border-color: #8b5cf6;
+    }
+    .result-card-correct {
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.04),
+            rgba(5, 150, 105, 0.06)
+        );
+        border-color: rgba(16, 185, 129, 0.25);
+    }
+    .result-card-incorrect {
+        background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.04),
+            rgba(220, 38, 38, 0.06)
+        );
+        border-color: rgba(239, 68, 68, 0.25);
+    }
+    .result-card-pending {
+        background: linear-gradient(
+            135deg,
+            rgba(251, 191, 36, 0.05),
+            rgba(245, 158, 11, 0.07)
+        );
+        border-color: rgba(251, 191, 36, 0.3);
+    }
+    .result-card-neutral {
+        background: linear-gradient(
+            180deg,
+            #ffffff 0%,
+            rgba(139, 92, 246, 0.02) 100%
+        );
+        border-color: rgba(118, 75, 162, 0.15);
+    }
+    .status-graded {
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.12),
+            rgba(5, 150, 105, 0.15)
+        );
+        color: #047857;
+        border-color: rgba(16, 185, 129, 0.35);
+    }
+    .status-submitted {
+        background: linear-gradient(
+            135deg,
+            rgba(251, 191, 36, 0.12),
+            rgba(245, 158, 11, 0.15)
+        );
+        color: #92400e;
+        border-color: rgba(251, 191, 36, 0.35);
+    }
+    .status-inprogress {
+        background: linear-gradient(
+            135deg,
+            rgba(139, 92, 246, 0.12),
+            rgba(124, 58, 237, 0.15)
+        );
+        color: #6d28d9;
+        border-color: rgba(139, 92, 246, 0.35);
+    }
+    .q-type-chip-mcq {
+        background: rgba(16, 185, 129, 0.1);
+        color: #047857;
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    .q-type-chip-tf {
+        background: rgba(99, 102, 241, 0.1);
+        color: #4338ca;
+        border-color: rgba(99, 102, 241, 0.3);
+    }
+    .q-type-chip-fb {
+        background: rgba(59, 130, 246, 0.1);
+        color: #1d4ed8;
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    .q-type-chip-sa {
+        background: rgba(245, 158, 11, 0.1);
+        color: #92400e;
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+    .q-type-chip-essay {
+        background: rgba(168, 85, 247, 0.12);
+        color: #7e22ce;
+        border-color: rgba(168, 85, 247, 0.35);
+    }
+    .q-num-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .correct-answer {
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.08),
+            rgba(5, 150, 105, 0.12)
+        );
+        border-color: rgba(16, 185, 129, 0.35) !important;
+        color: #065f46;
+    }
+    .incorrect-answer {
+        background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.06),
+            rgba(220, 38, 38, 0.1)
+        );
+        border-color: rgba(239, 68, 68, 0.3) !important;
+        color: #991b1b;
+    }
+    .feedback-box {
+        background: linear-gradient(
+            135deg,
+            rgba(251, 191, 36, 0.08),
+            rgba(245, 158, 11, 0.12)
+        );
+        border-color: rgba(251, 191, 36, 0.4);
+    }
+    .score-chip-auto {
+        background: rgba(59, 130, 246, 0.1);
+        color: #1d4ed8;
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    .score-chip-manual {
+        background: rgba(245, 158, 11, 0.1);
+        color: #92400e;
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+    .score-chip-pts {
+        background: rgba(16, 185, 129, 0.1);
+        color: #047857;
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    .score-chip-pending {
+        background: rgba(156, 163, 175, 0.1);
+        color: #4b5563;
+        border-color: rgba(156, 163, 175, 0.3);
+    }
+    .bar-track {
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+    .bar-fill {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 999px;
+        height: 100%;
+        transition: width 1s ease;
+    }
+    .score-ring-good {
+        color: #047857;
+    }
+    .score-ring-mid {
+        color: #92400e;
+    }
+    .score-ring-bad {
+        color: #b91c1c;
+    }
+    .divider-gradient {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(139, 92, 246, 0.2),
+            transparent
+        );
+    }
+    .answer-placeholder {
+        color: #9ca3af;
+        font-style: italic;
+    }
+    .notice-banner {
+        background: linear-gradient(
+            135deg,
+            rgba(251, 191, 36, 0.12),
+            rgba(245, 158, 11, 0.15)
+        );
+        border-color: rgba(251, 191, 36, 0.35);
+        color: #92400e;
+    }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 relative overflow-hidden">
+<div
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 relative overflow-hidden"
+>
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-24 -left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 float-orb-1"></div>
-        <div class="absolute top-96 -right-20 w-[28rem] h-[28rem] bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-15 float-orb-2"></div>
-        <div class="absolute bottom-10 left-1/3 w-80 h-80 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 float-orb-1"></div>
+        <div
+            class="absolute top-24 -left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 float-orb-1"
+        ></div>
+        <div
+            class="absolute top-96 -right-20 w-[28rem] h-[28rem] bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-15 float-orb-2"
+        ></div>
+        <div
+            class="absolute bottom-10 left-1/3 w-80 h-80 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 float-orb-1"
+        ></div>
     </div>
 
     <div class="relative p-4 md:p-8 max-w-6xl mx-auto space-y-8">
-    <div class="flex flex-wrap items-start justify-between gap-5">
-        <div class="flex-1 min-w-0">
-            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-purple-600 mb-2">
-                <i class="fas fa-chart-line mr-1.5"></i>MilliaLMS — Assessment Result
-            </p>
-            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words">
-                Assessment Result
-            </h1>
-            <p class="mt-3 max-w-4xl text-gray-700 font-medium leading-relaxed">
-                <i class="fas fa-book text-purple-500 mr-1.5"></i>{{ attempt.assessment.title }}
-            </p>
-        </div>
-        <div class="flex flex-wrap gap-2.5">
-            <a href="{% url 'millialms_student_assessment_detail' attempt.assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-3 text-sm font-black">
-                <i class="fas fa-arrow-left"></i>Back to Assessment
-            </a>
-            <a href="{% url 'millialms_student_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-5 py-3 text-sm font-black text-white">
-                <i class="fas fa-table-columns"></i>All Assessments
-            </a>
-        </div>
-    </div>
-
-    {% if messages %}
-    <div class="space-y-3">
-        {% for message in messages %}
-        <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
-            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <div class="stat-card rounded-3xl p-5">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempt</p>
-            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-gray-700 to-gray-900 bg-clip-text text-transparent">#{{ attempt.attempt_number }}</p>
-            <p class="mt-3 text-xs font-bold text-gray-500">of {{ attempt.assessment.max_attempts }} max</p>
-        </div>
-        <div class="stat-card rounded-3xl p-5">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Status</p>
-            <div class="mt-3">
-                <span class="inline-flex items-center rounded-full px-3.5 py-1.5 text-xs font-black border
-                    {% if attempt.status == 'graded' %}status-graded
-                    {% elif attempt.status == 'submitted' %}status-submitted
-                    {% else %}status-inprogress{% endif %}">
-                    {% if attempt.status == 'graded' %}<i class="fas fa-check-double mr-1.5"></i>
-                    {% elif attempt.status == 'submitted' %}<i class="fas fa-hourglass-half mr-1.5 animate-pulse"></i>
-                    {% else %}<i class="fas fa-pen mr-1.5"></i>{% endif %}
-                    {{ attempt.get_status_display }}
-                </span>
+        <div class="flex flex-wrap items-start justify-between gap-5">
+            <div class="flex-1 min-w-0">
+                <p
+                    class="text-[11px] font-black uppercase tracking-[0.22em] text-purple-600 mb-2"
+                >
+                    <i class="fas fa-chart-line mr-1.5"></i>MilliaLMS —
+                    Assessment Result
+                </p>
+                <h1
+                    class="text-2xl md:text-3xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words"
+                >
+                    Assessment Result
+                </h1>
+                <p
+                    class="mt-3 max-w-4xl text-gray-700 text-sm font-medium leading-relaxed"
+                >
+                    <i class="fas fa-book text-purple-500 mr-1.5"></i>{{
+                    attempt.assessment.title }}
+                </p>
             </div>
-            <p class="mt-3 text-xs font-bold text-gray-500">{% if attempt.submitted_at %}Submitted: {{ attempt.submitted_at }}{% else %}Not yet submitted{% endif %}</p>
+            <div class="flex flex-wrap gap-2.5">
+                <a
+                    href="{% url 'millialms_student_assessment_detail' attempt.assessment.id %}"
+                    class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-3 text-sm font-black"
+                >
+                    <i class="fas fa-arrow-left"></i>Back to Assessment
+                </a>
+                <a
+                    href="{% url 'millialms_student_dashboard' %}"
+                    class="inline-flex items-center gap-2 rounded-2xl btn-purple px-5 py-3 text-sm font-black text-white"
+                >
+                    <i class="fas fa-table-columns"></i>All Assessments
+                </a>
+            </div>
         </div>
-        <div class="stat-card rounded-3xl p-5">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Your Score</p>
-            {% if attempt.total_possible_score > 0 %}
-                {% with ratio=attempt.total_score|add:0 %}
-                {% widthratio ratio attempt.total_possible_score 100 as pct %}
-                <p class="mt-3 text-3xl md:text-4xl font-black
-                    {% if pct >= 70 %}score-ring-good{% elif pct >= 50 %}score-ring-mid{% else %}score-ring-bad{% endif %}">
+
+        {% if messages %}
+        <div class="space-y-3">
+            {% for message in messages %}
+            <div
+                class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}"
+            >
+                <i
+                    class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"
+                ></i
+                >{{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+            <div class="stat-card rounded-3xl p-5">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Attempt
+                </p>
+                <p
+                    class="mt-3 text-2xl md:text-3xl font-black bg-gradient-to-br from-gray-700 to-gray-900 bg-clip-text text-transparent"
+                >
+                    #{{ attempt.attempt_number }}
+                </p>
+                <p class="mt-3 text-xs font-bold text-gray-500">
+                    of {{ attempt.assessment.max_attempts }} max
+                </p>
+            </div>
+            <div class="stat-card rounded-3xl p-5">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Status
+                </p>
+                <div class="mt-3">
+                    <span
+                        class="inline-flex items-center rounded-full px-3.5 py-1.5 text-xs font-black border {% if attempt.status == 'graded' %}status-graded {% elif attempt.status == 'submitted' %}status-submitted {% else %}status-inprogress{% endif %}"
+                    >
+                        {% if attempt.status == 'graded' %}<i
+                            class="fas fa-check-double mr-1.5"
+                        ></i>
+                        {% elif attempt.status == 'submitted' %}<i
+                            class="fas fa-hourglass-half mr-1.5 animate-pulse"
+                        ></i>
+                        {% else %}<i class="fas fa-pen mr-1.5"></i>{% endif %}
+                        {{ attempt.get_status_display }}
+                    </span>
+                </div>
+                <p class="mt-3 text-xs font-bold text-gray-500">
+                    {% if attempt.submitted_at %}Submitted: {{
+                    attempt.submitted_at }}{% else %}Not yet submitted{% endif
+                    %}
+                </p>
+            </div>
+            <div class="stat-card rounded-3xl p-5">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Your Score
+                </p>
+                {% if attempt.total_possible_score > 0 %} {% with
+                ratio=attempt.total_score|add:0 %} {% widthratio ratio
+                attempt.total_possible_score 100 as pct %}
+                <p
+                    class="mt-3 text-3xl md:text-4xl font-black {% if pct >= 70 %}score-ring-good{% elif pct >= 50 %}score-ring-mid{% else %}score-ring-bad{% endif %}"
+                >
                     {{ pct }}<span class="text-xl">%</span>
                 </p>
                 <div class="mt-3 h-1.5 bar-track">
-                    <div class="bar-fill" style="width:{{ pct }}%; {% if pct < 50 %}background:linear-gradient(90deg,#ef4444,#f87171);{% elif pct < 70 %}background:linear-gradient(90deg,#f59e0b,#fb923c);{% endif %}"></div>
+                    <div
+                        class="bar-fill"
+                        style="width:{{ pct }}%; {% if pct < 50 %}background:linear-gradient(90deg,#ef4444,#f87171);{% elif pct < 70 %}background:linear-gradient(90deg,#f59e0b,#fb923c);{% endif %}"
+                    ></div>
                 </div>
-                {% endwith %}
-            {% else %}
+                {% endwith %} {% else %}
                 <p class="mt-3 text-3xl font-black text-gray-500">—</p>
-                <p class="mt-3 text-xs font-bold text-gray-400">No score available</p>
-            {% endif %}
-        </div>
-        <div class="stat-card rounded-3xl p-5">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Points</p>
-            <p class="mt-3">
-                <span class="text-3xl md:text-4xl font-black bg-gradient-to-br from-purple-600 to-indigo-700 bg-clip-text text-transparent">{{ attempt.total_score }}</span>
-                <span class="text-lg font-bold text-gray-400">/ {{ attempt.total_possible_score }}</span>
-            </p>
-            <p class="mt-3 text-xs font-bold text-gray-500">
-                <i class="fas fa-robot mr-1"></i>Auto: {{ attempt.auto_score }}
-                <span class="mx-1.5">·</span>
-                <i class="fas fa-user-tie mr-1"></i>Manual: {{ attempt.manual_score }}
-            </p>
-        </div>
-    </div>
-
-    {% if attempt.status == 'submitted' %}
-    <div class="rounded-3xl notice-banner border px-5 py-5 text-sm shadow-sm flex items-start gap-3">
-        <i class="fas fa-memo-circle-check text-2xl mt-0.5 flex-shrink-0"></i>
-        <div class="font-bold leading-relaxed">
-            <strong class="text-base">Grading in progress.</strong>
-            Your objective questions (MCQ, True/False, Fill-in-blank) have already been auto-graded.
-            Essay and short-answer responses appear as <strong>Pending</strong> until your lecturer reviews and marks them manually.
-            Once fully graded, your score and percentage above will update to reflect the final result.
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="purple-card rounded-3xl shadow-sm overflow-hidden">
-        <div class="border-b border-purple-100/60 px-6 py-5 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <h2 class="text-xl font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent flex items-center gap-2">
-                    <i class="fas fa-list-check text-purple-600"></i>Question-by-Question Breakdown
-                </h2>
-                <p class="text-sm text-gray-500 mt-0.5 font-medium">Review every question, your answer, the correct answer, and feedback from your lecturer.</p>
+                <p class="mt-3 text-xs font-bold text-gray-400">
+                    No score available
+                </p>
+                {% endif %}
             </div>
-            <div class="text-xs font-bold text-gray-500 flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 px-2.5 py-1"><i class="fas fa-circle text-[6px]"></i>Correct</span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 border border-red-200 text-red-800 px-2.5 py-1"><i class="fas fa-circle text-[6px]"></i>Incorrect</span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 px-2.5 py-1"><i class="fas fa-circle text-[6px]"></i>Awaiting Review</span>
+            <div class="stat-card rounded-3xl p-5">
+                <p
+                    class="text-[11px] font-black uppercase tracking-wider text-gray-500"
+                >
+                    Points
+                </p>
+                <p class="mt-3">
+                    <span
+                        class="text-3xl md:text-4xl font-black bg-gradient-to-br from-purple-600 to-indigo-700 bg-clip-text text-transparent"
+                        >{{ attempt.total_score }}</span
+                    >
+                    <span class="text-lg font-bold text-gray-400"
+                        >/ {{ attempt.total_possible_score }}</span
+                    >
+                </p>
+                <p class="mt-3 text-xs font-bold text-gray-500">
+                    <i class="fas fa-robot mr-1"></i>Auto: {{ attempt.auto_score
+                    }}
+                    <span class="mx-1.5">·</span>
+                    <i class="fas fa-user-tie mr-1"></i>Manual: {{
+                    attempt.manual_score }}
+                </p>
             </div>
         </div>
 
-        {% if responses %}
-        <div class="divide-y divide-purple-100/60">
-            {% for response in responses %}
-            {% with q=response.question qt=q.question_type %}
-            {% with manual_pending=qt|stringformat:"s" %}
-            {% if manual_pending == 'essay' or manual_pending == 'short_answer' %}
-                {% if response.graded_manually == False %}
-                    <div class="p-5 md:p-7 result-card-pending border-l-4 rounded-none">
-                {% else %}
-                    {% if response.is_correct or response.manual_score >= q.points|stringformat:"f"|slice:":4" or response.manual_score > 0 and response.manual_score >= q.points|divisibleby:2 %}
-                        {% if response.is_correct %}
-                            <div class="p-5 md:p-7 result-card-correct border-l-4 rounded-none border-emerald-400">
-                        {% else %}
-                            <div class="p-5 md:p-7 result-card-neutral border-l-4 rounded-none border-purple-300">
-                        {% endif %}
-                    {% elif response.is_correct %}
-                        <div class="p-5 md:p-7 result-card-correct border-l-4 rounded-none border-emerald-400">
-                    {% else %}
-                        <div class="p-5 md:p-7 result-card-incorrect border-l-4 rounded-none border-red-400">
-                    {% endif %}
-                {% endif %}
-            {% else %}
-                {% if response.is_correct %}
-                    <div class="p-5 md:p-7 result-card-correct border-l-4 rounded-none border-emerald-400">
-                {% else %}
-                    <div class="p-5 md:p-7 result-card-incorrect border-l-4 rounded-none border-red-400">
-                {% endif %}
-            {% endif %}
+        {% if attempt.status == 'submitted' %}
+        <div
+            class="rounded-3xl notice-banner border px-5 py-5 text-sm shadow-sm flex items-start gap-3"
+        >
+            <i
+                class="fas fa-memo-circle-check text-2xl mt-0.5 flex-shrink-0"
+            ></i>
+            <div class="font-bold leading-relaxed">
+                <strong class="text-base">Grading in progress.</strong>
+                Your objective questions (MCQ, True/False, Fill-in-blank) have
+                already been auto-graded. Essay and short-answer responses
+                appear as <strong>Pending</strong> until your lecturer reviews
+                and marks them manually. Once fully graded, your score and
+                percentage above will update to reflect the final result.
+            </div>
+        </div>
+        {% endif %}
 
-                <div class="flex flex-wrap items-start gap-3 md:gap-4 mb-4 md:mb-5">
-                    <div class="flex h-10 w-10 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-2xl q-num-badge font-black text-sm shadow-md">
-                        {{ forloop.counter }}
-                    </div>
-                    <div class="min-w-0 flex-1 pt-0.5">
-                        <div class="flex flex-wrap items-center gap-2 mb-2.5">
-                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border
-                                {% if qt == 'mcq' %}q-type-chip-mcq
-                                {% elif qt == 'true_false' %}q-type-chip-tf
-                                {% elif qt == 'fill_blank' %}q-type-chip-fb
-                                {% elif qt == 'short_answer' %}q-type-chip-sa
-                                {% elif qt == 'essay' %}q-type-chip-essay{% endif %}">
-                                <i class="fas {% if qt == 'mcq' %}fa-list{% elif qt == 'true_false' %}fa-check-double{% elif qt == 'fill_blank' %}fa-pen-line{% elif qt == 'short_answer' %}fa-memo-circle-info{% elif qt == 'essay' %}fa-feather-pointed{% endif %} mr-1.5"></i>
-                                {{ q.get_question_type_display }}
-                            </span>
-                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-pts">
-                                <i class="fas fa-coins mr-1.5"></i>{{ q.points }} pt{{ q.points|pluralize }}
-                            </span>
-
-                            {% if qt == 'essay' or qt == 'short_answer' %}
-                                {% if not response.graded_manually %}
-                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-pending animate-pulse">
-                                        <i class="fas fa-hourglass-half mr-1.5"></i>Awaiting Review
-                                    </span>
-                                {% else %}
-                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-manual">
-                                        <i class="fas fa-user-tie mr-1.5"></i>Lecturer Graded
-                                    </span>
-                                {% endif %}
-                            {% else %}
-                                <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-auto">
-                                    <i class="fas fa-robot mr-1.5"></i>Auto-Graded
-                                </span>
-                            {% endif %}
-
-                            {% if qt != 'essay' and qt != 'short_answer' %}
-                                {% if response.is_correct %}
-                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                        <i class="fas fa-circle-check mr-1.5"></i>Correct
-                                    </span>
-                                {% else %}
-                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black bg-red-50 text-red-800 border border-red-200">
-                                        <i class="fas fa-circle-xmark mr-1.5"></i>Incorrect
-                                    </span>
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                        <h3 class="text-lg md:text-xl font-black text-gray-900 leading-relaxed break-words">
-                            {{ q.question_text }}
-                        </h3>
-                    </div>
+        <div class="purple-card rounded-3xl shadow-sm overflow-hidden">
+            <div
+                class="border-b border-purple-100/60 px-6 py-5 flex flex-wrap items-center justify-between gap-3"
+            >
+                <div>
+                    <h2
+                        class="text-xl font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent flex items-center gap-2"
+                    >
+                        <i class="fas fa-list-check text-purple-600"></i
+                        >Question-by-Question Breakdown
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-0.5 font-medium">
+                        Review every question, your answer, the correct answer,
+                        and feedback from your lecturer.
+                    </p>
                 </div>
+                <div
+                    class="text-xs font-bold text-gray-500 flex flex-wrap gap-2"
+                >
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 px-2.5 py-1"
+                        ><i class="fas fa-circle text-[6px]"></i>Correct</span
+                    >
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full bg-red-50 border border-red-200 text-red-800 px-2.5 py-1"
+                        ><i class="fas fa-circle text-[6px]"></i>Incorrect</span
+                    >
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 px-2.5 py-1"
+                        ><i class="fas fa-circle text-[6px]"></i>Awaiting
+                        Review</span
+                    >
+                </div>
+            </div>
 
-                <div class="md:ml-14 space-y-3 md:space-y-4">
-                    {% if qt == 'mcq' or qt == 'true_false' %}
-                        <div>
-                            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2.5 flex items-center gap-1.5">
-                                <i class="fas fa-user"></i>Your Answer
-                            </p>
-                            {% if response.selected_option %}
-                                <div class="rounded-2xl border-2 p-4 md:p-4.5 {% if response.selected_option.is_correct %}correct-answer{% else %}incorrect-answer{% endif %} font-semibold">
-                                    <div class="flex items-start gap-3">
-                                        <i class="fas {% if response.selected_option.is_correct %}fa-circle-check{% else %}fa-circle-xmark{% endif %} text-lg mt-0.5 shrink-0"></i>
-                                        <div class="min-w-0 flex-1">
-                                            <div class="leading-relaxed">{{ response.selected_option.option_text }}</div>
-                                            {% if response.selected_option.is_correct %}
-                                                <div class="mt-1.5 text-xs font-black opacity-90"><i class="fas fa-check mr-1"></i>Matches the correct answer</div>
-                                            {% endif %}
+            {% if responses %}
+            <div class="divide-y divide-purple-100/60">
+                {% for response in responses %} {% with q=response.question
+                qt=q.question_type %} {% with manual_pending=qt|stringformat:"s"
+                %} {% if manual_pending == 'essay' or manual_pending ==
+                'short_answer' %} {% if response.graded_manually == False %}
+                <div
+                    class="p-5 md:p-7 result-card-pending border-l-4 rounded-none"
+                >
+                    {% else %} {% if response.is_correct or
+                    response.manual_score >=
+                    q.points|stringformat:"f"|slice:":4" or
+                    response.manual_score > 0 and response.manual_score >=
+                    q.points|divisibleby:2 %} {% if response.is_correct %}
+                    <div
+                        class="p-5 md:p-7 result-card-correct border-l-4 rounded-none border-emerald-400"
+                    >
+                        {% else %}
+                        <div
+                            class="p-5 md:p-7 result-card-neutral border-l-4 rounded-none border-purple-300"
+                        >
+                            {% endif %} {% elif response.is_correct %}
+                            <div
+                                class="p-5 md:p-7 result-card-correct border-l-4 rounded-none border-emerald-400"
+                            >
+                                {% else %}
+                                <div
+                                    class="p-5 md:p-7 result-card-incorrect border-l-4 rounded-none border-red-400"
+                                >
+                                    {% endif %} {% endif %} {% else %} {% if
+                                    response.is_correct %}
+                                    <div
+                                        class="p-5 md:p-7 result-card-correct border-l-4 rounded-none border-emerald-400"
+                                    >
+                                        {% else %}
+                                        <div
+                                            class="p-5 md:p-7 result-card-incorrect border-l-4 rounded-none border-red-400"
+                                        >
+                                            {% endif %} {% endif %}
+
+                                            <div
+                                                class="flex flex-wrap items-start gap-3 md:gap-4 mb-4 md:mb-5"
+                                            >
+                                                <div
+                                                    class="flex h-10 w-10 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-2xl q-num-badge font-black text-sm shadow-md"
+                                                >
+                                                    {{ forloop.counter }}
+                                                </div>
+                                                <div
+                                                    class="min-w-0 flex-1 pt-0.5"
+                                                >
+                                                    <div
+                                                        class="flex flex-wrap items-center gap-2 mb-2.5"
+                                                    >
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border {% if qt == 'mcq' %}q-type-chip-mcq {% elif qt == 'true_false' %}q-type-chip-tf {% elif qt == 'fill_blank' %}q-type-chip-fb {% elif qt == 'short_answer' %}q-type-chip-sa {% elif qt == 'essay' %}q-type-chip-essay{% endif %}"
+                                                        >
+                                                            <i
+                                                                class="fas {% if qt == 'mcq' %}fa-list{% elif qt == 'true_false' %}fa-check-double{% elif qt == 'fill_blank' %}fa-pen-line{% elif qt == 'short_answer' %}fa-memo-circle-info{% elif qt == 'essay' %}fa-feather-pointed{% endif %} mr-1.5"
+                                                            ></i>
+                                                            {{
+                                                            q.get_question_type_display
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-pts"
+                                                        >
+                                                            <i
+                                                                class="fas fa-coins mr-1.5"
+                                                            ></i
+                                                            >{{ q.points }} pt{{
+                                                            q.points|pluralize
+                                                            }}
+                                                        </span>
+
+                                                        {% if qt == 'essay' or
+                                                        qt == 'short_answer' %}
+                                                        {% if not
+                                                        response.graded_manually
+                                                        %}
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-pending animate-pulse"
+                                                        >
+                                                            <i
+                                                                class="fas fa-hourglass-half mr-1.5"
+                                                            ></i
+                                                            >Awaiting Review
+                                                        </span>
+                                                        {% else %}
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-manual"
+                                                        >
+                                                            <i
+                                                                class="fas fa-user-tie mr-1.5"
+                                                            ></i
+                                                            >Lecturer Graded
+                                                        </span>
+                                                        {% endif %} {% else %}
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border score-chip-auto"
+                                                        >
+                                                            <i
+                                                                class="fas fa-robot mr-1.5"
+                                                            ></i
+                                                            >Auto-Graded
+                                                        </span>
+                                                        {% endif %} {% if qt !=
+                                                        'essay' and qt !=
+                                                        'short_answer' %} {% if
+                                                        response.is_correct %}
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200"
+                                                        >
+                                                            <i
+                                                                class="fas fa-circle-check mr-1.5"
+                                                            ></i
+                                                            >Correct
+                                                        </span>
+                                                        {% else %}
+                                                        <span
+                                                            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black bg-red-50 text-red-800 border border-red-200"
+                                                        >
+                                                            <i
+                                                                class="fas fa-circle-xmark mr-1.5"
+                                                            ></i
+                                                            >Incorrect
+                                                        </span>
+                                                        {% endif %} {% endif %}
+                                                    </div>
+                                                    <h3
+                                                        class="text-lg md:text-xl font-black text-gray-900 leading-relaxed break-words"
+                                                    >
+                                                        {{ q.question_text }}
+                                                    </h3>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="md:ml-14 space-y-3 md:space-y-4"
+                                            >
+                                                {% if qt == 'mcq' or qt ==
+                                                'true_false' %}
+                                                <div>
+                                                    <p
+                                                        class="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2.5 flex items-center gap-1.5"
+                                                    >
+                                                        <i
+                                                            class="fas fa-user"
+                                                        ></i
+                                                        >Your Answer
+                                                    </p>
+                                                    {% if
+                                                    response.selected_option %}
+                                                    <div
+                                                        class="rounded-2xl border-2 p-4 md:p-4.5 {% if response.selected_option.is_correct %}correct-answer{% else %}incorrect-answer{% endif %} font-semibold"
+                                                    >
+                                                        <div
+                                                            class="flex items-start gap-3"
+                                                        >
+                                                            <i
+                                                                class="fas {% if response.selected_option.is_correct %}fa-circle-check{% else %}fa-circle-xmark{% endif %} text-lg mt-0.5 shrink-0"
+                                                            ></i>
+                                                            <div
+                                                                class="min-w-0 flex-1"
+                                                            >
+                                                                <div
+                                                                    class="leading-relaxed"
+                                                                >
+                                                                    {{
+                                                                    response.selected_option.option_text
+                                                                    }}
+                                                                </div>
+                                                                {% if
+                                                                response.selected_option.is_correct
+                                                                %}
+                                                                <div
+                                                                    class="mt-1.5 text-xs font-black opacity-90"
+                                                                >
+                                                                    <i
+                                                                        class="fas fa-check mr-1"
+                                                                    ></i
+                                                                    >Matches the
+                                                                    correct
+                                                                    answer
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% if not
+                                                    response.selected_option.is_correct
+                                                    %} {% with correct_opt=None
+                                                    %} {% for opt in
+                                                    q.options.all %} {% if
+                                                    opt.is_correct %}
+                                                    <p
+                                                        class="text-[11px] font-black uppercase tracking-wider text-emerald-700 mt-4 mb-2.5 flex items-center gap-1.5"
+                                                    >
+                                                        <i
+                                                            class="fas fa-check-double"
+                                                        ></i
+                                                        >Correct Answer
+                                                    </p>
+                                                    <div
+                                                        class="rounded-2xl border-2 correct-answer p-4 md:p-4.5 font-semibold"
+                                                    >
+                                                        <div
+                                                            class="flex items-start gap-3"
+                                                        >
+                                                            <i
+                                                                class="fas fa-check-circle text-lg mt-0.5 shrink-0 text-emerald-600"
+                                                            ></i>
+                                                            <div
+                                                                class="leading-relaxed"
+                                                            >
+                                                                {{
+                                                                opt.option_text
+                                                                }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %} {% endfor %} {%
+                                                    endwith %} {% endif %} {%
+                                                    else %}
+                                                    <div
+                                                        class="rounded-2xl border-2 border-dashed border-gray-300 p-4 answer-placeholder font-semibold bg-gray-50"
+                                                    >
+                                                        <i
+                                                            class="fas fa-circle-minus mr-2 text-gray-400"
+                                                        ></i
+                                                        >No answer selected
+                                                        (left blank)
+                                                    </div>
+                                                    {% for opt in q.options.all
+                                                    %} {% if opt.is_correct %}
+                                                    <p
+                                                        class="text-[11px] font-black uppercase tracking-wider text-emerald-700 mt-4 mb-2.5 flex items-center gap-1.5"
+                                                    >
+                                                        <i
+                                                            class="fas fa-check-double"
+                                                        ></i
+                                                        >Correct Answer
+                                                    </p>
+                                                    <div
+                                                        class="rounded-2xl border-2 correct-answer p-4 md:p-4.5 font-semibold"
+                                                    >
+                                                        <div
+                                                            class="flex items-start gap-3"
+                                                        >
+                                                            <i
+                                                                class="fas fa-check-circle text-lg mt-0.5 shrink-0 text-emerald-600"
+                                                            ></i>
+                                                            <div
+                                                                class="leading-relaxed"
+                                                            >
+                                                                {{
+                                                                opt.option_text
+                                                                }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %} {% endfor %} {%
+                                                    endif %}
+                                                </div>
+
+                                                {% else %}
+                                                <div>
+                                                    <p
+                                                        class="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2.5 flex items-center gap-1.5"
+                                                    >
+                                                        <i
+                                                            class="fas fa-user-pen"
+                                                        ></i
+                                                        >Your Response
+                                                    </p>
+                                                    {% if response.text_answer
+                                                    %}
+                                                    <div
+                                                        class="rounded-2xl border-2 {% if response.is_correct %}correct-answer{% elif response.graded_manually and response.manual_score > 0 %}border-purple-200 bg-purple-50/50 text-purple-900{% else %}incorrect-answer{% endif %} p-4 md:p-5 whitespace-pre-wrap font-semibold leading-relaxed"
+                                                    >
+                                                        {{ response.text_answer
+                                                        }}
+                                                    </div>
+                                                    {% else %}
+                                                    <div
+                                                        class="rounded-2xl border-2 border-dashed border-gray-300 p-4 answer-placeholder bg-gray-50"
+                                                    >
+                                                        <i
+                                                            class="fas fa-circle-minus mr-2 text-gray-400"
+                                                        ></i
+                                                        >No answer submitted
+                                                        (left blank)
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                {% if q.accepted_answers %}
+                                                <div>
+                                                    <p
+                                                        class="text-[11px] font-black uppercase tracking-wider text-blue-700 mb-2.5 flex items-center gap-1.5"
+                                                    >
+                                                        <i
+                                                            class="fas fa-spell-check"
+                                                        ></i
+                                                        >Accepted Answers (for
+                                                        reference)
+                                                    </p>
+                                                    <div
+                                                        class="rounded-2xl border-2 border-blue-200 bg-blue-50/50 p-4 text-blue-900 whitespace-pre-line font-semibold"
+                                                    >
+                                                        {{ q.accepted_answers }}
+                                                    </div>
+                                                </div>
+                                                {% endif %} {% endif %}
+
+                                                <div
+                                                    class="flex flex-wrap items-center gap-2.5 pt-1"
+                                                >
+                                                    <span
+                                                        class="inline-flex items-center gap-1.5 rounded-xl border score-chip-auto px-3.5 py-2 text-xs font-black"
+                                                    >
+                                                        <i
+                                                            class="fas fa-robot"
+                                                        ></i
+                                                        >Auto: {{
+                                                        response.auto_score }}
+                                                    </span>
+                                                    <span
+                                                        class="inline-flex items-center gap-1.5 rounded-xl border score-chip-manual px-3.5 py-2 text-xs font-black"
+                                                    >
+                                                        <i
+                                                            class="fas fa-user-tie"
+                                                        ></i
+                                                        >Manual: {{
+                                                        response.manual_score }}
+                                                        {% if not
+                                                        response.graded_manually
+                                                        and (qt == 'essay' or qt
+                                                        == 'short_answer') %}
+                                                        <span
+                                                            class="ml-1 opacity-70"
+                                                            >(pending)</span
+                                                        >
+                                                        {% endif %}
+                                                    </span>
+                                                    <span
+                                                        class="inline-flex items-center gap-1.5 rounded-xl border score-chip-pts px-3.5 py-2 text-xs font-black"
+                                                    >
+                                                        <i
+                                                            class="fas fa-bullseye"
+                                                        ></i
+                                                        >Worth: {{ q.points }}
+                                                        pts
+                                                    </span>
+                                                    {% if response.is_correct %}
+                                                    <span
+                                                        class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 border-2 border-emerald-200 text-emerald-800 px-3.5 py-2 text-xs font-black"
+                                                    >
+                                                        <i
+                                                            class="fas fa-check-double"
+                                                        ></i
+                                                        >Earned: {{
+                                                        response.auto_score|add:response.manual_score
+                                                        }} pts
+                                                    </span>
+                                                    {% elif
+                                                    response.graded_manually or
+                                                    qt == 'mcq' or qt ==
+                                                    'true_false' or qt ==
+                                                    'fill_blank' %}
+                                                    <span
+                                                        class="inline-flex items-center gap-1.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-800 px-3.5 py-2 text-xs font-black"
+                                                    >
+                                                        Earned: {{
+                                                        response.auto_score|add:response.manual_score
+                                                        }} / {{ q.points }}
+                                                    </span>
+                                                    {% endif %}
+                                                </div>
+
+                                                {% if response.lecturer_feedback
+                                                %}
+                                                <div
+                                                    class="rounded-2xl border-2 feedback-box p-4 md:p-5 mt-2"
+                                                >
+                                                    <p
+                                                        class="text-[11px] font-black uppercase tracking-wider text-amber-800 mb-2.5 flex items-center gap-1.5"
+                                                    >
+                                                        <i
+                                                            class="fas fa-comment-dots text-lg"
+                                                        ></i
+                                                        >Lecturer Feedback
+                                                    </p>
+                                                    <div
+                                                        class="text-amber-950 font-semibold leading-relaxed whitespace-pre-wrap"
+                                                    >
+                                                        {{
+                                                        response.lecturer_feedback
+                                                        }}
+                                                    </div>
+                                                </div>
+                                                {% elif not
+                                                response.graded_manually and (qt
+                                                == 'essay' or qt ==
+                                                'short_answer') %}
+                                                <div
+                                                    class="rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 p-4 mt-2"
+                                                >
+                                                    <p
+                                                        class="text-sm font-bold text-amber-900 flex items-center gap-2"
+                                                    >
+                                                        <i
+                                                            class="fas fa-hourglass-half animate-pulse"
+                                                        ></i>
+                                                        Your lecturer hasn't
+                                                        reviewed this {{
+                                                        q.get_question_type_display
+                                                        }} yet. Check back later
+                                                        for your mark and
+                                                        personalised feedback.
+                                                    </p>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endwith %} {% endwith %} {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <div class="p-14 text-center">
+                                        <div
+                                            class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-600 shadow-lg"
+                                        >
+                                            <i
+                                                class="fas fa-inbox text-3xl"
+                                            ></i>
+                                        </div>
+                                        <h3
+                                            class="text-2xl font-black text-gray-900"
+                                        >
+                                            No responses recorded
+                                        </h3>
+                                        <p
+                                            class="mt-2 text-gray-600 font-medium max-w-md mx-auto"
+                                        >
+                                            This attempt doesn't contain any
+                                            saved responses. Start the
+                                            assessment to answer questions.
+                                        </p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="sticky bottom-4 z-10">
+                                    <div
+                                        class="purple-card rounded-3xl shadow-2xl p-4 md:p-5 border-purple-200"
+                                    >
+                                        <div
+                                            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                                        >
+                                            <div
+                                                class="text-xs md:text-sm font-bold text-gray-600 flex items-center gap-2"
+                                            >
+                                                <i
+                                                    class="fas fa-clock text-purple-600 text-base"
+                                                ></i>
+                                                <span
+                                                    >Server time (Lagos/WAT): {{
+                                                    server_now_lagos }} ·
+                                                    Results are final once fully
+                                                    graded.</span
+                                                >
+                                            </div>
+                                            <div
+                                                class="flex flex-wrap gap-2.5 md:justify-end"
+                                            >
+                                                <a
+                                                    href="{% url 'millialms_student_assessment_detail' attempt.assessment.id %}"
+                                                    class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-5 py-3 text-sm font-black"
+                                                >
+                                                    <i
+                                                        class="fas fa-clock-rotate-left"
+                                                    ></i
+                                                    >Attempt History
+                                                </a>
+                                                <a
+                                                    href="{% url 'millialms_student_dashboard' %}"
+                                                    class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3 text-sm font-black text-white"
+                                                >
+                                                    <i
+                                                        class="fas fa-table-columns"
+                                                    ></i
+                                                    >Back to Dashboard
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                {% if not response.selected_option.is_correct %}
-                                    {% with correct_opt=None %}
-                                    {% for opt in q.options.all %}
-                                        {% if opt.is_correct %}
-                                            <p class="text-[11px] font-black uppercase tracking-wider text-emerald-700 mt-4 mb-2.5 flex items-center gap-1.5">
-                                                <i class="fas fa-check-double"></i>Correct Answer
-                                            </p>
-                                            <div class="rounded-2xl border-2 correct-answer p-4 md:p-4.5 font-semibold">
-                                                <div class="flex items-start gap-3">
-                                                    <i class="fas fa-check-circle text-lg mt-0.5 shrink-0 text-emerald-600"></i>
-                                                    <div class="leading-relaxed">{{ opt.option_text }}</div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% endwith %}
-                                {% endif %}
-                            {% else %}
-                                <div class="rounded-2xl border-2 border-dashed border-gray-300 p-4 answer-placeholder font-semibold bg-gray-50">
-                                    <i class="fas fa-circle-minus mr-2 text-gray-400"></i>No answer selected (left blank)
-                                </div>
-                                {% for opt in q.options.all %}
-                                    {% if opt.is_correct %}
-                                        <p class="text-[11px] font-black uppercase tracking-wider text-emerald-700 mt-4 mb-2.5 flex items-center gap-1.5">
-                                            <i class="fas fa-check-double"></i>Correct Answer
-                                        </p>
-                                        <div class="rounded-2xl border-2 correct-answer p-4 md:p-4.5 font-semibold">
-                                            <div class="flex items-start gap-3">
-                                                <i class="fas fa-check-circle text-lg mt-0.5 shrink-0 text-emerald-600"></i>
-                                                <div class="leading-relaxed">{{ opt.option_text }}</div>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-
-                    {% else %}
-                        <div>
-                            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2.5 flex items-center gap-1.5">
-                                <i class="fas fa-user-pen"></i>Your Response
-                            </p>
-                            {% if response.text_answer %}
-                                <div class="rounded-2xl border-2 {% if response.is_correct %}correct-answer{% elif response.graded_manually and response.manual_score > 0 %}border-purple-200 bg-purple-50/50 text-purple-900{% else %}incorrect-answer{% endif %} p-4 md:p-5 whitespace-pre-wrap font-semibold leading-relaxed">
-                                    {{ response.text_answer }}
-                                </div>
-                            {% else %}
-                                <div class="rounded-2xl border-2 border-dashed border-gray-300 p-4 answer-placeholder bg-gray-50">
-                                    <i class="fas fa-circle-minus mr-2 text-gray-400"></i>No answer submitted (left blank)
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        {% if q.accepted_answers %}
-                            <div>
-                                <p class="text-[11px] font-black uppercase tracking-wider text-blue-700 mb-2.5 flex items-center gap-1.5">
-                                    <i class="fas fa-spell-check"></i>Accepted Answers (for reference)
-                                </p>
-                                <div class="rounded-2xl border-2 border-blue-200 bg-blue-50/50 p-4 text-blue-900 whitespace-pre-line font-semibold">
-                                    {{ q.accepted_answers }}
-                                </div>
                             </div>
-                        {% endif %}
-                    {% endif %}
-
-                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
-                        <span class="inline-flex items-center gap-1.5 rounded-xl border score-chip-auto px-3.5 py-2 text-xs font-black">
-                            <i class="fas fa-robot"></i>Auto: {{ response.auto_score }}
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 rounded-xl border score-chip-manual px-3.5 py-2 text-xs font-black">
-                            <i class="fas fa-user-tie"></i>Manual: {{ response.manual_score }}
-                            {% if not response.graded_manually and (qt == 'essay' or qt == 'short_answer') %}
-                                <span class="ml-1 opacity-70">(pending)</span>
-                            {% endif %}
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 rounded-xl border score-chip-pts px-3.5 py-2 text-xs font-black">
-                            <i class="fas fa-bullseye"></i>Worth: {{ q.points }} pts
-                        </span>
-                        {% if response.is_correct %}
-                            <span class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 border-2 border-emerald-200 text-emerald-800 px-3.5 py-2 text-xs font-black">
-                                <i class="fas fa-check-double"></i>Earned: {{ response.auto_score|add:response.manual_score }} pts
-                            </span>
-                        {% elif response.graded_manually or qt == 'mcq' or qt == 'true_false' or qt == 'fill_blank' %}
-                            <span class="inline-flex items-center gap-1.5 rounded-xl bg-gray-50 border-2 border-gray-200 text-gray-800 px-3.5 py-2 text-xs font-black">
-                                Earned: {{ response.auto_score|add:response.manual_score }} / {{ q.points }}
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    {% if response.lecturer_feedback %}
-                    <div class="rounded-2xl border-2 feedback-box p-4 md:p-5 mt-2">
-                        <p class="text-[11px] font-black uppercase tracking-wider text-amber-800 mb-2.5 flex items-center gap-1.5">
-                            <i class="fas fa-comment-dots text-lg"></i>Lecturer Feedback
-                        </p>
-                        <div class="text-amber-950 font-semibold leading-relaxed whitespace-pre-wrap">
-                            {{ response.lecturer_feedback }}
                         </div>
                     </div>
-                    {% elif not response.graded_manually and (qt == 'essay' or qt == 'short_answer') %}
-                    <div class="rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 p-4 mt-2">
-                        <p class="text-sm font-bold text-amber-900 flex items-center gap-2">
-                            <i class="fas fa-hourglass-half animate-pulse"></i>
-                            Your lecturer hasn't reviewed this {{ q.get_question_type_display }} yet. Check back later for your mark and personalised feedback.
-                        </p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endwith %}
-            {% endwith %}
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="p-14 text-center">
-            <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-600 shadow-lg">
-                <i class="fas fa-inbox text-3xl"></i>
-            </div>
-            <h3 class="text-2xl font-black text-gray-900">No responses recorded</h3>
-            <p class="mt-2 text-gray-600 font-medium max-w-md mx-auto">This attempt doesn't contain any saved responses. Start the assessment to answer questions.</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <div class="sticky bottom-4 z-10">
-        <div class="purple-card rounded-3xl shadow-2xl p-4 md:p-5 border-purple-200">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="text-xs md:text-sm font-bold text-gray-600 flex items-center gap-2">
-                    <i class="fas fa-clock text-purple-600 text-base"></i>
-                    <span>Server time (Lagos/WAT): {{ server_now_lagos }} · Results are final once fully graded.</span>
-                </div>
-                <div class="flex flex-wrap gap-2.5 md:justify-end">
-                    <a href="{% url 'millialms_student_assessment_detail' attempt.assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-5 py-3 text-sm font-black">
-                        <i class="fas fa-clock-rotate-left"></i>Attempt History
-                    </a>
-                    <a href="{% url 'millialms_student_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3 text-sm font-black text-white">
-                        <i class="fas fa-table-columns"></i>Back to Dashboard
-                    </a>
+                    {% endblock content %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-    </div>
-</div>
-{% endblock content %}

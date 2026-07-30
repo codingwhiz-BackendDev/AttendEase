@@ -87,10 +87,10 @@
                     <i class="fas fa-list-check mr-1.5"></i>{{ assessment.type_label }}
                 </span>
             </div>
-            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words">
+            <h1 class="text-2xl md:text-3xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words">
                 {{ assessment.title }}
             </h1>
-            <p class="mt-3 max-w-4xl text-gray-700 font-medium leading-relaxed">
+            <p class="mt-3 max-w-4xl text-gray-700 text-sm font-medium leading-relaxed">
                 {{ assessment.instructions|default:'No instructions supplied yet.' }}
             </p>
         </div>
@@ -132,22 +132,22 @@
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5">
         <div class="stat-card rounded-3xl p-5">
             <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Questions</p>
-            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-gray-700 to-gray-900 bg-clip-text text-transparent">{{ assessment.total_questions }}</p>
+            <p class="mt-3 text-2xl md:text-3xl font-black bg-gradient-to-br from-gray-700 to-gray-900 bg-clip-text text-transparent">{{ assessment.total_questions }}</p>
             <div class="mt-3 h-1.5 bar-track"><div class="bar-fill" style="width:100%"></div></div>
         </div>
         <div class="stat-card rounded-3xl p-5">
             <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Enrolled</p>
-            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-blue-600 to-indigo-700 bg-clip-text text-transparent">{{ stats.enrolled }}</p>
+            <p class="mt-3 text-2xl md:text-3xl font-black bg-gradient-to-br from-blue-600 to-indigo-700 bg-clip-text text-transparent">{{ stats.enrolled }}</p>
             <p class="mt-3 text-xs font-bold text-gray-500">across assigned courses</p>
         </div>
         <div class="stat-card rounded-3xl p-5">
             <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Submissions</p>
-            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-purple-600 to-fuchsia-700 bg-clip-text text-transparent">{{ stats.submission_count }}</p>
+            <p class="mt-3 text-2xl md:text-3xl font-black bg-gradient-to-br from-purple-600 to-fuchsia-700 bg-clip-text text-transparent">{{ stats.submission_count }}</p>
             <p class="mt-3 text-xs font-bold text-gray-500">{{ stats.submission_rate }}% submission rate</p>
         </div>
         <div class="stat-card rounded-3xl p-5">
             <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Avg Score</p>
-            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-emerald-600 to-teal-700 bg-clip-text text-transparent">{{ stats.avg_score }}</p>
+            <p class="mt-3 text-2xl md:text-3xl font-black bg-gradient-to-br from-emerald-600 to-teal-700 bg-clip-text text-transparent">{{ stats.avg_score }}</p>
             <p class="mt-3 text-xs font-bold text-gray-500">
                 {% if stats.avg_pct >= 70 %}<span class="score-good"><i class="fas fa-arrow-trend-up"></i> {{ stats.avg_pct }}% strong</span>
                 {% elif stats.avg_pct >= 50 %}<span class="score-mid"><i class="fas fa-minus"></i> {{ stats.avg_pct }}%</span>
@@ -157,7 +157,7 @@
         <div class="stat-card rounded-3xl p-5">
             <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Grading</p>
             <div class="flex items-baseline gap-2 mt-3">
-                <p class="text-3xl md:text-4xl font-black bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">{{ stats.pending_grading_count }}</p>
+                <p class="text-2xl md:text-3xl font-black bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">{{ stats.pending_grading_count }}</p>
                 <span class="text-xs font-bold text-gray-500">/ {{ stats.attempt_count }}</span>
             </div>
             <div class="mt-3 h-1.5 bar-track"><div class="bar-fill" style="width:{% if stats.attempt_count > 0 %}{{ stats.graded_count|add:0 }}{% else %}0{% endif %}{% if stats.attempt_count > 0 %}{% widthratio stats.graded_count stats.attempt_count 100 %}{% else %}0{% endif %}%; background:linear-gradient(90deg,#f59e0b 0%,#ea580c 100%);"></div></div>

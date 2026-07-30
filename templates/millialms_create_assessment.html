@@ -1,12 +1,21 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <style>
     @keyframes float-purple {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-14px); }
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-14px);
+        }
     }
-    .float-orb-1 { animation: float-purple 7s ease-in-out infinite; }
-    .float-orb-2 { animation: float-purple 9s ease-in-out infinite; animation-delay: 2s; }
+    .float-orb-1 {
+        animation: float-purple 7s ease-in-out infinite;
+    }
+    .float-orb-2 {
+        animation: float-purple 9s ease-in-out infinite;
+        animation-delay: 2s;
+    }
 
     .glass-card {
         background: rgba(255, 255, 255, 0.06);
@@ -62,7 +71,11 @@
         box-shadow: 0 16px 40px rgba(139, 92, 246, 0.3);
     }
     .type-card.active {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.45));
+        background: linear-gradient(
+            135deg,
+            rgba(102, 126, 234, 0.4),
+            rgba(118, 75, 162, 0.45)
+        );
         border-color: rgba(196, 181, 253, 0.75);
         box-shadow: 0 14px 40px rgba(102, 126, 234, 0.45);
     }
@@ -109,56 +122,102 @@
         border: 1px solid rgba(255, 255, 255, 0.15);
     }
     .step-pill.done {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.45), rgba(5, 150, 105, 0.55));
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.45),
+            rgba(5, 150, 105, 0.55)
+        );
         border-color: rgba(110, 231, 183, 0.55);
         color: white;
     }
     .step-pill.active {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.75), rgba(118, 75, 162, 0.85));
+        background: linear-gradient(
+            135deg,
+            rgba(102, 126, 234, 0.75),
+            rgba(118, 75, 162, 0.85)
+        );
         border-color: rgba(196, 181, 253, 0.75);
         color: white;
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.45);
     }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 relative overflow-hidden">
+<div
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 relative overflow-hidden"
+>
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-24 -left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 float-orb-1"></div>
-        <div class="absolute top-96 -right-20 w-[28rem] h-[28rem] bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-15 float-orb-2"></div>
-        <div class="absolute bottom-10 left-1/3 w-80 h-80 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 float-orb-1"></div>
+        <div
+            class="absolute top-24 -left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 float-orb-1"
+        ></div>
+        <div
+            class="absolute top-96 -right-20 w-[28rem] h-[28rem] bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-15 float-orb-2"
+        ></div>
+        <div
+            class="absolute bottom-10 left-1/3 w-80 h-80 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 float-orb-1"
+        ></div>
     </div>
 
     <div class="relative p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
         <div class="flex flex-wrap items-start justify-between gap-5">
             <div>
-                <p class="text-[11px] font-black uppercase tracking-[0.25em] text-indigo-300/80 mb-2">
+                <p
+                    class="text-[11px] font-black uppercase tracking-[0.25em] text-indigo-300/80 mb-2"
+                >
                     <i class="fas fa-sparkles mr-1.5"></i>MilliaLMS Studio
                 </p>
-                <h1 class="text-3xl md:text-5xl font-black text-white leading-tight">
-                    {% if edit_mode %}Edit your assessment{% else %}Create a new assessment{% endif %}
+                <h1
+                    class="text-2xl sm:text-3xl font-black text-white leading-tight"
+                >
+                    {% if edit_mode %}Edit your assessment{% else %}Create a new
+                    assessment{% endif %}
                 </h1>
-                <p class="mt-3 max-w-3xl text-indigo-100/80 font-medium text-base">
-                    Three simple steps → 1️⃣ Pick the question types you want to mix &nbsp; 2️⃣ Type your custom questions &amp; correct answers &nbsp; 3️⃣ Set time, attempts, and publish to any course.
+                <p
+                    class="mt-3 max-w-3xl text-indigo-100/80 font-medium text-sm sm:text-base"
+                >
+                    Three simple steps → 1️⃣ Pick the question types you want to
+                    mix &nbsp; 2️⃣ Type your custom questions &amp; correct
+                    answers &nbsp; 3️⃣ Set time, attempts, and publish to any
+                    course.
                 </p>
             </div>
-            <a href="{% url 'millialms_lecturer_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-light px-5 py-3 text-sm font-black">
+            <a
+                href="{% url 'millialms_lecturer_dashboard' %}"
+                class="inline-flex items-center gap-2 rounded-2xl btn-outline-light px-5 py-3 text-sm font-black"
+            >
                 <i class="fas fa-arrow-left"></i>Back to MilliaLMS
             </a>
         </div>
 
-        <div class="glass-card rounded-3xl p-5 md:p-6 flex flex-wrap items-center justify-center gap-3">
-            <div class="flex items-center gap-3 rounded-full px-5 py-2.5 text-xs md:text-sm font-black step-pill active">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white font-black">1</span>
+        <div
+            class="glass-card rounded-3xl p-5 md:p-6 flex flex-wrap items-center justify-center gap-3"
+        >
+            <div
+                class="flex items-center gap-3 rounded-full px-5 py-2.5 text-xs md:text-sm font-black step-pill active"
+            >
+                <span
+                    class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white font-black"
+                    >1</span
+                >
                 Basic info &amp; settings
             </div>
             <i class="fas fa-chevron-right text-white/30 text-sm"></i>
-            <div class="flex items-center gap-3 rounded-full px-5 py-2.5 text-xs md:text-sm font-black step-pill active">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white font-black">2</span>
+            <div
+                class="flex items-center gap-3 rounded-full px-5 py-2.5 text-xs md:text-sm font-black step-pill active"
+            >
+                <span
+                    class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white font-black"
+                    >2</span
+                >
                 Choose question types &amp; add questions
             </div>
             <i class="fas fa-chevron-right text-white/30 text-sm"></i>
-            <div class="flex items-center gap-3 rounded-full px-5 py-2.5 text-xs md:text-sm font-black step-pill active">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white font-black">3</span>
+            <div
+                class="flex items-center gap-3 rounded-full px-5 py-2.5 text-xs md:text-sm font-black step-pill active"
+            >
+                <span
+                    class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white font-black"
+                    >3</span
+                >
                 Save Draft or Publish
             </div>
         </div>
@@ -166,137 +225,371 @@
         {% if messages %}
         <div class="space-y-3">
             {% for message in messages %}
-            <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-lg
-                {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-200 border border-emerald-400/30
-                {% elif message.tags == 'error' %}bg-red-500/20 text-red-200 border border-red-400/30
-                {% elif message.tags == 'warning' %}bg-amber-500/20 text-amber-100 border border-amber-400/30
-                {% else %}bg-indigo-500/20 text-indigo-100 border border-indigo-400/30{% endif %}">
-                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
+            <div
+                class="rounded-2xl px-5 py-4 text-sm font-bold shadow-lg {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 {% elif message.tags == 'error' %}bg-red-500/20 text-red-200 border border-red-400/30 {% elif message.tags == 'warning' %}bg-amber-500/20 text-amber-100 border border-amber-400/30 {% else %}bg-indigo-500/20 text-indigo-100 border border-indigo-400/30{% endif %}"
+            >
+                <i
+                    class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"
+                ></i
+                >{{ message }}
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        <form method="post" id="assessmentForm" onsubmit="return validateForm();" class="space-y-8">
+        <form
+            method="post"
+            id="assessmentForm"
+            onsubmit="return validateForm();"
+            class="space-y-8"
+        >
             {% csrf_token %}
 
             <div class="glass-card rounded-3xl p-6 md:p-8">
                 <div class="flex flex-wrap items-center gap-3 mb-6">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-black shadow-lg">
+                    <span
+                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-black shadow-lg"
+                    >
                         1
                     </span>
-                    <h2 class="text-2xl md:text-3xl font-black text-white">Basic info &amp; settings</h2>
+                    <h2 class="text-xl md:text-2xl font-black text-white">
+                        Basic info &amp; settings
+                    </h2>
                 </div>
 
                 <div class="space-y-5">
                     <div>
-                        <label class="block text-sm font-black text-white/95 mb-2">
-                            <i class="fas fa-signature text-indigo-300 mr-1.5"></i>Assessment title <span class="text-rose-300">*</span>
+                        <label
+                            class="block text-sm font-black text-white/95 mb-2"
+                        >
+                            <i
+                                class="fas fa-signature text-indigo-300 mr-1.5"
+                            ></i
+                            >Assessment title
+                            <span class="text-rose-300">*</span>
                         </label>
-                        <input name="title" id="id_title" required
+                        <input
+                            name="title"
+                            id="id_title"
+                            required
                             class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900 placeholder:text-slate-400"
                             placeholder="e.g. CSC 401 Mid-Semester Quiz — Object Oriented Programming"
-                            {% if edit_mode and assessment %}value="{{ assessment.title }}"{% endif %} />
+                            {%
+                            if
+                            edit_mode
+                            and
+                            assessment
+                            %}value="{{ assessment.title }}"
+                            {%
+                            endif
+                            %}
+                        />
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-sm font-black text-white/95 mb-2">
-                                <i class="fas fa-list-check text-indigo-300 mr-1.5"></i>Type of assessment
+                            <label
+                                class="block text-sm font-black text-white/95 mb-2"
+                            >
+                                <i
+                                    class="fas fa-list-check text-indigo-300 mr-1.5"
+                                ></i
+                                >Type of assessment
                             </label>
-                            <select name="assessment_type" id="id_assessment_type" class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900">
-                                <option value="quiz" {% if edit_mode and assessment and assessment.assessment_type == 'quiz' %}selected{% endif %}>📝 Quiz (standard class assessment)</option>
-                                <option value="timed_test" {% if edit_mode and assessment and assessment.assessment_type == 'timed_test' %}selected{% endif %}>⏱ Timed Test (strict countdown)</option>
-                                <option value="practice" {% if edit_mode and assessment and assessment.assessment_type == 'practice' %}selected{% endif %}>🎯 Practice Test (relaxed, retry-friendly)</option>
+                            <select
+                                name="assessment_type"
+                                id="id_assessment_type"
+                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900"
+                            >
+                                <option
+                                    value="quiz"
+                                    {%
+                                    if
+                                    edit_mode
+                                    and
+                                    assessment
+                                    and
+                                    assessment.assessment_type=""
+                                    ="quiz"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    📝 Quiz (standard class assessment)
+                                </option>
+                                <option
+                                    value="timed_test"
+                                    {%
+                                    if
+                                    edit_mode
+                                    and
+                                    assessment
+                                    and
+                                    assessment.assessment_type=""
+                                    ="timed_test"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    ⏱ Timed Test (strict countdown)
+                                </option>
+                                <option
+                                    value="practice"
+                                    {%
+                                    if
+                                    edit_mode
+                                    and
+                                    assessment
+                                    and
+                                    assessment.assessment_type=""
+                                    ="practice"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    🎯 Practice Test (relaxed, retry-friendly)
+                                </option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-black text-white/95 mb-2">
-                                <i class="fas fa-repeat text-indigo-300 mr-1.5"></i>Maximum attempts per student
+                            <label
+                                class="block text-sm font-black text-white/95 mb-2"
+                            >
+                                <i
+                                    class="fas fa-repeat text-indigo-300 mr-1.5"
+                                ></i
+                                >Maximum attempts per student
                             </label>
-                            <input type="number" min="1" name="max_attempts" id="id_max_attempts"
-                                {% if edit_mode and assessment %}value="{{ assessment.max_attempts }}"{% else %}value="1"{% endif %}
-                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900" />
+                            <input
+                                type="number"
+                                min="1"
+                                name="max_attempts"
+                                id="id_max_attempts"
+                                {%
+                                if
+                                edit_mode
+                                and
+                                assessment
+                                %}value="{{ assessment.max_attempts }}"
+                                {%
+                                else
+                                %}value="1"
+                                {%
+                                endif
+                                %}
+                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900"
+                            />
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div>
-                            <label class="block text-sm font-black text-white/95 mb-2">
-                                <i class="fas fa-calendar-plus text-indigo-300 mr-1.5"></i>Opens at (optional)
+                            <label
+                                class="block text-sm font-black text-white/95 mb-2"
+                            >
+                                <i
+                                    class="fas fa-calendar-plus text-indigo-300 mr-1.5"
+                                ></i
+                                >Opens at (optional)
                             </label>
-                            <input type="datetime-local" name="start_time" id="id_start_time"
-                                {% if edit_mode and assessment and assessment.start_time %}value="{{ assessment.start_time|date:'Y-m-d\TH:i' }}"{% endif %}
-                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900" />
+                            <input
+                                type="datetime-local"
+                                name="start_time"
+                                id="id_start_time"
+                                {%
+                                if
+                                edit_mode
+                                and
+                                assessment
+                                and
+                                assessment.start_time
+                                %}value="{{ assessment.start_time|date:'Y-m-d\TH:i' }}"
+                                {%
+                                endif
+                                %}
+                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900"
+                            />
                         </div>
                         <div>
-                            <label class="block text-sm font-black text-white/95 mb-2">
-                                <i class="fas fa-calendar-xmark text-indigo-300 mr-1.5"></i>Closes at (optional)
+                            <label
+                                class="block text-sm font-black text-white/95 mb-2"
+                            >
+                                <i
+                                    class="fas fa-calendar-xmark text-indigo-300 mr-1.5"
+                                ></i
+                                >Closes at (optional)
                             </label>
-                            <input type="datetime-local" name="end_time" id="id_end_time"
-                                {% if edit_mode and assessment and assessment.end_time %}value="{{ assessment.end_time|date:'Y-m-d\TH:i' }}"{% endif %}
-                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900" />
+                            <input
+                                type="datetime-local"
+                                name="end_time"
+                                id="id_end_time"
+                                {%
+                                if
+                                edit_mode
+                                and
+                                assessment
+                                and
+                                assessment.end_time
+                                %}value="{{ assessment.end_time|date:'Y-m-d\TH:i' }}"
+                                {%
+                                endif
+                                %}
+                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900"
+                            />
                         </div>
                         <div>
-                            <label class="block text-sm font-black text-white/95 mb-2">
-                                <i class="fas fa-stopwatch text-indigo-300 mr-1.5"></i>Time limit (minutes)
+                            <label
+                                class="block text-sm font-black text-white/95 mb-2"
+                            >
+                                <i
+                                    class="fas fa-stopwatch text-indigo-300 mr-1.5"
+                                ></i
+                                >Time limit (minutes)
                             </label>
-                            <input type="number" min="1" name="time_limit_minutes" id="id_time_limit_minutes"
-                                {% if edit_mode and assessment and assessment.time_limit_minutes %}value="{{ assessment.time_limit_minutes }}"{% endif %}
+                            <input
+                                type="number"
+                                min="1"
+                                name="time_limit_minutes"
+                                id="id_time_limit_minutes"
+                                {%
+                                if
+                                edit_mode
+                                and
+                                assessment
+                                and
+                                assessment.time_limit_minutes
+                                %}value="{{ assessment.time_limit_minutes }}"
+                                {%
+                                endif
+                                %}
                                 placeholder="Leave blank for unlimited"
-                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900" />
+                                class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900"
+                            />
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-black text-white/95 mb-2">
-                            <i class="fas fa-memo text-indigo-300 mr-1.5"></i>Instructions (students will see this before starting)
+                        <label
+                            class="block text-sm font-black text-white/95 mb-2"
+                        >
+                            <i class="fas fa-memo text-indigo-300 mr-1.5"></i
+                            >Instructions (students will see this before
+                            starting)
                         </label>
-                        <textarea name="instructions" id="id_instructions" rows="3"
+                        <textarea
+                            name="instructions"
+                            id="id_instructions"
+                            rows="3"
                             class="w-full rounded-2xl input-field px-5 py-4 text-base font-semibold text-slate-900 placeholder:text-slate-400"
-                            placeholder="Example: Answer all questions. Calculators allowed. No external resources. Time limit is strictly enforced.">{% if edit_mode and assessment %}{{ assessment.instructions }}{% endif %}</textarea>
+                            placeholder="Example: Answer all questions. Calculators allowed. No external resources. Time limit is strictly enforced."
+                        >
+{% if edit_mode and assessment %}{{ assessment.instructions }}{% endif %}</textarea>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-black text-white/95 mb-3">
-                            <i class="fas fa-book text-indigo-300 mr-1.5"></i>Assign to courses (tick one or more)
+                        <label
+                            class="block text-sm font-black text-white/95 mb-3"
+                        >
+                            <i class="fas fa-book text-indigo-300 mr-1.5"></i
+                            >Assign to courses (tick one or more)
                         </label>
                         {% if lecturer_courses %}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {% for course in lecturer_courses %}
-                            <label class="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-5 py-4 cursor-pointer hover:bg-white/10 hover:border-white/25 transition-all text-white">
-                                <input type="checkbox" name="courses" value="{{ course.id }}"
+                            <label
+                                class="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-5 py-4 cursor-pointer hover:bg-white/10 hover:border-white/25 transition-all text-white"
+                            >
+                                <input
+                                    type="checkbox"
+                                    name="courses"
+                                    value="{{ course.id }}"
                                     class="h-5 w-5 rounded border-indigo-400/50 bg-white/10 text-indigo-600 focus:ring-indigo-500"
-                                    {% if edit_mode and selected_course_ids and course.id in selected_course_ids %}checked{% endif %} />
+                                    {%
+                                    if
+                                    edit_mode
+                                    and
+                                    selected_course_ids
+                                    and
+                                    course.id
+                                    in
+                                    selected_course_ids
+                                    %}checked{%
+                                    endif
+                                    %}
+                                />
                                 <div class="min-w-0 flex-1">
-                                    <p class="font-black text-white">{{ course.course_code }}</p>
-                                    <p class="text-sm font-semibold text-indigo-200/80 truncate">{{ course.course_title }}</p>
+                                    <p class="font-black text-white">
+                                        {{ course.course_code }}
+                                    </p>
+                                    <p
+                                        class="text-sm font-semibold text-indigo-200/80 truncate"
+                                    >
+                                        {{ course.course_title }}
+                                    </p>
                                 </div>
                             </label>
                             {% endfor %}
                         </div>
                         {% else %}
-                        <div class="rounded-2xl border border-amber-400/40 bg-amber-500/15 px-5 py-4 text-sm font-bold text-amber-100">
+                        <div
+                            class="rounded-2xl border border-amber-400/40 bg-amber-500/15 px-5 py-4 text-sm font-bold text-amber-100"
+                        >
                             <i class="fas fa-triangle-exclamation mr-2"></i>
-                            You need at least one assigned course before creating assessments. Visit the Courses menu to add courses first.
+                            You need at least one assigned course before
+                            creating assessments. Visit the Courses menu to add
+                            courses first.
                         </div>
                         {% endif %}
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <label class="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-5 py-4 cursor-pointer hover:bg-white/10 hover:border-white/25 transition-all text-white">
-                            <input type="checkbox" name="randomize_question_order"
+                        <label
+                            class="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-5 py-4 cursor-pointer hover:bg-white/10 hover:border-white/25 transition-all text-white"
+                        >
+                            <input
+                                type="checkbox"
+                                name="randomize_question_order"
                                 class="h-5 w-5 rounded border-indigo-400/50 bg-white/10 text-indigo-600 focus:ring-indigo-500"
-                                {% if edit_mode and assessment and assessment.randomize_question_order %}checked{% endif %} />
+                                {%
+                                if
+                                edit_mode
+                                and
+                                assessment
+                                and
+                                assessment.randomize_question_order
+                                %}checked{%
+                                endif
+                                %}
+                            />
                             <i class="fas fa-shuffle text-indigo-300"></i>
-                            <span class="font-bold">Mix up the question order each attempt</span>
+                            <span class="font-bold"
+                                >Mix up the question order each attempt</span
+                            >
                         </label>
-                        <label class="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-5 py-4 cursor-pointer hover:bg-white/10 hover:border-white/25 transition-all text-white">
-                            <input type="checkbox" name="randomize_answer_options"
+                        <label
+                            class="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 px-5 py-4 cursor-pointer hover:bg-white/10 hover:border-white/25 transition-all text-white"
+                        >
+                            <input
+                                type="checkbox"
+                                name="randomize_answer_options"
                                 class="h-5 w-5 rounded border-indigo-400/50 bg-white/10 text-indigo-600 focus:ring-indigo-500"
-                                {% if edit_mode and assessment and assessment.randomize_answer_options %}checked{% endif %} />
-                            <i class="fas fa-arrow-right-arrow-left text-indigo-300"></i>
-                            <span class="font-bold">Shuffle MCQ answer options each attempt</span>
+                                {%
+                                if
+                                edit_mode
+                                and
+                                assessment
+                                and
+                                assessment.randomize_answer_options
+                                %}checked{%
+                                endif
+                                %}
+                            />
+                            <i
+                                class="fas fa-arrow-right-arrow-left text-indigo-300"
+                            ></i>
+                            <span class="font-bold"
+                                >Shuffle MCQ answer options each attempt</span
+                            >
                         </label>
                     </div>
                 </div>
@@ -304,94 +597,208 @@
 
             <div class="glass-card rounded-3xl p-6 md:p-8">
                 <div class="flex flex-wrap items-center gap-3 mb-6">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white font-black shadow-lg">
+                    <span
+                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white font-black shadow-lg"
+                    >
                         2
                     </span>
-                    <h2 class="text-2xl md:text-3xl font-black text-white">Choose question types &amp; add questions</h2>
+                    <h2 class="text-xl md:text-2xl font-black text-white">
+                        Choose question types &amp; add questions
+                    </h2>
                 </div>
 
-                <p class="mb-5 text-indigo-100/80 font-medium text-base">
+                <p class="mb-5 text-indigo-100/80 font-medium text-sm">
                     <i class="fas fa-lightbulb text-amber-300 mr-1.5"></i>
-                    Click any of the big buttons below to add a question of that type. You can mix them however you want — every question is 100% custom-written by you.
+                    Click any of the big buttons below to add a question of that
+                    type. You can mix them however you want — every question is
+                    100% custom-written by you.
                 </p>
 
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6">
-                    <button type="button" onclick="addQuestion('mcq')" class="type-card rounded-2xl p-5 md:p-6 text-center">
-                        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white text-2xl shadow-lg">
+                <div
+                    class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6"
+                >
+                    <button
+                        type="button"
+                        onclick="addQuestion('mcq')"
+                        class="type-card rounded-2xl p-5 md:p-6 text-center"
+                    >
+                        <div
+                            class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white text-2xl shadow-lg"
+                        >
                             <i class="fas fa-list"></i>
                         </div>
-                        <p class="font-black text-white text-sm md:text-base">Multiple Choice</p>
-                        <p class="text-[11px] md:text-xs text-emerald-200/80 mt-1 font-semibold">Auto-graded</p>
+                        <p class="font-black text-white text-sm md:text-base">
+                            Multiple Choice
+                        </p>
+                        <p
+                            class="text-[11px] md:text-xs text-emerald-200/80 mt-1 font-semibold"
+                        >
+                            Auto-graded
+                        </p>
                     </button>
-                    <button type="button" onclick="addQuestion('true_false')" class="type-card rounded-2xl p-5 md:p-6 text-center">
-                        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 text-white text-2xl shadow-lg">
+                    <button
+                        type="button"
+                        onclick="addQuestion('true_false')"
+                        class="type-card rounded-2xl p-5 md:p-6 text-center"
+                    >
+                        <div
+                            class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 text-white text-2xl shadow-lg"
+                        >
                             <i class="fas fa-check-double"></i>
                         </div>
-                        <p class="font-black text-white text-sm md:text-base">True / False</p>
-                        <p class="text-[11px] md:text-xs text-indigo-200/80 mt-1 font-semibold">Auto-graded</p>
+                        <p class="font-black text-white text-sm md:text-base">
+                            True / False
+                        </p>
+                        <p
+                            class="text-[11px] md:text-xs text-indigo-200/80 mt-1 font-semibold"
+                        >
+                            Auto-graded
+                        </p>
                     </button>
-                    <button type="button" onclick="addQuestion('fill_blank')" class="type-card rounded-2xl p-5 md:p-6 text-center">
-                        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 text-white text-2xl shadow-lg">
+                    <button
+                        type="button"
+                        onclick="addQuestion('fill_blank')"
+                        class="type-card rounded-2xl p-5 md:p-6 text-center"
+                    >
+                        <div
+                            class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 text-white text-2xl shadow-lg"
+                        >
                             <i class="fas fa-pen-line"></i>
                         </div>
-                        <p class="font-black text-white text-sm md:text-base">Fill in Blank</p>
-                        <p class="text-[11px] md:text-xs text-sky-200/80 mt-1 font-semibold">Auto-graded</p>
+                        <p class="font-black text-white text-sm md:text-base">
+                            Fill in Blank
+                        </p>
+                        <p
+                            class="text-[11px] md:text-xs text-sky-200/80 mt-1 font-semibold"
+                        >
+                            Auto-graded
+                        </p>
                     </button>
-                    <button type="button" onclick="addQuestion('short_answer')" class="type-card rounded-2xl p-5 md:p-6 text-center">
-                        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white text-2xl shadow-lg">
+                    <button
+                        type="button"
+                        onclick="addQuestion('short_answer')"
+                        class="type-card rounded-2xl p-5 md:p-6 text-center"
+                    >
+                        <div
+                            class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white text-2xl shadow-lg"
+                        >
                             <i class="fas fa-memo-circle-info"></i>
                         </div>
-                        <p class="font-black text-white text-sm md:text-base">Short Answer</p>
-                        <p class="text-[11px] md:text-xs text-amber-200/80 mt-1 font-semibold">You grade manually</p>
+                        <p class="font-black text-white text-sm md:text-base">
+                            Short Answer
+                        </p>
+                        <p
+                            class="text-[11px] md:text-xs text-amber-200/80 mt-1 font-semibold"
+                        >
+                            You grade manually
+                        </p>
                     </button>
-                    <button type="button" onclick="addQuestion('essay')" class="type-card rounded-2xl p-5 md:p-6 text-center">
-                        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-500 text-white text-2xl shadow-lg">
+                    <button
+                        type="button"
+                        onclick="addQuestion('essay')"
+                        class="type-card rounded-2xl p-5 md:p-6 text-center"
+                    >
+                        <div
+                            class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-500 text-white text-2xl shadow-lg"
+                        >
                             <i class="fas fa-feather-pointed"></i>
                         </div>
-                        <p class="font-black text-white text-sm md:text-base">Essay</p>
-                        <p class="text-[11px] md:text-xs text-fuchsia-200/80 mt-1 font-semibold">You grade with feedback</p>
+                        <p class="font-black text-white text-sm md:text-base">
+                            Essay
+                        </p>
+                        <p
+                            class="text-[11px] md:text-xs text-fuchsia-200/80 mt-1 font-semibold"
+                        >
+                            You grade with feedback
+                        </p>
                     </button>
                 </div>
 
-                <div class="rounded-2xl bg-white/5 border border-white/10 px-5 py-4 mb-6 flex flex-wrap items-center justify-between gap-3">
-                    <div class="text-white/90 font-semibold flex flex-wrap items-center gap-3">
-                        <i class="fas fa-clipboard-question text-indigo-300 text-xl"></i>
-                        <span><span id="questionCount" class="font-black text-2xl gradient-text">0</span> question<span id="questionCountPlural">s</span> added so far</span>
+                <div
+                    class="rounded-2xl bg-white/5 border border-white/10 px-5 py-4 mb-6 flex flex-wrap items-center justify-between gap-3"
+                >
+                    <div
+                        class="text-white/90 font-semibold flex flex-wrap items-center gap-3"
+                    >
+                        <i
+                            class="fas fa-clipboard-question text-indigo-300 text-xl"
+                        ></i>
+                        <span
+                            ><span
+                                id="questionCount"
+                                class="font-black text-2xl gradient-text"
+                                >0</span
+                            >
+                            question<span id="questionCountPlural">s</span>
+                            added so far</span
+                        >
                     </div>
-                    <button type="button" onclick="addQuestion('mcq')" class="inline-flex items-center gap-2 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/15 px-4 py-2.5 text-xs md:text-sm font-black text-white transition-all">
-                        <i class="fas fa-plus-circle"></i>Quick-add a Multiple Choice question
+                    <button
+                        type="button"
+                        onclick="addQuestion('mcq')"
+                        class="inline-flex items-center gap-2 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/15 px-4 py-2.5 text-xs md:text-sm font-black text-white transition-all"
+                    >
+                        <i class="fas fa-plus-circle"></i>Quick-add a Multiple
+                        Choice question
                     </button>
                 </div>
 
                 <div id="questionsContainer" class="space-y-5"></div>
 
-                <button type="button" onclick="addQuestion('mcq')" class="mt-5 w-full rounded-3xl border-2 border-dashed border-indigo-400/50 bg-white/[0.03] hover:bg-white/[0.06] hover:border-indigo-400/80 transition-all py-7 text-white/90 font-black text-base md:text-lg flex items-center justify-center gap-3">
-                    <i class="fas fa-plus-circle text-2xl md:text-3xl text-indigo-300"></i>
+                <button
+                    type="button"
+                    onclick="addQuestion('mcq')"
+                    class="mt-5 w-full rounded-3xl border-2 border-dashed border-indigo-400/50 bg-white/[0.03] hover:bg-white/[0.06] hover:border-indigo-400/80 transition-all py-7 text-white/90 font-black text-base md:text-lg flex items-center justify-center gap-3"
+                >
+                    <i
+                        class="fas fa-plus-circle text-2xl md:text-3xl text-indigo-300"
+                    ></i>
                     <span>Click here to add a new question</span>
                 </button>
             </div>
 
             <div class="glass-card rounded-3xl p-6 md:p-8">
                 <div class="flex flex-wrap items-center gap-3 mb-6">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black shadow-lg">
+                    <span
+                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black shadow-lg"
+                    >
                         3
                     </span>
-                    <h2 class="text-2xl md:text-3xl font-black text-white">Save your work</h2>
+                    <h2 class="text-xl md:text-2xl font-black text-white">
+                        Save your work
+                    </h2>
                 </div>
 
-                <p class="mb-6 text-indigo-100/80 font-medium text-base">
-                    <strong class="text-white">Save Draft</strong> keeps it hidden from students while you edit. <strong class="text-white">Publish</strong> makes it immediately available for enrolled students to start.
+                <p class="mb-6 text-indigo-100/80 font-medium text-sm">
+                    <strong class="text-white">Save Draft</strong> keeps it
+                    hidden from students while you edit.
+                    <strong class="text-white">Publish</strong> makes it
+                    immediately available for enrolled students to start.
                 </p>
 
                 <div class="flex flex-wrap gap-4">
-                    <button type="submit" name="action" value="draft" class="inline-flex items-center gap-3 rounded-2xl btn-outline-light px-7 py-4 text-sm md:text-base font-black">
+                    <button
+                        type="submit"
+                        name="action"
+                        value="draft"
+                        class="inline-flex items-center gap-3 rounded-2xl btn-outline-light px-7 py-4 text-sm md:text-base font-black"
+                    >
                         <i class="fas fa-floppy-disk text-lg"></i>Save Draft
                     </button>
-                    <button type="submit" name="action" value="publish" class="inline-flex items-center gap-3 rounded-2xl btn-primary px-8 py-4 text-sm md:text-base font-black text-white">
+                    <button
+                        type="submit"
+                        name="action"
+                        value="publish"
+                        class="inline-flex items-center gap-3 rounded-2xl btn-primary px-8 py-4 text-sm md:text-base font-black text-white"
+                    >
                         <i class="fas fa-rocket text-lg"></i>
-                        {% if edit_mode %}Save Changes &amp; Keep Published{% else %}Publish Now → Students can start{% endif %}
+                        {% if edit_mode %}Save Changes &amp; Keep Published{%
+                        else %}Publish Now → Students can start{% endif %}
                     </button>
-                    <a href="{% url 'millialms_lecturer_dashboard' %}" class="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.08] hover:text-white transition-all px-7 py-4 text-sm md:text-base font-black">
+                    <a
+                        href="{% url 'millialms_lecturer_dashboard' %}"
+                        class="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.08] hover:text-white transition-all px-7 py-4 text-sm md:text-base font-black"
+                    >
                         <i class="fas fa-xmark"></i>Cancel
                     </a>
                 </div>
@@ -401,29 +808,34 @@
 </div>
 
 <script>
-const TYPE_LABELS = {
-    mcq: { label: "Multiple Choice", icon: "fa-list" },
-    true_false: { label: "True / False", icon: "fa-check-double" },
-    fill_blank: { label: "Fill in Blank", icon: "fa-pen-line" },
-    short_answer: { label: "Short Answer", icon: "fa-memo-circle-info" },
-    essay: { label: "Essay", icon: "fa-feather-pointed" },
-};
-let qIdx = 0;
-const existingQuestionsRaw = "{% if edit_mode and existing_questions_json %}{{ existing_questions_json|safe }}{% else %}[]{% endif %}";
-let existingQuestions = [];
-try { existingQuestions = JSON.parse(existingQuestionsRaw); } catch (e) { existingQuestions = []; }
+    const TYPE_LABELS = {
+        mcq: { label: "Multiple Choice", icon: "fa-list" },
+        true_false: { label: "True / False", icon: "fa-check-double" },
+        fill_blank: { label: "Fill in Blank", icon: "fa-pen-line" },
+        short_answer: { label: "Short Answer", icon: "fa-memo-circle-info" },
+        essay: { label: "Essay", icon: "fa-feather-pointed" },
+    };
+    let qIdx = 0;
+    const existingQuestionsRaw =
+        "{% if edit_mode and existing_questions_json %}{{ existing_questions_json|safe }}{% else %}[]{% endif %}";
+    let existingQuestions = [];
+    try {
+        existingQuestions = JSON.parse(existingQuestionsRaw);
+    } catch (e) {
+        existingQuestions = [];
+    }
 
-function addQuestion(type, preset) {
-    const container = document.getElementById("questionsContainer");
-    const idx = qIdx++;
-    const meta = TYPE_LABELS[type] || TYPE_LABELS.mcq;
-    const p = preset || {};
-    const qid = p.id || ("new_" + idx);
+    function addQuestion(type, preset) {
+        const container = document.getElementById("questionsContainer");
+        const idx = qIdx++;
+        const meta = TYPE_LABELS[type] || TYPE_LABELS.mcq;
+        const p = preset || {};
+        const qid = p.id || "new_" + idx;
 
-    const q = document.createElement("div");
-    q.className = "question-card rounded-3xl p-5 md:p-7";
-    q.dataset.qidx = idx;
-    q.innerHTML = `
+        const q = document.createElement("div");
+        q.className = "question-card rounded-3xl p-5 md:p-7";
+        q.dataset.qidx = idx;
+        q.innerHTML = `
         <input type="hidden" name="q_idx_${idx}" value="${qid}" />
         <input type="hidden" name="q_type_${idx}" value="${type}" />
         <div class="flex flex-wrap items-start gap-4 mb-5">
@@ -461,15 +873,23 @@ function addQuestion(type, preset) {
             ${renderQuestionBody(type, idx, p)}
         </div>
     `;
-    container.appendChild(q);
-    updateCounts();
-}
+        container.appendChild(q);
+        updateCounts();
+    }
 
-function renderQuestionBody(type, idx, p) {
-    if (type === "mcq") {
-        const opts = (p.options && p.options.length) ? p.options : [{ text: "", is_correct: true }, { text: "", is_correct: false }];
-        const rows = opts.map((o, i) => optionRow(idx, i, o.text, o.is_correct)).join("");
-        return `
+    function renderQuestionBody(type, idx, p) {
+        if (type === "mcq") {
+            const opts =
+                p.options && p.options.length
+                    ? p.options
+                    : [
+                          { text: "", is_correct: true },
+                          { text: "", is_correct: false },
+                      ];
+            const rows = opts
+                .map((o, i) => optionRow(idx, i, o.text, o.is_correct))
+                .join("");
+            return `
             <div>
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                     <label class="block text-sm font-black text-slate-800"><i class="fas fa-list text-emerald-500 mr-1.5"></i>Answer options — tick the radio next to the correct one</label>
@@ -479,10 +899,10 @@ function renderQuestionBody(type, idx, p) {
                 </div>
                 <div class="options-wrapper space-y-3" data-qidx="${idx}">${rows}</div>
             </div>`;
-    }
-    if (type === "true_false") {
-        const val = (p.correct_tf !== undefined) ? p.correct_tf : "true";
-        return `
+        }
+        if (type === "true_false") {
+            const val = p.correct_tf !== undefined ? p.correct_tf : "true";
+            return `
             <div>
                 <label class="block text-sm font-black text-slate-800 mb-3"><i class="fas fa-check-double text-indigo-500 mr-1.5"></i>Pick the correct answer</label>
                 <input type="hidden" name="q_tf_correct_${idx}" id="q_tf_correct_${idx}" value="${val}" />
@@ -503,32 +923,36 @@ function renderQuestionBody(type, idx, p) {
                     </label>
                 </div>
             </div>`;
-    }
-    if (type === "fill_blank" || type === "short_answer") {
-        const answers = p.accepted_answers || "";
-        return `
+        }
+        if (type === "fill_blank" || type === "short_answer") {
+            const answers = p.accepted_answers || "";
+            return `
             <div>
-                ${type === "fill_blank" ? `
+                ${
+                    type === "fill_blank"
+                        ? `
                 <label class="block text-sm font-black text-slate-800 mb-2"><i class="fas fa-spell-check text-sky-500 mr-1.5"></i>Accepted answers (one per line, case-insensitive match)</label>
                 <textarea name="q_answers_${idx}" rows="3" class="input-field w-full rounded-2xl px-5 py-4 text-base font-semibold text-slate-900 placeholder:text-slate-400" placeholder="one&#10;1&#10;unity">${answers}</textarea>
                 <p class="mt-2 text-xs font-bold text-slate-500"><i class="fas fa-info-circle mr-1"></i>If the student writes ANY of these, it counts as correct. One answer per line.</p>
-                ` : `
+                `
+                        : `
                 <div class="rounded-2xl bg-amber-50 border border-amber-200 px-5 py-4 text-sm font-bold text-amber-800">
                     <i class="fas fa-memo-circle-check mr-2"></i>Students will write a 1-3 sentence response. You will grade this manually and can add personalised feedback.
-                </div>`}
+                </div>`
+                }
             </div>`;
-    }
-    if (type === "essay") {
-        return `
+        }
+        if (type === "essay") {
+            return `
             <div class="rounded-2xl bg-fuchsia-50 border border-fuchsia-200 px-5 py-4 text-sm font-bold text-fuchsia-800">
                 <i class="fas fa-feather-pointed mr-2"></i>Students will write a full essay response. You will grade it manually with marks and personalised written feedback. No pre-set answers needed.
             </div>`;
+        }
+        return "";
     }
-    return "";
-}
 
-function optionRow(qIdx, optIdx, text, isCorrect) {
-    return `
+    function optionRow(qIdx, optIdx, text, isCorrect) {
+        return `
         <div class="option-row flex flex-wrap items-center gap-3 md:gap-4 rounded-2xl px-4 md:px-5 py-3.5 md:py-4">
             <div class="flex items-center justify-center">
                 <input type="radio" name="q_mcq_correct_${qIdx}" value="${optIdx}" ${isCorrect ? "checked" : ""} onchange="syncMCCorrect(${qIdx})" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500" title="Tick if this is the correct option" />
@@ -540,127 +964,186 @@ function optionRow(qIdx, optIdx, text, isCorrect) {
                 <i class="fas fa-times"></i>
             </button>
         </div>`;
-}
-
-function addOption(qIdx) {
-    const wrap = document.querySelector(`.options-wrapper[data-qidx="${qIdx}"]`);
-    if (!wrap) return;
-    const existing = wrap.querySelectorAll('[name^="q_opt_' + qIdx + '_"]');
-    const maxIdx = Array.from(existing).reduce((m, el) => {
-        const m2 = el.name.match(new RegExp(`q_opt_${qIdx}_(\\d+)`));
-        return m2 ? Math.max(m, parseInt(m2[1], 10)) : m;
-    }, -1);
-    const newIdx = maxIdx + 1;
-    wrap.insertAdjacentHTML("beforeend", optionRow(qIdx, newIdx, "", false));
-    syncMCCorrect(qIdx);
-}
-
-function removeOption(qIdx, optIdx) {
-    const wrap = document.querySelector(`.options-wrapper[data-qidx="${qIdx}"]`);
-    if (!wrap) return;
-    const count = wrap.children.length;
-    if (count <= 2) { alert("A multiple-choice question needs at least 2 options."); return; }
-    const toRemove = wrap.querySelector(`[name="q_opt_${qIdx}_${optIdx}"]`);
-    if (toRemove && toRemove.parentElement) toRemove.parentElement.remove();
-    renumberOptions(qIdx);
-    syncMCCorrect(qIdx);
-}
-
-function renumberOptions(qIdx) {
-    const wrap = document.querySelector(`.options-wrapper[data-qidx="${qIdx}"]`);
-    if (!wrap) return;
-    const rows = Array.from(wrap.children);
-    const prevCorrect = [];
-    rows.forEach((r, i) => {
-        const hid = r.querySelector(`[id^="q_opt_${qIdx}_"][id$="_correct"]`);
-        const radio = r.querySelector(`input[type="radio"]`);
-        if (hid && hid.value === "1") prevCorrect.push(i);
-        const textInp = r.querySelector(`input[type="text"][name^="q_opt_${qIdx}_"]`);
-        const letterBadge = r.querySelector(".flex.h-9.w-9");
-        if (textInp) { textInp.name = `q_opt_${qIdx}_${i}`; }
-        if (hid) hid.id = `q_opt_${qIdx}_${i}_correct`;
-        if (hid) hid.name = `q_opt_${qIdx}_${i}_correct`;
-        if (radio) radio.value = `${i}`;
-        if (letterBadge) letterBadge.textContent = String.fromCharCode(65 + i);
-    });
-    rows.forEach((r, i) => {
-        const hid = r.querySelector(`[id^="q_opt_${qIdx}_"][id$="_correct"]`);
-        const radio = r.querySelector(`input[type="radio"]`);
-        if (prevCorrect.length === 0 && i === 0) {
-            if (hid) hid.value = "1";
-            if (radio) radio.checked = true;
-        } else if (prevCorrect.includes(i)) {
-            if (hid) hid.value = "1";
-            if (radio) radio.checked = true;
-        } else {
-            if (hid) hid.value = "0";
-            if (radio) radio.checked = false;
-        }
-    });
-}
-
-function syncMCCorrect(qIdx) {
-    const wrap = document.querySelector(`.options-wrapper[data-qidx="${qIdx}"]`);
-    if (!wrap) return;
-    const radio = wrap.querySelector(`input[type="radio"][name="q_mcq_correct_${qIdx}"]:checked`);
-    const pickedIdx = radio ? parseInt(radio.value, 10) : 0;
-    wrap.querySelectorAll('[id^="q_opt_' + qIdx + '_"][id$="_correct"]').forEach((hid, i) => {
-        hid.value = (i === pickedIdx) ? "1" : "0";
-    });
-}
-
-function removeQuestion(idx) {
-    const q = document.querySelector(`[data-qidx="${idx}"]`);
-    if (!q) return;
-    const total = document.querySelectorAll("#questionsContainer > div").length;
-    if (total <= 1) { if (!confirm("Remove the only question? (you can add a new one right after)")) return; }
-    else if (!confirm("Remove this question?")) return;
-    q.remove();
-    document.querySelectorAll("#questionsContainer > div").forEach((card, i) => {
-        const num = card.querySelector(".questionNumber");
-        if (num) num.textContent = i + 1;
-    });
-    updateCounts();
-}
-
-function updateCounts() {
-    const n = document.querySelectorAll("#questionsContainer > div").length;
-    const qc = document.getElementById("questionCount");
-    const qcp = document.getElementById("questionCountPlural");
-    if (qc) qc.textContent = n;
-    if (qcp) qcp.textContent = (n === 1) ? "" : "s";
-}
-
-function validateForm() {
-    const cards = document.querySelectorAll("#questionsContainer > div");
-    if (cards.length === 0) {
-        alert("Add at least one question first — pick any big button above.");
-        return false;
     }
-    for (const card of cards) {
-        const inputs = card.querySelectorAll('textarea[name^="q_text_"], input[name^="q_text_"]');
-        for (const t of inputs) {
-            if (!t.value.trim()) { alert("Every question must have text. Please fill in the blank question."); t.focus(); return false; }
+
+    function addOption(qIdx) {
+        const wrap = document.querySelector(
+            `.options-wrapper[data-qidx="${qIdx}"]`,
+        );
+        if (!wrap) return;
+        const existing = wrap.querySelectorAll('[name^="q_opt_' + qIdx + '_"]');
+        const maxIdx = Array.from(existing).reduce((m, el) => {
+            const m2 = el.name.match(new RegExp(`q_opt_${qIdx}_(\\d+)`));
+            return m2 ? Math.max(m, parseInt(m2[1], 10)) : m;
+        }, -1);
+        const newIdx = maxIdx + 1;
+        wrap.insertAdjacentHTML(
+            "beforeend",
+            optionRow(qIdx, newIdx, "", false),
+        );
+        syncMCCorrect(qIdx);
+    }
+
+    function removeOption(qIdx, optIdx) {
+        const wrap = document.querySelector(
+            `.options-wrapper[data-qidx="${qIdx}"]`,
+        );
+        if (!wrap) return;
+        const count = wrap.children.length;
+        if (count <= 2) {
+            alert("A multiple-choice question needs at least 2 options.");
+            return;
         }
-        const typeInput = card.querySelector('[name^="q_type_"]');
-        if (typeInput && typeInput.value === "mcq") {
-            const qIdxMatch = (typeInput.name || "").match(/q_type_(\d+)/);
-            if (qIdxMatch) {
-                const qi = qIdxMatch[1];
-                const optInputs = card.querySelectorAll(`input[type="text"][name^="q_opt_${qi}_"]`);
-                const filled = Array.from(optInputs).filter(o => (o.value || "").trim().length > 0).length;
-                if (filled < 2) { alert("Each Multiple-Choice question needs at least 2 filled options."); optInputs[0].focus(); return false; }
+        const toRemove = wrap.querySelector(`[name="q_opt_${qIdx}_${optIdx}"]`);
+        if (toRemove && toRemove.parentElement) toRemove.parentElement.remove();
+        renumberOptions(qIdx);
+        syncMCCorrect(qIdx);
+    }
+
+    function renumberOptions(qIdx) {
+        const wrap = document.querySelector(
+            `.options-wrapper[data-qidx="${qIdx}"]`,
+        );
+        if (!wrap) return;
+        const rows = Array.from(wrap.children);
+        const prevCorrect = [];
+        rows.forEach((r, i) => {
+            const hid = r.querySelector(
+                `[id^="q_opt_${qIdx}_"][id$="_correct"]`,
+            );
+            const radio = r.querySelector(`input[type="radio"]`);
+            if (hid && hid.value === "1") prevCorrect.push(i);
+            const textInp = r.querySelector(
+                `input[type="text"][name^="q_opt_${qIdx}_"]`,
+            );
+            const letterBadge = r.querySelector(".flex.h-9.w-9");
+            if (textInp) {
+                textInp.name = `q_opt_${qIdx}_${i}`;
+            }
+            if (hid) hid.id = `q_opt_${qIdx}_${i}_correct`;
+            if (hid) hid.name = `q_opt_${qIdx}_${i}_correct`;
+            if (radio) radio.value = `${i}`;
+            if (letterBadge)
+                letterBadge.textContent = String.fromCharCode(65 + i);
+        });
+        rows.forEach((r, i) => {
+            const hid = r.querySelector(
+                `[id^="q_opt_${qIdx}_"][id$="_correct"]`,
+            );
+            const radio = r.querySelector(`input[type="radio"]`);
+            if (prevCorrect.length === 0 && i === 0) {
+                if (hid) hid.value = "1";
+                if (radio) radio.checked = true;
+            } else if (prevCorrect.includes(i)) {
+                if (hid) hid.value = "1";
+                if (radio) radio.checked = true;
+            } else {
+                if (hid) hid.value = "0";
+                if (radio) radio.checked = false;
+            }
+        });
+    }
+
+    function syncMCCorrect(qIdx) {
+        const wrap = document.querySelector(
+            `.options-wrapper[data-qidx="${qIdx}"]`,
+        );
+        if (!wrap) return;
+        const radio = wrap.querySelector(
+            `input[type="radio"][name="q_mcq_correct_${qIdx}"]:checked`,
+        );
+        const pickedIdx = radio ? parseInt(radio.value, 10) : 0;
+        wrap.querySelectorAll(
+            '[id^="q_opt_' + qIdx + '_"][id$="_correct"]',
+        ).forEach((hid, i) => {
+            hid.value = i === pickedIdx ? "1" : "0";
+        });
+    }
+
+    function removeQuestion(idx) {
+        const q = document.querySelector(`[data-qidx="${idx}"]`);
+        if (!q) return;
+        const total = document.querySelectorAll(
+            "#questionsContainer > div",
+        ).length;
+        if (total <= 1) {
+            if (
+                !confirm(
+                    "Remove the only question? (you can add a new one right after)",
+                )
+            )
+                return;
+        } else if (!confirm("Remove this question?")) return;
+        q.remove();
+        document
+            .querySelectorAll("#questionsContainer > div")
+            .forEach((card, i) => {
+                const num = card.querySelector(".questionNumber");
+                if (num) num.textContent = i + 1;
+            });
+        updateCounts();
+    }
+
+    function updateCounts() {
+        const n = document.querySelectorAll("#questionsContainer > div").length;
+        const qc = document.getElementById("questionCount");
+        const qcp = document.getElementById("questionCountPlural");
+        if (qc) qc.textContent = n;
+        if (qcp) qcp.textContent = n === 1 ? "" : "s";
+    }
+
+    function validateForm() {
+        const cards = document.querySelectorAll("#questionsContainer > div");
+        if (cards.length === 0) {
+            alert(
+                "Add at least one question first — pick any big button above.",
+            );
+            return false;
+        }
+        for (const card of cards) {
+            const inputs = card.querySelectorAll(
+                'textarea[name^="q_text_"], input[name^="q_text_"]',
+            );
+            for (const t of inputs) {
+                if (!t.value.trim()) {
+                    alert(
+                        "Every question must have text. Please fill in the blank question.",
+                    );
+                    t.focus();
+                    return false;
+                }
+            }
+            const typeInput = card.querySelector('[name^="q_type_"]');
+            if (typeInput && typeInput.value === "mcq") {
+                const qIdxMatch = (typeInput.name || "").match(/q_type_(\d+)/);
+                if (qIdxMatch) {
+                    const qi = qIdxMatch[1];
+                    const optInputs = card.querySelectorAll(
+                        `input[type="text"][name^="q_opt_${qi}_"]`,
+                    );
+                    const filled = Array.from(optInputs).filter(
+                        (o) => (o.value || "").trim().length > 0,
+                    ).length;
+                    if (filled < 2) {
+                        alert(
+                            "Each Multiple-Choice question needs at least 2 filled options.",
+                        );
+                        optInputs[0].focus();
+                        return false;
+                    }
+                }
             }
         }
+        return true;
     }
-    return true;
-}
 
-document.addEventListener("DOMContentLoaded", function () {
-    if (existingQuestions.length > 0) {
-        existingQuestions.forEach((eq) => addQuestion(eq.question_type, eq));
-    }
-    updateCounts();
-});
+    document.addEventListener("DOMContentLoaded", function () {
+        if (existingQuestions.length > 0) {
+            existingQuestions.forEach((eq) =>
+                addQuestion(eq.question_type, eq),
+            );
+        }
+        updateCounts();
+    });
 </script>
 {% endblock content %}
