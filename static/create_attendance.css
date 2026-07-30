@@ -83,7 +83,18 @@ form textarea {
     background-color: #1C3B5A;
 }
 
-/* Responsive */
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .content {
+        padding: 15px;
+        margin-left: 20px;
+    }
+
+    .form-section {
+        max-width: 450px;
+    }
+}
+
 @media (max-width: 768px) {
     .content {
         margin-left: 0;
@@ -92,5 +103,62 @@ form textarea {
 
     .form-section {
         width: 90%;
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    header h2 {
+        font-size: 20px;
+    }
+
+    form label {
+        font-size: 14px;
+    }
+
+    form input,
+    form select,
+    form textarea {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .submit-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 10px;
+    }
+
+    .form-section {
+        width: 95%;
+        padding: 12px;
+    }
+
+    header h2 {
+        font-size: 18px;
+    }
+
+    form label {
+        font-size: 13px;
+    }
+
+    form input,
+    form select,
+    form textarea {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    form textarea {
+        height: 80px;
+    }
+
+    .submit-btn {
+        padding: 12px;
+        font-size: 13px;
     }
 }

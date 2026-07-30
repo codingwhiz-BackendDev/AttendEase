@@ -123,3 +123,100 @@ footer {
     font-size: 14px;
     font-weight: 300;
 }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .content {
+        max-width: 700px;
+        padding: 15px;
+    }
+
+    .content h1 {
+        font-size: 40px;
+    }
+
+    .content p {
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content {
+        max-width: 600px;
+        padding: 15px;
+    }
+
+    .content h1 {
+        font-size: 32px;
+    }
+
+    .content p {
+        font-size: 15px;
+        margin-bottom: 25px;
+    }
+
+    .buttons {
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 18px;
+        font-size: 15px;
+    }
+
+    .logo {
+        font-size: 35px;
+        top: 15px;
+        right: 20px;
+    }
+
+    footer {
+        font-size: 12px;
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .content h1 {
+        font-size: 26px;
+    }
+
+    .content p {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn {
+        padding: 14px 20px;
+        font-size: 14px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .logo {
+        font-size: 30px;
+        top: 10px;
+        right: 15px;
+    }
+
+    footer {
+        font-size: 11px;
+        bottom: 5px;
+        padding: 0 5px;
+    }
+}

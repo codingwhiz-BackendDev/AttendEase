@@ -167,3 +167,93 @@ footer {
     font-size: 14px;
     font-weight: 300;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-container {
+        width: 90%;
+        max-width: 380px;
+        padding: 1.5rem;
+    }
+
+    .login-container h1 {
+        font-size: 20px;
+    }
+
+    .login-container p {
+        font-size: 13px;
+    }
+
+    .btn-google {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .logo {
+        font-size: 30px;
+        top: 15px;
+        right: 20px;
+    }
+
+    footer {
+        font-size: 12px;
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        width: 95%;
+        padding: 1.2rem;
+    }
+
+    .login-container h1 {
+        font-size: 18px;
+    }
+
+    .login-container p {
+        font-size: 12px;
+    }
+
+    .divider {
+        font-size: 12px;
+    }
+
+    .divider::before,
+    .divider::after {
+        width: 30px;
+    }
+
+    .divider::before {
+        left: -40px;
+    }
+
+    .divider::after {
+        right: -40px;
+    }
+
+    .btn-google {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    .btn-google i {
+        font-size: 14px;
+    }
+
+    .logo {
+        font-size: 25px;
+        top: 10px;
+        right: 15px;
+    }
+
+    footer {
+        font-size: 11px;
+        bottom: 5px;
+    }
+
+    .alert {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}

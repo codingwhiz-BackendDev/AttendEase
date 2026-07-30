@@ -107,3 +107,120 @@
     color: #FFD700;
     font-size: 16px;
 }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .profile-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-info,
+    .course-section {
+        width: 90%;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        margin-top: 20px;
+        gap: 20px;
+    }
+
+    .profile-info,
+    .course-section {
+        width: 95%;
+        min-width: 250px;
+        padding: 20px;
+    }
+
+    .profile-pic {
+        width: 80px;
+        height: 80px;
+    }
+
+    .profile-header h3 {
+        font-size: 18px;
+    }
+
+    .matric-number {
+        font-size: 13px;
+    }
+
+    .detail-item {
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+
+    .detail-label {
+        font-size: 13px;
+    }
+
+    .detail-value {
+        font-size: 13px;
+    }
+
+    .course-section h3 {
+        font-size: 18px;
+    }
+
+    .course-item {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-container {
+        margin-top: 15px;
+        gap: 15px;
+    }
+
+    .profile-info,
+    .course-section {
+        width: 100%;
+        min-width: 200px;
+        padding: 15px;
+    }
+
+    .profile-pic {
+        width: 70px;
+        height: 70px;
+    }
+
+    .profile-header h3 {
+        font-size: 16px;
+    }
+
+    .matric-number {
+        font-size: 12px;
+    }
+
+    .detail-item {
+        padding: 8px;
+        margin-bottom: 6px;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detail-label {
+        font-size: 12px;
+    }
+
+    .detail-value {
+        font-size: 12px;
+    }
+
+    .course-section h3 {
+        font-size: 16px;
+    }
+
+    .course-item {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .course-item i {
+        font-size: 14px;
+    }
+}

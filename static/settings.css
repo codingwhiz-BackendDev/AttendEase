@@ -77,3 +77,75 @@
     transform: translate(-50%, -50%);
     pointer-events: none;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .settings-container {
+        width: 90%;
+        min-width: 280px;
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .save-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .video-container {
+        max-width: 100%;
+    }
+
+    #webcam {
+        border-radius: 8px;
+    }
+
+    .overlay-circle {
+        width: 150px;
+        height: 150px;
+        border-width: 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-container {
+        width: 95%;
+        min-width: 250px;
+        margin: 15px auto;
+        padding: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+    }
+
+    .form-group input {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .save-btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .overlay-circle {
+        width: 120px;
+        height: 120px;
+        border-width: 2px;
+    }
+}
