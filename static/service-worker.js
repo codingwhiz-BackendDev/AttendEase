@@ -1,4 +1,4 @@
-const CACHE_NAME = 'classmillia-v1';
+const CACHE_NAME = 'classmillia-v2';
 
 // Install event - cache assets
 self.addEventListener('install', event => {
