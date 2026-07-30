@@ -284,9 +284,11 @@ def compare_faces(known_embedding, candidate_embedding, threshold=0.5):
 
 
 def redirect_to_google_login(request):
-    if request.method == "POST":
-        logger.info("Redirecting to welcome page")
-        return redirect("welcome_page")
+    """Prevent direct access to the default allauth login form (username/password).
+    Users must use the role-specific Google OAuth entry points instead.
+    """
+    logger.info("Intercepted direct access to /accounts/login/; redirecting to welcome page")
+    return redirect("welcome_page")
 
 
 """View for the student dashboard."""
@@ -448,12 +450,12 @@ def lecturer_google_login(request):
     return redirect("/accounts/google/login/")
 
 
+@student_required
 def student_profile(request):
-    user = User.objects.get(username=request.user)
-    student_profile = StudentProfile.objects.get(student_name=user)
+    user = request.user
+    student_profile = get_object_or_404(StudentProfile, student_name=user)
 
-    logged_user = request.user
-    user_role = get_user_role(logged_user)
+    user_role = get_user_role(user)
 
     enrolled_courses = student_profile.courses_enrolled.all()
     context = {
@@ -496,43 +498,41 @@ def student_courses(request):
 
 
 # View to enroll course
+@student_required
 @transaction.atomic
 def course_enrollment(request):
     if request.method == "POST":
-        student = request.POST.get("student")
         course_title = request.POST.get("course")
 
         # Validation
-        if not student or not course_title:
+        if not course_title:
             messages.error(request, "Missing required fields.")
             return redirect("student_courses")
 
-        """ Get the user object of the person enrolling & the Course """
+        user = request.user
         try:
-            user = User.objects.get(username=student)
             course = Course.objects.get(course_title=course_title)
-        except User.DoesNotExist:
-            messages.error(request, "User not found.")
-            return redirect("student_courses")
         except Course.DoesNotExist:
             messages.error(request, "Course not found.")
             return redirect("student_courses")
 
-        if StudentProfile.objects.filter(student_name=user).exists():
-            student_profile = StudentProfile.objects.get(student_name=user)
+        student_profile, _ = StudentProfile.objects.get_or_create(student_name=user)
+        if student_profile.courses_enrolled.filter(id=course.id).exists():
+            messages.warning(request, f"You are already enrolled in '{course.course_title}'")
+        else:
             student_profile.courses_enrolled.add(course)
             messages.success(request, f"You've successfully enrolled for '{course}'")
-        else:
-            student_profile = StudentProfile.objects.create(student_name=user)
-            student_profile.courses_enrolled.add(course)
 
         return redirect("student_courses")
 
+    return redirect("student_courses")
+
 
 # Lecturers Profile
+@lecturer_required
 def lecturer_profile(request):
-    user = User.objects.get(username=request.user)
-    lecturer_profile = LecturerProfile.objects.get(user=user)
+    user = request.user
+    lecturer_profile = get_object_or_404(LecturerProfile, user=user)
 
     courses_taught = lecturer_profile.courses_taught.all()
     context = {"courses_taught": courses_taught, "lecturer_profile": lecturer_profile}
@@ -540,75 +540,69 @@ def lecturer_profile(request):
 
 
 # Search courses & Courses page
+@lecturer_required
 def lecturer_courses(request):
     user = request.user
-    user_obj = User.objects.get(username=user)
-    # If a form is submitted
-    if request.method == "POST":
-        course = request.POST["course"]
-        # Filter Courses based on search
-        results = Course.objects.filter(course_title__icontains=course)
-        # If not found print out an error message
-        if not results:
-            messages.error(request, f" 'No Course Found on {course}'")
-    else:
-        # Else a form is not submitted, display the normal home page
-        lecturer_profile = LecturerProfile.objects.get(user=user_obj)
-        courses_taught = lecturer_profile.courses_taught.all()
-        logger.info(f"Lecturer courses: {courses_taught}")
+    lecturer_profile = get_object_or_404(LecturerProfile, user=user)
+    courses_taught = lecturer_profile.courses_taught.all()
 
+    # If a form is submitted (search)
+    if request.method == "POST":
+        search_query = request.POST.get("course", "").strip()
+        if search_query:
+            results = Course.objects.filter(course_title__icontains=search_query)
+            if not results:
+                messages.error(request, f"No Course Found for '{search_query}'")
+        else:
+            results = Course.objects.none()
+        # Always provide both results AND courses_taught so the template renders fully
         return render(
-            request, "lecturer_courses.html", {"courses_taught": courses_taught}
+            request,
+            "lecturer_courses.html",
+            {"results": results, "courses_taught": courses_taught},
         )
 
-    return render(request, "lecturer_courses.html", {"results": results})
+    # GET request — normal home page
+    logger.info(f"Lecturer courses: {courses_taught}")
+    return render(
+        request, "lecturer_courses.html", {"courses_taught": courses_taught}
+    )
 
 
 # Lecturer enroll for course
+@lecturer_required
 @transaction.atomic
 def lecturer_course_enrollment(request):
     if request.method == "POST":
-        lecturer = request.POST.get("lecturer")
         course_title = request.POST.get("course")
 
         # Validation
-        if not lecturer or not course_title:
+        if not course_title:
             messages.error(request, "Missing required fields.")
             return redirect("lecturer_courses")
 
-        """ Get the user object of the person enrolling & the Course """
+        user = request.user
         try:
-            user = User.objects.get(username=lecturer)
             course = Course.objects.get(course_title=course_title)
-        except User.DoesNotExist:
-            messages.error(request, "User not found.")
-            return redirect("lecturer_courses")
         except Course.DoesNotExist:
             messages.error(request, "Course not found.")
             return redirect("lecturer_courses")
 
         # Check if lecturer exists
-        if LecturerProfile.objects.filter(user=user).exists():
-            lecturer_profile = LecturerProfile.objects.get(user=user)
-            # Check if THIS lecturer has already enrolled for this course
-            if lecturer_profile.courses_taught.filter(id=course.id).exists():
-                messages.warning(
-                    request, f"You are already enrolled in '{course.course_title}'"
-                )
-                return redirect("lecturer_courses")
-            else:
-                lecturer_profile.courses_taught.add(course)
-                messages.success(
-                    request, f"Successfully enrolled in '{course.course_title}'"
-                )
+        lecturer_profile, _ = LecturerProfile.objects.get_or_create(user=user)
+        if lecturer_profile.courses_taught.filter(id=course.id).exists():
+            messages.warning(
+                request, f"You are already enrolled in '{course.course_title}'"
+            )
         else:
-            lecturer_profile = LecturerProfile.objects.create(user=user)
             lecturer_profile.courses_taught.add(course)
             messages.success(
                 request, f"Successfully enrolled in '{course.course_title}'"
             )
 
         return redirect("lecturer_courses")
+
+    return redirect("lecturer_courses")
 
 
 # Lecturer create new course
@@ -679,10 +673,10 @@ def create_course(request):
 
 
 # Lecturer Unenroll for course
+@lecturer_required
 @transaction.atomic
 def lecturer_course_unenrollment(request):
     user = request.user
-    user_obj = User.objects.get(username=user)
     if request.method == "POST":
         course_title = request.POST.get("course")
 
@@ -692,7 +686,7 @@ def lecturer_course_unenrollment(request):
             return redirect("lecturer_courses")
 
         try:
-            lecturer_profile = LecturerProfile.objects.get(user=user_obj)
+            lecturer_profile = LecturerProfile.objects.get(user=user)
             course = Course.objects.get(course_title=course_title)
         except LecturerProfile.DoesNotExist:
             messages.error(request, "Lecturer profile not found.")
@@ -706,6 +700,8 @@ def lecturer_course_unenrollment(request):
             request, f"You've successfully unenrolled for '{course}' as a Lecturer"
         )
         return redirect("lecturer_courses")
+
+    return redirect("lecturer_courses")
 
 
 def format_lagos_time(aware_dt):

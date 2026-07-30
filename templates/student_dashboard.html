@@ -1,478 +1,863 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <style>
-    .countdown-cell { font-variant-numeric: tabular-nums; }
-    .mini-map { border-radius: 1rem; overflow: hidden; background: #e5e7eb; }
-    .leaflet-container { z-index: 1; }
-    
+    .countdown-cell {
+        font-variant-numeric: tabular-nums;
+    }
+    .mini-map {
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #e5e7eb;
+    }
+    .leaflet-container {
+        z-index: 1;
+    }
+
     .glass-card {
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .gradient-text {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-    
+
     .stat-card {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        background: linear-gradient(
+            135deg,
+            rgba(102, 126, 234, 0.1) 0%,
+            rgba(118, 75, 162, 0.1) 100%
+        );
         border: 1px solid rgba(102, 126, 234, 0.2);
     }
-    
+
     .card-hover {
         transition: all 0.3s ease;
     }
-    
+
     .card-hover:hover {
         transform: translateY(-5px);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     }
-    
+
     .pulse-glow {
         animation: pulse-glow 2s ease-in-out infinite;
     }
-    
+
     @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-        50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+        0%,
+        100% {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+        }
     }
-    
+
     .float-animation {
         animation: float 6s ease-in-out infinite;
     }
-    
+
     @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
     }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+<div
+    class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+>
     <!-- Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
-        <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
+        <div
+            class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
+        ></div>
+        <div
+            class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
+            style="animation-delay: 2s"
+        ></div>
     </div>
 
     <div class="relative p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto">
         <!-- Header / Welcome -->
-        <div class="mb-6 sm:mb-8 flex items-end justify-between flex-wrap gap-4">
+        <div
+            class="mb-6 sm:mb-8 flex items-end justify-between flex-wrap gap-4"
+        >
             <div class="flex items-center gap-3 sm:gap-4">
-                <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xl sm:text-2xl shadow-xl pulse-glow">
+                <div
+                    class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xl sm:text-2xl shadow-xl pulse-glow"
+                >
                     {{ user.username|first|upper }}
                 </div>
                 <div>
-                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-1">Welcome back, <span class="gradient-text">{{ user.get_full_name|default:user.last_name|default:user.username }}</span>! 👋</h1>
-                    <p class="text-xs sm:text-sm lg:text-base text-gray-400">Track your attendance, get to class on time, and stay in the know.</p>
-                </div>
-            </div>
-            <div class="glass-card rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-right">
-                <div class="font-black text-gray-400 uppercase tracking-wider mb-1 text-[10px] sm:text-xs">Server Time (Lagos/WAT)</div>
-                <div class="font-mono text-white font-black text-sm sm:text-base lg:text-lg">{{ server_now_lagos|default:"N/A" }}</div>
-            </div>
-        </div>
-
-    <!-- ====== HERO WIDGET: NEXT CLASS / LIVE ====== -->
-    {% if next_session %}
-    <div id="next-class-hero" class="glass-card rounded-3xl shadow-2xl overflow-hidden mb-6 sm:mb-8 border border-indigo-500/30">
-        <div class="grid grid-cols-1 lg:grid-cols-5">
-            <!-- LEFT: info + countdown -->
-            <div class="lg:col-span-3 p-4 sm:p-6 lg:p-8">
-                <div class="flex items-center gap-2 mb-3 sm:mb-4 flex-wrap">
-                    {% if next_session.status_label == 'Active' %}
-                    <span class="animate-pulse px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-md">
-                        <i class="fas fa-bolt mr-1"></i>Happening NOW
-                    </span>
-                    {% elif next_session.status_label == 'Upcoming' %}
-                    <span class="px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-md">
-                        <i class="fas fa-bell mr-1"></i>Next Up
-                    </span>
-                    {% endif %}
-                    <span class="px-2 sm:px-3 py-1 rounded-full bg-white/10 text-gray-300 text-[10px] sm:text-xs font-black border border-white/20">
-                        Session #{{ next_session.id }}
-                    </span>
-                    <span class="px-2 sm:px-3 py-1 rounded-full bg-white/10 text-gray-300 text-[10px] sm:text-xs font-black border border-white/20">
-                        <i class="fas fa-book mr-1"></i>{{ next_session.course.course_code }}
-                    </span>
-                </div>
-                <h2 class="text-xl sm:text-2xl lg:text-3xl lg:text-4xl font-black text-white mb-2 leading-tight">{{ next_session.course.course_title }}</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 my-4 sm:my-5">
-                    <div class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10">
-                        <p class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5">Lecture Hall</p>
-                        <p class="font-black text-white text-xs sm:text-sm truncate" title="{{ next_session.hall }}">
-                            <i class="fas fa-building text-indigo-400 mr-1"></i>{{ next_session.hall }}
-                        </p>
-                    </div>
-                    <div class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10">
-                        <p class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5">Window (Lagos)</p>
-                        <p class="font-black text-white text-xs sm:text-sm">
-                            <i class="fas fa-clock text-indigo-400 mr-1"></i>{{ next_session.formatted_start|slice:"11:16" }}–{{ next_session.formatted_end|slice:"11:16" }}
-                        </p>
-                    </div>
-                    <div class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10">
-                        <p class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5">Checked In</p>
-                        <p class="font-black text-white text-xs sm:text-sm">
-                            <i class="fas fa-users text-indigo-400 mr-1"></i>{{ next_session.attendance_count }}
-                        </p>
-                    </div>
-                    <div class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10">
-                        <p class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5">Radius</p>
-                        <p class="font-black text-white text-xs sm:text-sm">
-                            <i class="fas fa-compress-arrows-alt text-indigo-400 mr-1"></i>{{ next_session.radius }}m
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Live countdown -->
-                <div class="glass-card rounded-2xl p-3 sm:p-4 border border-white/10 mb-3 sm:mb-4">
-                    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-                        <p id="next-class-caption" class="text-xs sm:text-sm font-black text-indigo-400 uppercase tracking-wide">⏳ Loading time…</p>
-                        {% if next_session.status_label == 'Active' and not next_session.has_attended %}
-                        <a href="/student/mark-attendance/{{ next_session.id }}"
-                           class="px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm">
-                            <i class="fas fa-camera mr-1 sm:mr-2"></i>Mark Attendance →
-                        </a>
-                        {% elif next_session.status_label == 'Upcoming' %}
-                        <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 text-xs sm:text-sm font-black border border-indigo-500/30">
-                            <i class="fas fa-hourglass-half mr-1"></i>Arrive Early!
-                        </span>
-                        {% elif next_session.has_attended %}
-                        <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 text-xs sm:text-sm font-black border border-emerald-500/30">
-                            <i class="fas fa-check-double mr-1"></i>Already Marked ✅
-                        </span>
-                        {% endif %}
-                    </div>
-                    <div id="next-class-countdown" class="text-2xl sm:text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-white">
-                        --:--:--
-                    </div>
-                </div>
-
-                <!-- Directions buttons -->
-                {% if next_session.latitude and next_session.longitude %}
-                <div class="flex flex-wrap gap-2 items-center">
-                    <span class="text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-wide mr-1">🚀 Navigate:</span>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ next_session.latitude }},{{ next_session.longitude }}&dir_action=navigate&travelmode=walking"
-                       target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-blue-600 text-white text-[10px] sm:text-xs sm:text-sm font-black hover:bg-blue-700 shadow-md transition-all">
-                        <i class="fab fa-google text-xs"></i><span class="hidden sm:inline">Google Maps</span>
-                    </a>
-                    <a href="https://www.waze.com/ul?ll={{ next_session.latitude }},{{ next_session.longitude }}&navigate=yes"
-                       target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-cyan-600 text-white text-[10px] sm:text-xs sm:text-sm font-black hover:bg-cyan-700 shadow-md transition-all">
-                        <i class="fas fa-route text-xs"></i><span class="hidden sm:inline">Waze</span>
-                    </a>
-                    <a href="/student/mark-attendance/{{ next_session.id }}"
-                       class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white/10 text-white text-[10px] sm:text-xs sm:text-sm font-black hover:bg-white/20 border border-white/20 shadow-sm transition-all">
-                        <i class="fas fa-expand text-xs"></i><span class="hidden sm:inline">Open Live Map</span>
-                    </a>
-                </div>
-                {% endif %}
-
-                {% if next_session.notes %}
-                <div class="mt-3 sm:mt-4 p-2 sm:p-3 rounded-2xl bg-amber-500/20 border border-amber-500/30">
-                    <p class="text-[10px] sm:text-xs font-black text-amber-400 uppercase tracking-wide mb-1">
-                        <i class="fas fa-sticky-note mr-1"></i>Lecturer's Note
+                    <h1
+                        class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-1"
+                    >
+                        Welcome back,
+                        <span class="gradient-text"
+                            >{{
+                            user.get_full_name|default:user.last_name|default:user.username
+                            }}</span
+                        >! 👋
+                    </h1>
+                    <p class="text-xs sm:text-sm lg:text-base text-gray-400">
+                        Track your attendance, get to class on time, and stay in
+                        the know.
                     </p>
-                    <p class="text-xs sm:text-sm text-amber-200 italic">"{{ next_session.notes }}"</p>
                 </div>
-                {% endif %}
             </div>
+            <div
+                class="glass-card rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-right"
+            >
+                <div
+                    class="font-black text-gray-400 uppercase tracking-wider mb-1 text-[10px] sm:text-xs"
+                >
+                    Server Time (Lagos/WAT)
+                </div>
+                <div
+                    class="font-mono text-white font-black text-sm sm:text-base lg:text-lg"
+                >
+                    {{ server_now_lagos|default:"N/A" }}
+                </div>
+            </div>
+        </div>
 
-            <!-- RIGHT: mini map -->
-            <div class="lg:col-span-2 relative bg-white/5">
-                {% if next_session.latitude and next_session.longitude %}
-                <div id="next-class-minimap" class="mini-map w-full h-full min-h-[200px] sm:min-h-[280px] lg:min-h-[420px] rounded-none"></div>
-                {% else %}
-                <div class="w-full h-full min-h-[200px] sm:min-h-[280px] lg:min-h-[420px] flex flex-col items-center justify-center text-gray-500 p-4 sm:p-6">
-                    <i class="fas fa-map-marker-slash text-3xl sm:text-5xl mb-2 sm:mb-3 text-gray-600"></i>
-                    <p class="font-bold text-xs sm:text-sm">No GPS location published for this session yet.</p>
-                    <p class="text-[10px] sm:text-xs mt-1">Ask your lecturer to enable geofencing.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- ======= QUICK STATS ======= -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 mb-6 sm:mb-8">
-        <div class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1">Courses Enrolled</p>
-                    <p class="text-2xl sm:text-3xl font-black gradient-text">{{ enrolled_courses_count }}</p>
-                </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                    <i class="fas fa-book-open text-lg sm:text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold">Stay registered via Courses page</p>
-        </div>
-        <div class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1">Attendance Rate</p>
-                    <p class="text-2xl sm:text-3xl font-black gradient-text">{{ attendance_rate_pct }}<span class="text-lg sm:text-xl">%</span></p>
-                </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                    <i class="fas fa-chart-pie text-lg sm:text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold">{{ total_attended }}/{{ total_eligible }} sessions you've marked.</p>
-            <!-- Progress bar -->
-            <div class="mt-3 bg-white/10 rounded-full h-2">
-                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full h-2" style="width:{{ attendance_rate_pct }}%"></div>
-            </div>
-        </div>
-        <div class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1">Active Sessions</p>
-                    <p class="text-2xl sm:text-3xl font-black gradient-text">{{ active_count }}</p>
-                </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                    <i class="fas fa-bolt text-lg sm:text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold">Open right now for check-in</p>
-        </div>
-        <div class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1">Upcoming Next</p>
-                    <p class="text-2xl sm:text-3xl font-black gradient-text">{{ upcoming_count }}</p>
-                </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
-                    <i class="fas fa-calendar-plus text-lg sm:text-2xl"></i>
-                </div>
-            </div>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold">Scheduled in the future</p>
-        </div>
-    </div>
-
-    <!-- ======= MAIN GRID ======= -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <!-- Sessions table -->
-        <div class="lg:col-span-2 glass-card rounded-2xl shadow-xl p-4 sm:p-6 border border-white/10 card-hover">
-            <div class="flex items-center justify-between mb-4 sm:mb-5 flex-wrap gap-3">
-                <h2 class="text-lg sm:text-xl font-black text-white flex items-center">
-                    <i class="fas fa-calendar-week text-indigo-400 mr-2"></i>Recent & Upcoming Classes
-                </h2>
-                <a href="/student/view-attendance/" class="px-4 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 text-sm font-black hover:bg-indigo-500/30 border border-indigo-500/30 transition-all">
-                    View All Sessions →
-                </a>
-            </div>
-
-            {% if attendances %}
-            <div class="space-y-2 sm:space-y-3">
-                {% for att in attendances|slice:":6" %}
-                <div class="flex flex-col sm:flex-row sm:items-start justify-between p-3 sm:p-4 rounded-2xl bg-white/5 hover:bg-white/10 hover:shadow-md hover:border-indigo-500/30 border border-white/10 transition-all gap-3">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-1.5 sm:mb-2">
-                            <h3 class="font-black text-white text-sm sm:text-base truncate">{{ att.course.course_title }}</h3>
-                            <span class="px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[10px] font-black rounded-full bg-{{ att.status_color }}-500/20 text-{{ att.status_color }}-300 uppercase tracking-wide border border-{{ att.status_color }}-500/30">
-                                {{ att.status_label }}
-                            </span>
-                            {% if att.has_attended %}
-                            <span class="px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[10px] font-black rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                ✅ Marked
-                            </span>
-                            {% endif %}
-                        </div>
-                        <div class="flex items-center gap-2 sm:gap-4 flex-wrap text-[10px] sm:text-xs text-gray-400">
-                            <span class="inline-flex items-center font-semibold">
-                                <i class="fas fa-clock text-indigo-400 mr-1"></i>{{ att.formatted_start|slice:"11:16" }} – {{ att.formatted_end|slice:"11:16" }}
-                            </span>
-                            <span class="inline-flex items-center font-semibold">
-                                <i class="fas fa-building text-indigo-400 mr-1"></i>{{ att.hall }}
-                            </span>
-                            <span class="inline-flex items-center font-semibold">
-                                <i class="fas fa-calendar-day text-indigo-400 mr-1"></i>{{ att.formatted_start|slice:":11" }}
-                            </span>
-                            <span class="inline-flex items-center font-semibold">
-                                <i class="fas fa-users text-indigo-400 mr-1"></i>{{ att.attendance_count }}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex flex-row sm:flex-col items-end gap-1.5 sm:gap-2 sm:ml-3">
-                        {% if att.status_label == 'Active' and not att.has_attended %}
-                        <a href="/student/mark-attendance/{{ att.id }}"
-                           class="px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:shadow-md text-[10px] sm:text-xs font-black transition-all whitespace-nowrap">
-                            <i class="fas fa-camera mr-1"></i>Mark Now
-                        </a>
-                        {% elif att.status_label == 'Upcoming' %}
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            {% if att.latitude and att.longitude %}
-                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ att.latitude }},{{ att.longitude }}&dir_action=navigate&travelmode=walking"
-                               target="_blank"
-                               title="Directions"
-                               class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center hover:bg-blue-500/30 transition-all">
-                                <i class="fab fa-google text-xs"></i>
-                            </a>
-                            {% endif %}
-                            <span class="px-2 sm:px-3 py-1 sm:py-1.5 bg-indigo-500/20 text-indigo-300 rounded-xl text-[10px] sm:text-xs font-black border border-indigo-500/30 whitespace-nowrap">
-                                <i class="fas fa-hourglass-half mr-1"></i>Upcoming
-                            </span>
-                        </div>
-                        {% elif att.has_attended %}
-                        <span class="px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-500/20 text-emerald-300 rounded-xl text-[10px] sm:text-xs font-black border border-emerald-500/30 whitespace-nowrap">
-                            <i class="fas fa-check mr-1"></i>Present
+        <!-- ====== HERO WIDGET: NEXT CLASS / LIVE ====== -->
+        {% if next_session %}
+        <div
+            id="next-class-hero"
+            class="glass-card rounded-3xl shadow-2xl overflow-hidden mb-6 sm:mb-8 border border-indigo-500/30"
+        >
+            <div class="grid grid-cols-1 lg:grid-cols-5">
+                <!-- LEFT: info + countdown -->
+                <div class="lg:col-span-3 p-4 sm:p-6 lg:p-8">
+                    <div class="flex items-center gap-2 mb-3 sm:mb-4 flex-wrap">
+                        {% if next_session.status_label == 'Active' %}
+                        <span
+                            class="animate-pulse px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-md"
+                        >
+                            <i class="fas fa-bolt mr-1"></i>Happening NOW
                         </span>
-                        {% else %}
-                        <span class="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500/20 text-red-300 rounded-xl text-[10px] sm:text-xs font-black border border-red-500/30 whitespace-nowrap">
-                            <i class="fas fa-xmark mr-1"></i>Missed
+                        {% elif next_session.status_label == 'Upcoming' %}
+                        <span
+                            class="px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-md"
+                        >
+                            <i class="fas fa-bell mr-1"></i>Next Up
                         </span>
                         {% endif %}
+                        <span
+                            class="px-2 sm:px-3 py-1 rounded-full bg-white/10 text-gray-300 text-[10px] sm:text-xs font-black border border-white/20"
+                        >
+                            Session #{{ next_session.id }}
+                        </span>
+                        <span
+                            class="px-2 sm:px-3 py-1 rounded-full bg-white/10 text-gray-300 text-[10px] sm:text-xs font-black border border-white/20"
+                        >
+                            <i class="fas fa-book mr-1"></i>{{
+                            next_session.course.course_code }}
+                        </span>
                     </div>
+                    <h2
+                        class="text-xl sm:text-2xl lg:text-3xl lg:text-4xl font-black text-white mb-2 leading-tight"
+                    >
+                        {{ next_session.course.course_title }}
+                    </h2>
+                    <div
+                        class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 my-4 sm:my-5"
+                    >
+                        <div
+                            class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10"
+                        >
+                            <p
+                                class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5"
+                            >
+                                Lecture Hall
+                            </p>
+                            <p
+                                class="font-black text-white text-xs sm:text-sm truncate"
+                                title="{{ next_session.hall }}"
+                            >
+                                <i
+                                    class="fas fa-building text-indigo-400 mr-1"
+                                ></i
+                                >{{ next_session.hall }}
+                            </p>
+                        </div>
+                        <div
+                            class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10"
+                        >
+                            <p
+                                class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5"
+                            >
+                                Window (Lagos)
+                            </p>
+                            <p class="font-black text-white text-xs sm:text-sm">
+                                <i class="fas fa-clock text-indigo-400 mr-1"></i
+                                >{{ next_session.formatted_start|slice:"11:16"
+                                }}–{{ next_session.formatted_end|slice:"11:16"
+                                }}
+                            </p>
+                        </div>
+                        <div
+                            class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10"
+                        >
+                            <p
+                                class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5"
+                            >
+                                Checked In
+                            </p>
+                            <p class="font-black text-white text-xs sm:text-sm">
+                                <i class="fas fa-users text-indigo-400 mr-1"></i
+                                >{{ next_session.attendance_count }}
+                            </p>
+                        </div>
+                        <div
+                            class="glass-card rounded-2xl p-2 sm:p-3 border border-white/10"
+                        >
+                            <p
+                                class="text-[8px] sm:text-[10px] uppercase tracking-wider font-black text-gray-400 mb-0.5"
+                            >
+                                Radius
+                            </p>
+                            <p class="font-black text-white text-xs sm:text-sm">
+                                <i
+                                    class="fas fa-compress-arrows-alt text-indigo-400 mr-1"
+                                ></i
+                                >{{ next_session.radius }}m
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Live countdown -->
+                    <div
+                        class="glass-card rounded-2xl p-3 sm:p-4 border border-white/10 mb-3 sm:mb-4"
+                    >
+                        <div
+                            class="flex items-center justify-between mb-2 flex-wrap gap-2"
+                        >
+                            <p
+                                id="next-class-caption"
+                                class="text-xs sm:text-sm font-black text-indigo-400 uppercase tracking-wide"
+                            >
+                                ⏳ Loading time…
+                            </p>
+                            {% if next_session.status_label == 'Active' and not next_session.has_attended %}
+                            <a
+                                href="/student/mark-attendance/{{ next_session.id }}"
+                                class="px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm"
+                            >
+                                <i class="fas fa-camera mr-1 sm:mr-2"></i>Mark
+                                Attendance →
+                            </a>
+                            {% elif next_session.status_label == 'Upcoming' %}
+                            <span
+                                class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 text-xs sm:text-sm font-black border border-indigo-500/30"
+                            >
+                                <i class="fas fa-hourglass-half mr-1"></i>Arrive
+                                Early!
+                            </span>
+                            {% elif next_session.has_attended %}
+                            <span
+                                class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 text-xs sm:text-sm font-black border border-emerald-500/30"
+                            >
+                                <i class="fas fa-check-double mr-1"></i>Already
+                                Marked ✅
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div
+                            id="next-class-countdown"
+                            class="text-2xl sm:text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-white"
+                        >
+                            --:--:--
+                        </div>
+                    </div>
+
+                    <!-- Directions buttons -->
+                    {% if next_session.latitude and next_session.longitude %}
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <span
+                            class="text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-wide mr-1"
+                            >🚀 Navigate:</span
+                        >
+                        <a
+                            href="https://www.google.com/maps/dir/?api=1&destination={{ next_session.latitude }},{{ next_session.longitude }}&dir_action=navigate&travelmode=walking"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-blue-600 text-white text-[10px] sm:text-xs sm:text-sm font-black hover:bg-blue-700 shadow-md transition-all"
+                        >
+                            <i class="fab fa-google text-xs"></i
+                            ><span class="hidden sm:inline">Google Maps</span>
+                        </a>
+                        <a
+                            href="https://www.waze.com/ul?ll={{ next_session.latitude }},{{ next_session.longitude }}&navigate=yes"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-cyan-600 text-white text-[10px] sm:text-xs sm:text-sm font-black hover:bg-cyan-700 shadow-md transition-all"
+                        >
+                            <i class="fas fa-route text-xs"></i
+                            ><span class="hidden sm:inline">Waze</span>
+                        </a>
+                        <a
+                            href="/student/mark-attendance/{{ next_session.id }}"
+                            class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white/10 text-white text-[10px] sm:text-xs sm:text-sm font-black hover:bg-white/20 border border-white/20 shadow-sm transition-all"
+                        >
+                            <i class="fas fa-expand text-xs"></i
+                            ><span class="hidden sm:inline">Open Live Map</span>
+                        </a>
+                    </div>
+                    {% endif %} {% if next_session.notes %}
+                    <div
+                        class="mt-3 sm:mt-4 p-2 sm:p-3 rounded-2xl bg-amber-500/20 border border-amber-500/30"
+                    >
+                        <p
+                            class="text-[10px] sm:text-xs font-black text-amber-400 uppercase tracking-wide mb-1"
+                        >
+                            <i class="fas fa-sticky-note mr-1"></i>Lecturer's
+                            Note
+                        </p>
+                        <p class="text-xs sm:text-sm text-amber-200 italic">
+                            "{{ next_session.notes }}"
+                        </p>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="text-center py-8 sm:py-12">
-                <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-white/10 flex items-center justify-center">
-                    <i class="fas fa-calendar-times text-xl sm:text-2xl text-gray-500"></i>
+
+                <!-- RIGHT: mini map -->
+                <div class="lg:col-span-2 relative bg-white/5">
+                    {% if next_session.latitude and next_session.longitude %}
+                    <div
+                        id="next-class-minimap"
+                        class="mini-map w-full h-full min-h-[200px] sm:min-h-[280px] lg:min-h-[420px] rounded-none"
+                    ></div>
+                    {% else %}
+                    <div
+                        class="w-full h-full min-h-[200px] sm:min-h-[280px] lg:min-h-[420px] flex flex-col items-center justify-center text-gray-500 p-4 sm:p-6"
+                    >
+                        <i
+                            class="fas fa-map-marker-slash text-3xl sm:text-5xl mb-2 sm:mb-3 text-gray-600"
+                        ></i>
+                        <p class="font-bold text-xs sm:text-sm">
+                            No GPS location published for this session yet.
+                        </p>
+                        <p class="text-[10px] sm:text-xs mt-1">
+                            Ask your lecturer to enable geofencing.
+                        </p>
+                    </div>
+                    {% endif %}
                 </div>
-                <p class="font-black text-gray-400 text-sm sm:text-base">No sessions yet</p>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">Enroll in courses and wait for lecturers to create check-ins.</p>
             </div>
-            {% endif %}
         </div>
+        {% endif %}
 
-        <!-- Quick actions -->
-        <div class="glass-card rounded-2xl shadow-xl p-4 sm:p-6 border border-white/10 card-hover">
-            <h2 class="text-lg sm:text-xl font-black text-white mb-4 sm:mb-5">
-                <i class="fas fa-bolt text-indigo-400 mr-2"></i>Quick Actions
-            </h2>
-            <div class="space-y-2 sm:space-y-3">
-                <a href="/student_courses" class="flex items-center p-3 sm:p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20 transition-all group">
-                    <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0">
-                        <i class="fas fa-book-open text-white text-sm"></i>
-                    </div>
+        <!-- ======= QUICK STATS ======= -->
+        <div
+            class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 mb-6 sm:mb-8"
+        >
+            <div
+                class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover"
+            >
+                <div class="flex items-center justify-between">
                     <div>
-                        <p class="font-black text-white text-sm sm:text-base">Browse Courses</p>
-                        <p class="text-[10px] sm:text-xs text-gray-400">Enroll or review your classes</p>
+                        <p
+                            class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1"
+                        >
+                            Courses Enrolled
+                        </p>
+                        <p
+                            class="text-2xl sm:text-3xl font-black gradient-text"
+                        >
+                            {{ enrolled_courses_count }}
+                        </p>
                     </div>
-                </a>
-                <a href="/student/view-attendance/" class="flex items-center p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
-                    <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0">
-                        <i class="fas fa-chart-line text-white text-sm"></i>
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
+                    >
+                        <i class="fas fa-book-open text-lg sm:text-2xl"></i>
                     </div>
-                    <div>
-                        <p class="font-black text-white text-sm sm:text-base">Full Attendance History</p>
-                        <p class="text-[10px] sm:text-xs text-gray-400">See every session + maps</p>
-                    </div>
-                </a>
-                <a href="/student/settings/" class="flex items-center p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
-                    <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0">
-                        <i class="fas fa-camera text-white text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="font-black text-white text-sm sm:text-base">Upload Face Photo</p>
-                        <p class="text-[10px] sm:text-xs text-gray-400">Verify your profile image</p>
-                    </div>
-                </a>
-                <a href="/student/profile" class="flex items-center p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
-                    <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0">
-                        <i class="fas fa-user text-white text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="font-black text-white text-sm sm:text-base">My Profile</p>
-                        <p class="text-[10px] sm:text-xs text-gray-400">Edit matric / department</p>
-                    </div>
-                </a>
+                </div>
+                <p
+                    class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold"
+                >
+                    Stay registered via Courses page
+                </p>
             </div>
-
-            <div class="mt-4 sm:mt-6 p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20">
-                <p class="text-[10px] sm:text-xs font-black text-indigo-300 uppercase tracking-wide mb-2">💡 ClassMillia Pro Tip</p>
-                <p class="text-sm text-gray-300 font-semibold leading-relaxed">
-                    Always arrive at least <strong class="text-white">5 minutes early</strong>, walk inside the geofence circle, and find a seat before opening your camera. Face recognition works best in bright, even light!
+            <div
+                class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover"
+            >
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p
+                            class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1"
+                        >
+                            Attendance Rate
+                        </p>
+                        <p
+                            class="text-2xl sm:text-3xl font-black gradient-text"
+                        >
+                            {{ attendance_rate_pct }}<span
+                                class="text-lg sm:text-xl"
+                                >%</span
+                            >
+                        </p>
+                    </div>
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center"
+                    >
+                        <i class="fas fa-chart-pie text-lg sm:text-2xl"></i>
+                    </div>
+                </div>
+                <p
+                    class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold"
+                >
+                    {{ total_attended }}/{{ total_eligible }} sessions you've
+                    marked.
+                </p>
+                <!-- Progress bar -->
+                <div class="mt-3 bg-white/10 rounded-full h-2">
+                    <div
+                        class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full h-2"
+                        style="width:{{ attendance_rate_pct }}%"
+                    ></div>
+                </div>
+            </div>
+            <div
+                class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover"
+            >
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p
+                            class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1"
+                        >
+                            Active Sessions
+                        </p>
+                        <p
+                            class="text-2xl sm:text-3xl font-black gradient-text"
+                        >
+                            {{ active_count }}
+                        </p>
+                    </div>
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center"
+                    >
+                        <i class="fas fa-bolt text-lg sm:text-2xl"></i>
+                    </div>
+                </div>
+                <p
+                    class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold"
+                >
+                    Open right now for check-in
+                </p>
+            </div>
+            <div
+                class="stat-card rounded-2xl p-3 sm:p-4 md:p-5 text-white shadow-xl card-hover"
+            >
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p
+                            class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wide mb-1"
+                        >
+                            Upcoming Next
+                        </p>
+                        <p
+                            class="text-2xl sm:text-3xl font-black gradient-text"
+                        >
+                            {{ upcoming_count }}
+                        </p>
+                    </div>
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center"
+                    >
+                        <i class="fas fa-calendar-plus text-lg sm:text-2xl"></i>
+                    </div>
+                </div>
+                <p
+                    class="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-semibold"
+                >
+                    Scheduled in the future
                 </p>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Leaflet assets already loaded via base (in case base needs them); include here if not -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    // ===== Hero countdown =====
-    {% if next_session %}
-    (function () {
-        const START = new Date("{{ next_session.start_time_iso }}");
-        const END   = new Date("{{ next_session.end_time_iso }}");
-        const timerEl = document.getElementById('next-class-countdown');
-        const capEl = document.getElementById('next-class-caption');
-        const heroEl = document.getElementById('next-class-hero');
+        <!-- ======= MAIN GRID ======= -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            <!-- Sessions table -->
+            <div
+                class="lg:col-span-2 glass-card rounded-2xl shadow-xl p-4 sm:p-6 border border-white/10 card-hover"
+            >
+                <div
+                    class="flex items-center justify-between mb-4 sm:mb-5 flex-wrap gap-3"
+                >
+                    <h2
+                        class="text-lg sm:text-xl font-black text-white flex items-center"
+                    >
+                        <i class="fas fa-calendar-week text-indigo-400 mr-2"></i
+                        >Recent & Upcoming Classes
+                    </h2>
+                    <a
+                        href="/student/view-attendance/"
+                        class="px-4 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 text-sm font-black hover:bg-indigo-500/30 border border-indigo-500/30 transition-all"
+                    >
+                        View All Sessions →
+                    </a>
+                </div>
 
-        function fmt(ms) {
-            const s = Math.max(0, Math.floor(ms / 1000));
-            const h = String(Math.floor(s / 3600)).padStart(2, '0');
-            const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-            const sec = String(s % 60).padStart(2, '0');
-            return `${h}:${m}:${sec}`;
-        }
-
-        function tick() {
-            const now = new Date();
-            if (now < START) {
-                timerEl.textContent = fmt(START - now);
-                timerEl.className = timerEl.className.replace(/text-\S+/g, '') + ' text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-indigo-700';
-                capEl.textContent = '⏳ Time until session starts (arrive early!)';
-            } else if (now <= END) {
-                timerEl.textContent = fmt(END - now);
-                timerEl.className = timerEl.className.replace(/text-\S+/g, '') + ' text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-emerald-700';
-                const pct = Math.max(0, Math.min(1, (END - now) / Math.max(1, END - START)));
-                if (pct > 0.3)      capEl.textContent = '🔥 Window open — go mark your attendance!';
-                else if (pct > 0.1) capEl.textContent = '⚠️ Hurry — check-in window is closing soon…';
-                else                 capEl.textContent = '🚨 LAST CALL — attendance closes in moments!';
-            } else {
-                timerEl.textContent = '00:00:00';
-                timerEl.className = timerEl.className.replace(/text-\S+/g, '') + ' text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-red-600';
-                capEl.textContent = '🔴 Session ended';
-            }
-        }
-        tick();
-        setInterval(tick, 1000);
-
-        // ===== Hero minimap =====
-        const lat = {{ next_session.latitude|default:0 }};
-        const lon = {{ next_session.longitude|default:0 }};
-        const radius = {{ next_session.radius|default:100 }};
-        const hall = "{{ next_session.hall|default:'Lecture Hall'|escapejs }}";
-        const container = document.getElementById('next-class-minimap');
-        if (lat && lon && container) {
-            const m = L.map(container, { zoomControl: true, attributionControl: true }).setView([lat, lon], 17);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(m);
-
-            const customIcon = L.divIcon({
-                className: '',
-                html: `<div style="transform: translate(-50%, -100%);">
-                    <div style="background:#4f46e5;color:#fff;border:3px solid #fff;border-radius:50% 50% 50% 0;padding:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);box-shadow:0 10px 25px rgba(79,70,229,0.4);">
-                        <i class="fas fa-graduation-cap" style="transform:rotate(45deg);font-size:16px;"></i>
+                {% if attendances %}
+                <div class="space-y-2 sm:space-y-3">
+                    {% for att in attendances|slice:":6" %}
+                    <div
+                        class="flex flex-col sm:flex-row sm:items-start justify-between p-3 sm:p-4 rounded-2xl bg-white/5 hover:bg-white/10 hover:shadow-md hover:border-indigo-500/30 border border-white/10 transition-all gap-3"
+                    >
+                        <div class="flex-1 min-w-0">
+                            <div
+                                class="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-1.5 sm:mb-2"
+                            >
+                                <h3
+                                    class="font-black text-white text-sm sm:text-base truncate"
+                                >
+                                    {{ att.course.course_title }}
+                                </h3>
+                                <span
+                                    class="px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[10px] font-black rounded-full bg-{{ att.status_color }}-500/20 text-{{ att.status_color }}-300 uppercase tracking-wide border border-{{ att.status_color }}-500/30"
+                                >
+                                    {{ att.status_label }}
+                                </span>
+                                {% if att.has_attended %}
+                                <span
+                                    class="px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[10px] font-black rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                >
+                                    ✅ Marked
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div
+                                class="flex items-center gap-2 sm:gap-4 flex-wrap text-[10px] sm:text-xs text-gray-400"
+                            >
+                                <span
+                                    class="inline-flex items-center font-semibold"
+                                >
+                                    <i
+                                        class="fas fa-clock text-indigo-400 mr-1"
+                                    ></i
+                                    >{{ att.formatted_start|slice:"11:16" }} –
+                                    {{ att.formatted_end|slice:"11:16" }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center font-semibold"
+                                >
+                                    <i
+                                        class="fas fa-building text-indigo-400 mr-1"
+                                    ></i
+                                    >{{ att.hall }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center font-semibold"
+                                >
+                                    <i
+                                        class="fas fa-calendar-day text-indigo-400 mr-1"
+                                    ></i
+                                    >{{ att.formatted_start|slice:":11" }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center font-semibold"
+                                >
+                                    <i
+                                        class="fas fa-users text-indigo-400 mr-1"
+                                    ></i
+                                    >{{ att.attendance_count }}
+                                </span>
+                            </div>
+                        </div>
+                        <div
+                            class="flex flex-row sm:flex-col items-end gap-1.5 sm:gap-2 sm:ml-3"
+                        >
+                            {% if att.status_label == 'Active' and not att.has_attended %}
+                            <a
+                                href="/student/mark-attendance/{{ att.id }}"
+                                class="px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:shadow-md text-[10px] sm:text-xs font-black transition-all whitespace-nowrap"
+                            >
+                                <i class="fas fa-camera mr-1"></i>Mark Now
+                            </a>
+                            {% elif att.status_label == 'Upcoming' %}
+                            <div class="flex items-center gap-1.5 sm:gap-2">
+                                {% if att.latitude and att.longitude %}
+                                <a
+                                    href="https://www.google.com/maps/dir/?api=1&destination={{ att.latitude }},{{ att.longitude }}&dir_action=navigate&travelmode=walking"
+                                    target="_blank"
+                                    title="Directions"
+                                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center hover:bg-blue-500/30 transition-all"
+                                >
+                                    <i class="fab fa-google text-xs"></i>
+                                </a>
+                                {% endif %}
+                                <span
+                                    class="px-2 sm:px-3 py-1 sm:py-1.5 bg-indigo-500/20 text-indigo-300 rounded-xl text-[10px] sm:text-xs font-black border border-indigo-500/30 whitespace-nowrap"
+                                >
+                                    <i class="fas fa-hourglass-half mr-1"></i
+                                    >Upcoming
+                                </span>
+                            </div>
+                            {% elif att.has_attended %}
+                            <span
+                                class="px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-500/20 text-emerald-300 rounded-xl text-[10px] sm:text-xs font-black border border-emerald-500/30 whitespace-nowrap"
+                            >
+                                <i class="fas fa-check mr-1"></i>Present
+                            </span>
+                            {% else %}
+                            <span
+                                class="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-500/20 text-red-300 rounded-xl text-[10px] sm:text-xs font-black border border-red-500/30 whitespace-nowrap"
+                            >
+                                <i class="fas fa-xmark mr-1"></i>Missed
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>`,
-                iconSize: [40, 52], iconAnchor: [20, 52],
-            });
-            L.marker([lat, lon], { icon: customIcon }).addTo(m)
-                .bindPopup(`<div class="text-center"><p class="font-black text-indigo-700">🏫 ${hall}</p><p class="text-xs text-gray-500">{{ next_session.course.course_code }}</p></div>`)
-                .openPopup();
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 sm:py-12">
+                    <div
+                        class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-white/10 flex items-center justify-center"
+                    >
+                        <i
+                            class="fas fa-calendar-times text-xl sm:text-2xl text-gray-500"
+                        ></i>
+                    </div>
+                    <p class="font-black text-gray-400 text-sm sm:text-base">
+                        No sessions yet
+                    </p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">
+                        Enroll in courses and wait for lecturers to create
+                        check-ins.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
 
-            L.circle([lat, lon], {
-                color: '{% if next_session.status_label == "Active" %}#10b981{% elif next_session.status_label == "Upcoming" %}#6366f1{% else %}#ef4444{% endif %}',
-                fillColor: '{% if next_session.status_label == "Active" %}#10b981{% elif next_session.status_label == "Upcoming" %}#6366f1{% else %}#ef4444{% endif %}',
-                fillOpacity: 0.14, weight: 2, radius: radius, dashArray: '5 4'
-            }).addTo(m);
+            <!-- Quick actions -->
+            <div
+                class="glass-card rounded-2xl shadow-xl p-4 sm:p-6 border border-white/10 card-hover"
+            >
+                <h2
+                    class="text-lg sm:text-xl font-black text-white mb-4 sm:mb-5"
+                >
+                    <i class="fas fa-bolt text-indigo-400 mr-2"></i>Quick
+                    Actions
+                </h2>
+                <div class="space-y-2 sm:space-y-3">
+                    <a
+                        href="/student_courses"
+                        class="flex items-center p-3 sm:p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20 transition-all group"
+                    >
+                        <div
+                            class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0"
+                        >
+                            <i class="fas fa-book-open text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="font-black text-white text-sm sm:text-base"
+                            >
+                                Browse Courses
+                            </p>
+                            <p class="text-[10px] sm:text-xs text-gray-400">
+                                Enroll or review your classes
+                            </p>
+                        </div>
+                    </a>
+                    <a
+                        href="/student/view-attendance/"
+                        class="flex items-center p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
+                    >
+                        <div
+                            class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0"
+                        >
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="font-black text-white text-sm sm:text-base"
+                            >
+                                Full Attendance History
+                            </p>
+                            <p class="text-[10px] sm:text-xs text-gray-400">
+                                See every session + maps
+                            </p>
+                        </div>
+                    </a>
+                    <a
+                        href="/student/settings/"
+                        class="flex items-center p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
+                    >
+                        <div
+                            class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0"
+                        >
+                            <i class="fas fa-camera text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="font-black text-white text-sm sm:text-base"
+                            >
+                                Upload Face Photo
+                            </p>
+                            <p class="text-[10px] sm:text-xs text-gray-400">
+                                Verify your profile image
+                            </p>
+                        </div>
+                    </a>
+                    <a
+                        href="/student/profile"
+                        class="flex items-center p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
+                    >
+                        <div
+                            class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0"
+                        >
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="font-black text-white text-sm sm:text-base"
+                            >
+                                My Profile
+                            </p>
+                            <p class="text-[10px] sm:text-xs text-gray-400">
+                                Edit matric / department
+                            </p>
+                        </div>
+                    </a>
+                    <a
+                        href="/millialms/student/"
+                        class="flex items-center p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-rose-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-rose-500/20 transition-all group"
+                    >
+                        <div
+                            class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-amber-500 to-rose-500 flex items-center justify-center mr-3 sm:mr-4 group-hover:scale-110 transition-transform shadow-md shrink-0"
+                        >
+                            <i
+                                class="fas fa-clipboard-check text-white text-sm"
+                            ></i>
+                        </div>
+                        <div>
+                            <p
+                                class="font-black text-white text-sm sm:text-base"
+                            >
+                                MilliaLMS Assessments
+                            </p>
+                            <p class="text-[10px] sm:text-xs text-gray-400">
+                                Quizzes, tests, instant scores
+                            </p>
+                        </div>
+                    </a>
+                </div>
 
-            m.fitBounds(L.latLng([lat, lon]).toBounds(radius * 3.5), { padding: [40, 40] });
-        }
-    })();
-    {% endif %}
-</script>
-{% endblock content %}
+                <div
+                    class="mt-4 sm:mt-6 p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20"
+                >
+                    <p
+                        class="text-[10px] sm:text-xs font-black text-indigo-300 uppercase tracking-wide mb-2"
+                    >
+                        💡 ClassMillia Pro Tip
+                    </p>
+                    <p
+                        class="text-sm text-gray-300 font-semibold leading-relaxed"
+                    >
+                        Always arrive at least
+                        <strong class="text-white">5 minutes early</strong>,
+                        walk inside the geofence circle, and find a seat before
+                        opening your camera. Face recognition works best in
+                        bright, even light!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet assets already loaded via base (in case base needs them); include here if not -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ===== Hero countdown =====
+        {% if next_session %}
+        (function () {
+            const START = new Date("{{ next_session.start_time_iso }}");
+            const END   = new Date("{{ next_session.end_time_iso }}");
+            const timerEl = document.getElementById('next-class-countdown');
+            const capEl = document.getElementById('next-class-caption');
+            const heroEl = document.getElementById('next-class-hero');
+
+            function fmt(ms) {
+                const s = Math.max(0, Math.floor(ms / 1000));
+                const h = String(Math.floor(s / 3600)).padStart(2, '0');
+                const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+                const sec = String(s % 60).padStart(2, '0');
+                return `${h}:${m}:${sec}`;
+            }
+
+            function tick() {
+                const now = new Date();
+                if (now < START) {
+                    timerEl.textContent = fmt(START - now);
+                    timerEl.className = timerEl.className.replace(/text-\S+/g, '') + ' text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-indigo-700';
+                    capEl.textContent = '⏳ Time until session starts (arrive early!)';
+                } else if (now <= END) {
+                    timerEl.textContent = fmt(END - now);
+                    timerEl.className = timerEl.className.replace(/text-\S+/g, '') + ' text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-emerald-700';
+                    const pct = Math.max(0, Math.min(1, (END - now) / Math.max(1, END - START)));
+                    if (pct > 0.3)      capEl.textContent = '🔥 Window open — go mark your attendance!';
+                    else if (pct > 0.1) capEl.textContent = '⚠️ Hurry — check-in window is closing soon…';
+                    else                 capEl.textContent = '🚨 LAST CALL — attendance closes in moments!';
+                } else {
+                    timerEl.textContent = '00:00:00';
+                    timerEl.className = timerEl.className.replace(/text-\S+/g, '') + ' text-3xl lg:text-4xl font-black font-mono tracking-tight countdown-cell text-red-600';
+                    capEl.textContent = '🔴 Session ended';
+                }
+            }
+            tick();
+            setInterval(tick, 1000);
+
+            // ===== Hero minimap =====
+            const lat = {{ next_session.latitude|default:0 }};
+            const lon = {{ next_session.longitude|default:0 }};
+            const radius = {{ next_session.radius|default:100 }};
+            const hall = "{{ next_session.hall|default:'Lecture Hall'|escapejs }}";
+            const container = document.getElementById('next-class-minimap');
+            if (lat && lon && container) {
+                const m = L.map(container, { zoomControl: true, attributionControl: true }).setView([lat, lon], 17);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(m);
+
+                const customIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="transform: translate(-50%, -100%);">
+                        <div style="background:#4f46e5;color:#fff;border:3px solid #fff;border-radius:50% 50% 50% 0;padding:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);box-shadow:0 10px 25px rgba(79,70,229,0.4);">
+                            <i class="fas fa-graduation-cap" style="transform:rotate(45deg);font-size:16px;"></i>
+                        </div>
+                    </div>`,
+                    iconSize: [40, 52], iconAnchor: [20, 52],
+                });
+                L.marker([lat, lon], { icon: customIcon }).addTo(m)
+                    .bindPopup(`<div class="text-center"><p class="font-black text-indigo-700">🏫 ${hall}</p><p class="text-xs text-gray-500">{{ next_session.course.course_code }}</p></div>`)
+                    .openPopup();
+
+                L.circle([lat, lon], {
+                    color: '{% if next_session.status_label == "Active" %}#10b981{% elif next_session.status_label == "Upcoming" %}#6366f1{% else %}#ef4444{% endif %}',
+                    fillColor: '{% if next_session.status_label == "Active" %}#10b981{% elif next_session.status_label == "Upcoming" %}#6366f1{% else %}#ef4444{% endif %}',
+                    fillOpacity: 0.14, weight: 2, radius: radius, dashArray: '5 4'
+                }).addTo(m);
+
+                m.fitBounds(L.latLng([lat, lon]).toBounds(radius * 3.5), { padding: [40, 40] });
+            }
+        })();
+        {% endif %}
+    </script>
+    {% endblock content %}
+</div>

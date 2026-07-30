@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <!-- Leaflet.js Map Assets -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
@@ -12,47 +12,64 @@
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .gradient-text {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-    
+
     .card-hover {
         transition: all 0.3s ease;
     }
-    
+
     .card-hover:hover {
         transform: translateY(-5px);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     }
-    
+
     .pulse-glow {
         animation: pulse-glow 2s ease-in-out infinite;
     }
-    
+
     @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-        50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+        0%,
+        100% {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+        }
     }
-    
+
     .float-animation {
         animation: float 6s ease-in-out infinite;
     }
-    
+
     @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
     }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+<div
+    class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+>
     <!-- Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
-        <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
+        <div
+            class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
+        ></div>
+        <div
+            class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
+            style="animation-delay: 2s"
+        ></div>
     </div>
 
     <div class="relative p-4 sm:p-6 lg:p-8">
@@ -61,22 +78,33 @@
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">
-                        Welcome back, {{ lecturer.academic_rank|default:'Dr.' }} {{ user.get_full_name|default:user.username }} 👋
+                        Welcome back, {{ lecturer.academic_rank|default:'Dr.' }}
+                        {{ user.get_full_name|default:user.username }} 👋
                     </h1>
                     <p class="text-sm sm:text-base text-gray-400">
                         Server time (Lagos/WAT):
-                        <span class="font-mono font-bold text-indigo-400">{{ server_now_lagos }}</span>
+                        <span class="font-mono font-bold text-indigo-400"
+                            >{{ server_now_lagos }}</span
+                        >
                     </p>
                 </div>
                 <div class="flex items-center space-x-3 sm:space-x-4">
-                    <div class="hidden md:flex items-center gap-2 px-3 sm:px-4 py-2 glass-card rounded-xl border border-white/10">
+                    <div
+                        class="hidden md:flex items-center gap-2 px-3 sm:px-4 py-2 glass-card rounded-xl border border-white/10"
+                    >
                         <i class="fas fa-bolt text-indigo-400"></i>
                         <div class="text-xs">
-                            <p class="font-black text-indigo-300 uppercase tracking-wide">Live Mode</p>
+                            <p
+                                class="font-black text-indigo-300 uppercase tracking-wide"
+                            >
+                                Live Mode
+                            </p>
                             <p class="text-indigo-400">Sessions auto-refresh</p>
                         </div>
                     </div>
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg shadow-lg">
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg shadow-lg"
+                    >
                         {{ user.username|first|upper }}
                     </div>
                 </div>
@@ -87,9 +115,13 @@
         {% if messages %}
         <div class="mb-6 space-y-2">
             {% for message in messages %}
-            <div class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-300 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-300 border border-blue-500/30{% endif %}">
+            <div
+                class="px-4 py-3 rounded-xl {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-300 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-300 border border-blue-500/30{% endif %}"
+            >
                 <div class="flex items-center">
-                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                    <i
+                        class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"
+                    ></i>
                     {{ message }}
                 </div>
             </div>
@@ -97,426 +129,904 @@
         </div>
         {% endif %}
 
-    <!-- =============== HERO "NEXT CLASS" WIDGET =============== -->
-    {% if next_session %}
-    <div class="glass-card rounded-3xl shadow-2xl border border-white/10 overflow-hidden mb-6 sm:mb-8">
-        <div class="grid grid-cols-1 lg:grid-cols-5">
-            <!-- Left: Hero info -->
-            <div class="lg:col-span-3 p-6 sm:p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 text-white relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-60 sm:w-80 h-60 sm:h-80 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4"></div>
-                <div class="absolute bottom-0 left-0 w-48 sm:w-60 h-48 sm:h-60 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/4"></div>
+        <!-- =============== HERO "NEXT CLASS" WIDGET =============== -->
+        {% if next_session %}
+        <div
+            class="glass-card rounded-3xl shadow-2xl border border-white/10 overflow-hidden mb-6 sm:mb-8"
+        >
+            <div class="grid grid-cols-1 lg:grid-cols-5">
+                <!-- Left: Hero info -->
+                <div
+                    class="lg:col-span-3 p-6 sm:p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 text-white relative overflow-hidden"
+                >
+                    <div
+                        class="absolute top-0 right-0 w-60 sm:w-80 h-60 sm:h-80 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4"
+                    ></div>
+                    <div
+                        class="absolute bottom-0 left-0 w-48 sm:w-60 h-48 sm:h-60 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/4"
+                    ></div>
 
-                <div class="relative z-10">
-                    <div class="flex flex-wrap items-center gap-2 mb-4">
-                        {% if next_session.status_label == 'Active' %}
-                        <span class="px-2 sm:px-3 py-1 rounded-full bg-red-500 text-white text-[10px] sm:text-xs font-black uppercase tracking-wide animate-pulse shadow-lg">
-                            <i class="fas fa-circle text-[6px] sm:text-[8px] mr-1"></i>Happening NOW
-                        </span>
-                        {% else %}
-                        <span class="px-2 sm:px-3 py-1 rounded-full bg-white/20 backdrop-blur text-white text-[10px] sm:text-xs font-black uppercase tracking-wide">
-                            <i class="fas fa-hourglass-half mr-1.5"></i>Next Up
-                        </span>
-                        {% endif %}
-                        <span class="px-2 sm:px-3 py-1 rounded-full bg-white/15 backdrop-blur text-white text-[10px] sm:text-xs font-bold">
-                            ID: #{{ next_session.id }}
-                        </span>
-                    </div>
+                    <div class="relative z-10">
+                        <div class="flex flex-wrap items-center gap-2 mb-4">
+                            {% if next_session.status_label == 'Active' %}
+                            <span
+                                class="px-2 sm:px-3 py-1 rounded-full bg-red-500 text-white text-[10px] sm:text-xs font-black uppercase tracking-wide animate-pulse shadow-lg"
+                            >
+                                <i
+                                    class="fas fa-circle text-[6px] sm:text-[8px] mr-1"
+                                ></i
+                                >Happening NOW
+                            </span>
+                            {% else %}
+                            <span
+                                class="px-2 sm:px-3 py-1 rounded-full bg-white/20 backdrop-blur text-white text-[10px] sm:text-xs font-black uppercase tracking-wide"
+                            >
+                                <i class="fas fa-hourglass-half mr-1.5"></i>Next
+                                Up
+                            </span>
+                            {% endif %}
+                            <span
+                                class="px-2 sm:px-3 py-1 rounded-full bg-white/15 backdrop-blur text-white text-[10px] sm:text-xs font-bold"
+                            >
+                                ID: #{{ next_session.id }}
+                            </span>
+                        </div>
 
-                    <p class="text-white/70 text-[10px] sm:text-xs uppercase tracking-widest font-black mb-1">{{ next_session.course.course_code }}</p>
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 sm:mb-6 leading-tight">
-                        {{ next_session.course.course_title }}
-                    </h2>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
-                        <div class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10">
-                            <p class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1">Hall</p>
-                            <p class="text-white font-black text-xs sm:text-sm truncate">
-                                <i class="fas fa-building mr-1"></i>{{ next_session.lecture_hall }}
-                            </p>
-                        </div>
-                        <div class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10">
-                            <p class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1">Window</p>
-                            <p class="text-white font-bold text-[10px] sm:text-xs">
-                                {{ next_session.start_time|date:"M d" }}<br>
-                                <span class="font-mono">{{ next_session.start_time|date:"H:i" }}–{{ next_session.end_time|date:"H:i" }}</span>
-                            </p>
-                        </div>
-                        <div class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10">
-                            <p class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1">Fence</p>
-                            <p class="text-white font-black text-xs sm:text-sm">
-                                <i class="fas fa-compress-arrows-alt mr-1"></i>{{ next_session.radius }}m
-                            </p>
-                        </div>
-                        <div class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10">
-                            <p class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1">Checked In</p>
-                            <p class="text-white font-black text-xs sm:text-sm">
-                                <i class="fas fa-users mr-1"></i>{{ next_session.marked_count }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Big Countdown Box -->
-                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/15 mb-4 sm:mb-6">
-                        <p class="text-white/80 text-[10px] sm:text-xs uppercase tracking-widest font-black mb-2 flex items-center gap-1.5">
-                            <i class="fas fa-stopwatch"></i>
-                            {% if next_session.status_label == 'Active' %}Time Remaining{% else %}Starts In{% endif %}
+                        <p
+                            class="text-white/70 text-[10px] sm:text-xs uppercase tracking-widest font-black mb-1"
+                        >
+                            {{ next_session.course.course_code }}
                         </p>
-                        <div id="hero-countdown" class="text-white font-black text-3xl sm:text-4xl md:text-5xl font-mono tracking-tight mb-1">
-                            --:--:--
-                        </div>
-                        <p id="hero-countdown-caption" class="text-white/70 text-[10px] sm:text-xs font-semibold">Calculating…</p>
-                    </div>
+                        <h2
+                            class="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 sm:mb-6 leading-tight"
+                        >
+                            {{ next_session.course.course_title }}
+                        </h2>
 
-                    {% if next_session.notes %}
-                    <div class="bg-amber-400/20 backdrop-blur rounded-xl p-3 sm:p-4 border border-amber-300/30 mb-4 sm:mb-6">
-                        <p class="text-amber-100 text-[10px] sm:text-xs uppercase font-black tracking-wider mb-1">
-                            <i class="fas fa-sticky-note mr-1"></i>Your Note
-                        </p>
-                        <p class="text-white italic text-sm">"{{ next_session.notes }}"</p>
-                    </div>
-                    {% endif %}
-
-                    <!-- CTA Buttons -->
-                    <div class="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-5">
-                        <a href="/lecturer/session/{{ next_session.id }}/" class="inline-flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-white text-indigo-700 rounded-xl font-black shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all text-sm sm:text-base">
-                            <i class="fas fa-chart-line"></i>
-                            {% if next_session.status_label == 'Active' %}Monitor Live{% else %}Open Session{% endif %}
-                        </a>
-                        {% if next_session.status_label == 'Active' %}
-                        <a href="{% url 'close_session_early' next_session.id %}" onclick="return confirmCloseHero(event)" class="inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 bg-red-500/90 backdrop-blur text-white rounded-xl font-bold shadow-lg hover:bg-red-600 transition-all text-sm sm:text-base">
-                            <i class="fas fa-times-circle"></i>End Early
-                        </a>
-                        {% endif %}
-                    </div>
-
-                    <!-- Directions buttons -->
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="openDirections('google', {{ next_session.latitude|default:0 }}, {{ next_session.longitude|default:0 }})" class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-500/90 backdrop-blur text-white rounded-xl font-bold text-xs sm:text-sm shadow-md hover:bg-blue-600 transition-all">
-                            <i class="fab fa-google"></i>Google Maps
-                        </button>
-                        <button onclick="openDirections('waze', {{ next_session.latitude|default:0 }}, {{ next_session.longitude|default:0 }})" class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 bg-cyan-500/90 backdrop-blur text-white rounded-xl font-bold text-xs sm:text-sm shadow-md hover:bg-cyan-600 transition-all">
-                            <i class="fas fa-route"></i>Waze
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right: Hero Mini-Map -->
-            <div class="lg:col-span-2 p-4 sm:p-6 flex flex-col bg-gradient-to-br from-gray-800 to-gray-900">
-                <div class="flex items-center justify-between mb-3">
-                    <p class="text-xs sm:text-sm font-black text-white uppercase tracking-wide">
-                        <i class="fas fa-map-marked-alt text-indigo-400 mr-1.5"></i>Venue Preview
-                    </p>
-                    <span class="text-[8px] sm:text-[10px] font-bold text-gray-500">OpenStreetMap</span>
-                </div>
-                <div id="hero-mini-map" class="w-full flex-1 min-h-[200px] sm:min-h-[280px] rounded-2xl border border-white/10 overflow-hidden shadow-inner bg-gray-800 z-10"></div>
-                <div class="mt-3 grid grid-cols-3 gap-2 text-[10px] sm:text-xs">
-                    <div class="bg-white/5 rounded-xl p-2 sm:p-2.5 border border-white/10 text-center">
-                        <p class="font-black text-indigo-300 text-[8px] sm:text-[10px] uppercase tracking-wide">Latitude</p>
-                        <p class="font-mono text-white font-bold text-[10px] sm:text-xs">{{ next_session.latitude|default:"—" }}</p>
-                    </div>
-                    <div class="bg-white/5 rounded-xl p-2 sm:p-2.5 border border-white/10 text-center">
-                        <p class="font-black text-indigo-300 text-[8px] sm:text-[10px] uppercase tracking-wide">Longitude</p>
-                        <p class="font-mono text-white font-bold text-[10px] sm:text-xs">{{ next_session.longitude|default:"—" }}</p>
-                    </div>
-                    <div class="bg-white/5 rounded-xl p-2 sm:p-2.5 border border-white/10 text-center">
-                        <p class="font-black text-indigo-300 text-[8px] sm:text-[10px] uppercase tracking-wide">Radius</p>
-                        <p class="font-mono text-white font-bold text-[10px] sm:text-xs">{{ next_session.radius }}m</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- =============== STATS CARDS =============== -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
-        <div class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
-            <div class="flex items-center justify-between mb-3">
-                <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider">Courses</p>
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                    <i class="fas fa-book text-sm"></i>
-                </div>
-            </div>
-            <p class="text-2xl sm:text-3xl font-black gradient-text">{{ lecturer.courses_taught.count }}</p>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1">Taught this semester</p>
-        </div>
-        <div class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
-            <div class="flex items-center justify-between mb-3">
-                <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider">Total Check-Ins</p>
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                    <i class="fas fa-user-check text-sm"></i>
-                </div>
-            </div>
-            <p class="text-2xl sm:text-3xl font-black text-emerald-400">{{ total_marked_all }}</p>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1">Across all sessions</p>
-        </div>
-        <div class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
-            <div class="flex items-center justify-between mb-3">
-                <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider">Active Now</p>
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-                    <i class="fas fa-circle text-[10px] sm:text-xs animate-pulse"></i>
-                </div>
-            </div>
-            <p class="text-2xl sm:text-3xl font-black text-orange-400">{{ active_count }}</p>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1">Live sessions marking</p>
-        </div>
-        <div class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10">
-            <div class="flex items-center justify-between mb-3">
-                <p class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider">Upcoming</p>
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                    <i class="fas fa-calendar-day text-sm"></i>
-                </div>
-            </div>
-            <p class="text-2xl sm:text-3xl font-black text-blue-400">{{ upcoming_count }}</p>
-            <p class="text-[10px] sm:text-xs text-gray-400 mt-1">Sessions scheduled</p>
-        </div>
-    </div>
-
-    <!-- =============== MAIN GRID =============== -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
-        <!-- Scheduled Lectures (main area) -->
-        <div class="lg:col-span-3 glass-card rounded-2xl shadow-xl border border-white/10 overflow-hidden">
-            <div class="p-4 sm:p-6 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
-                <h2 class="text-base sm:text-lg font-black text-white">
-                    <i class="fas fa-calendar-alt text-indigo-400 mr-2"></i>
-                    All Sessions
-                </h2>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button data-filter="all" class="filter-tab active px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md transition-all">
-                        <i class="fas fa-globe mr-1"></i>All
-                    </button>
-                    <button data-filter="Active" class="filter-tab px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all">
-                        🟢 Active
-                    </button>
-                    <button data-filter="Upcoming" class="filter-tab px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all">
-                        🔵 Upcoming
-                    </button>
-                    <button data-filter="Expired" class="filter-tab px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all">
-                        🔴 Past
-                    </button>
-                </div>
-            </div>
-
-            {% if scheduled_lectures %}
-            <div class="divide-y divide-white/10" id="session-list">
-                {% for class in scheduled_lectures %}
-                <div class="session-item p-4 sm:p-5 hover:bg-white/5 transition-colors"
-                     data-status="{{ class.status_label }}"
-                     data-start="{{ class.start_time_iso }}"
-                     data-end="{{ class.end_time_iso }}"
-                     data-lat="{{ class.latitude|default:0 }}"
-                     data-lon="{{ class.longitude|default:0 }}"
-                     data-hall="{{ class.lecture_hall|escapejs }}"
-                     data-id="{{ class.id }}">
-                    <div class="flex flex-col md:flex-row md:items-start gap-3 sm:gap-4">
-                        <!-- Left: Status badge + mini map -->
-                        <div class="md:w-48 shrink-0">
-                            <div class="flex md:flex-col gap-2 sm:gap-3 items-start">
-                                <div class="flex-1 md:w-full">
-                                    <span class="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-black bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">
-                                        {% if class.status_label == 'Active' %}
-                                        <i class="fas fa-circle text-[6px] sm:text-[8px] animate-pulse"></i>
-                                        {% elif class.status_label == 'Upcoming' %}
-                                        <i class="fas fa-hourglass-half text-[8px] sm:text-[10px]"></i>
-                                        {% else %}
-                                        <i class="fas fa-check-double text-[8px] sm:text-[10px]"></i>
-                                        {% endif %}
-                                        {{ class.status_label }}
-                                    </span>
-                                    <p class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider">Session #{{ class.id }}</p>
-                                </div>
-                                <div id="row-map-{{ class.id }}" class="w-32 h-24 sm:w-40 sm:h-28 md:w-full rounded-xl border border-white/10 overflow-hidden bg-gray-800 shrink-0 z-10"></div>
-                            </div>
-                        </div>
-
-                        <!-- Middle: Info -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex flex-wrap items-start justify-between gap-2 mb-2 sm:mb-3">
-                                <div class="min-w-0">
-                                    <p class="text-[10px] sm:text-xs font-black text-indigo-400 uppercase tracking-wider mb-0.5">{{ class.course.course_code }}</p>
-                                    <h3 class="font-black text-white text-base sm:text-lg truncate">{{ class.course.course_title }}</h3>
-                                </div>
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span class="px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] sm:text-xs font-bold border border-emerald-500/30">
-                                        <i class="fas fa-users mr-1"></i>{{ class.marked_count }} marked
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5 mb-3 sm:mb-4">
-                                <div class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5">
-                                    <i class="fas fa-building text-indigo-400 text-xs sm:text-sm"></i>
-                                    <div class="min-w-0">
-                                        <p class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide">Hall</p>
-                                        <p class="text-xs sm:text-sm font-bold text-white truncate">{{ class.lecture_hall }}</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5">
-                                    <i class="fas fa-clock text-indigo-400 text-xs sm:text-sm"></i>
-                                    <div class="min-w-0">
-                                        <p class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide">Date</p>
-                                        <p class="text-xs sm:text-sm font-bold text-white">{{ class.start_time|date:"M d, Y" }}</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5">
-                                    <i class="fas fa-hourglass-start text-indigo-400 text-xs sm:text-sm"></i>
-                                    <div class="min-w-0">
-                                        <p class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide">Window</p>
-                                        <p class="text-xs sm:text-sm font-bold text-white font-mono">{{ class.start_time|date:"H:i" }}–{{ class.end_time|date:"H:i" }}</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5">
-                                    <i class="fas fa-compress-arrows-alt text-indigo-400 text-xs sm:text-sm"></i>
-                                    <div class="min-w-0">
-                                        <p class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide">Fence</p>
-                                        <p class="text-xs sm:text-sm font-bold text-white">{{ class.radius }}m</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Live countdown row -->
-                            <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-                                <div class="flex items-center gap-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-2.5 sm:px-3.5 py-2 rounded-xl border border-indigo-500/30">
-                                    <i class="fas fa-stopwatch text-indigo-400 text-xs sm:text-sm"></i>
-                                    <div>
-                                        <p id="row-countdown-time-{{ class.id }}" class="font-black text-white font-mono text-xs sm:text-sm leading-tight">--:--:--</p>
-                                        <p id="row-countdown-caption-{{ class.id }}" class="text-[8px] sm:text-[10px] text-indigo-300 font-bold leading-tight">Calculating…</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                                    <button onclick="openRowDirections('google', {{ class.id }})" class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-500/20 text-blue-300 rounded-lg font-bold text-[10px] sm:text-xs border border-blue-500/30 hover:bg-blue-500/30 transition-all" title="Navigate via Google Maps">
-                                        <i class="fab fa-google text-xs"></i>
-                                        <span class="hidden sm:inline">Maps</span>
-                                    </button>
-                                    <button onclick="openRowDirections('waze', {{ class.id }})" class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-cyan-500/20 text-cyan-300 rounded-lg font-bold text-[10px] sm:text-xs border border-cyan-500/30 hover:bg-cyan-500/30 transition-all" title="Navigate via Waze">
-                                        <i class="fas fa-route text-xs"></i>
-                                        <span class="hidden sm:inline">Waze</span>
-                                    </button>
-                                    <a href="/lecturer/session/{{ class.id }}/" class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg font-bold text-[10px] sm:text-xs shadow-md hover:shadow-lg transition-all">
-                                        <i class="fas fa-arrow-right text-xs"></i>
-                                        <span class="hidden sm:inline">View Details</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                            {% if class.notes %}
-                            <div class="mt-2 sm:mt-3 p-2 sm:p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                                <p class="text-[8px] sm:text-[10px] font-black text-amber-300 uppercase tracking-wider mb-1">
-                                    <i class="fas fa-sticky-note mr-1"></i>Lecturer's Note
+                        <div
+                            class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6"
+                        >
+                            <div
+                                class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10"
+                            >
+                                <p
+                                    class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1"
+                                >
+                                    Hall
                                 </p>
-                                <p class="text-xs sm:text-sm text-amber-200 italic">"{{ class.notes }}"</p>
+                                <p
+                                    class="text-white font-black text-xs sm:text-sm truncate"
+                                >
+                                    <i class="fas fa-building mr-1"></i>{{
+                                    next_session.lecture_hall }}
+                                </p>
                             </div>
+                            <div
+                                class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10"
+                            >
+                                <p
+                                    class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1"
+                                >
+                                    Window
+                                </p>
+                                <p
+                                    class="text-white font-bold text-[10px] sm:text-xs"
+                                >
+                                    {{ next_session.start_time|date:"M d" }}<br />
+                                    <span class="font-mono"
+                                        >{{ next_session.start_time|date:"H:i"
+                                        }}–{{ next_session.end_time|date:"H:i"
+                                        }}</span
+                                    >
+                                </p>
+                            </div>
+                            <div
+                                class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10"
+                            >
+                                <p
+                                    class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1"
+                                >
+                                    Fence
+                                </p>
+                                <p
+                                    class="text-white font-black text-xs sm:text-sm"
+                                >
+                                    <i
+                                        class="fas fa-compress-arrows-alt mr-1"
+                                    ></i
+                                    >{{ next_session.radius }}m
+                                </p>
+                            </div>
+                            <div
+                                class="bg-white/15 backdrop-blur rounded-xl p-2 sm:p-3 border border-white/10"
+                            >
+                                <p
+                                    class="text-[8px] sm:text-[10px] text-white/70 uppercase tracking-wide font-black mb-1"
+                                >
+                                    Checked In
+                                </p>
+                                <p
+                                    class="text-white font-black text-xs sm:text-sm"
+                                >
+                                    <i class="fas fa-users mr-1"></i>{{
+                                    next_session.marked_count }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Big Countdown Box -->
+                        <div
+                            class="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/15 mb-4 sm:mb-6"
+                        >
+                            <p
+                                class="text-white/80 text-[10px] sm:text-xs uppercase tracking-widest font-black mb-2 flex items-center gap-1.5"
+                            >
+                                <i class="fas fa-stopwatch"></i>
+                                {% if next_session.status_label == 'Active' %}Time Remaining{% else %}Starts In{% endif %}
+                            </p>
+                            <div
+                                id="hero-countdown"
+                                class="text-white font-black text-3xl sm:text-4xl md:text-5xl font-mono tracking-tight mb-1"
+                            >
+                                --:--:--
+                            </div>
+                            <p
+                                id="hero-countdown-caption"
+                                class="text-white/70 text-[10px] sm:text-xs font-semibold"
+                            >
+                                Calculating…
+                            </p>
+                        </div>
+
+                        {% if next_session.notes %}
+                        <div
+                            class="bg-amber-400/20 backdrop-blur rounded-xl p-3 sm:p-4 border border-amber-300/30 mb-4 sm:mb-6"
+                        >
+                            <p
+                                class="text-amber-100 text-[10px] sm:text-xs uppercase font-black tracking-wider mb-1"
+                            >
+                                <i class="fas fa-sticky-note mr-1"></i>Your Note
+                            </p>
+                            <p class="text-white italic text-sm">
+                                "{{ next_session.notes }}"
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <!-- CTA Buttons -->
+                        <div class="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-5">
+                            <a
+                                href="/lecturer/session/{{ next_session.id }}/"
+                                class="inline-flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-white text-indigo-700 rounded-xl font-black shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all text-sm sm:text-base"
+                            >
+                                <i class="fas fa-chart-line"></i>
+                                {% if next_session.status_label == 'Active' %}Monitor Live{% else %}Open Session{% endif %}
+                            </a>
+                            {% if next_session.status_label == 'Active' %}
+                            <a
+                                href="{% url 'close_session_early' next_session.id %}"
+                                onclick="return confirmCloseHero(event);"
+                                class="inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 bg-red-500/90 backdrop-blur text-white rounded-xl font-bold shadow-lg hover:bg-red-600 transition-all text-sm sm:text-base"
+                            >
+                                <i class="fas fa-times-circle"></i>End Early
+                            </a>
                             {% endif %}
                         </div>
+
+                        <!-- Directions buttons -->
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                onclick="openDirections('google', {{ next_session.latitude|default:0 }}, {{ next_session.longitude|default:0 }})"
+                                class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-500/90 backdrop-blur text-white rounded-xl font-bold text-xs sm:text-sm shadow-md hover:bg-blue-600 transition-all"
+                            >
+                                <i class="fab fa-google"></i>Google Maps
+                            </button>
+                            <button
+                                onclick="openDirections('waze', {{ next_session.latitude|default:0 }}, {{ next_session.longitude|default:0 }})"
+                                class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 bg-cyan-500/90 backdrop-blur text-white rounded-xl font-bold text-xs sm:text-sm shadow-md hover:bg-cyan-600 transition-all"
+                            >
+                                <i class="fas fa-route"></i>Waze
+                            </button>
+                        </div>
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="text-center py-12 sm:py-20 px-4 sm:px-6">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-5 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                    <i class="fas fa-calendar-plus text-2xl sm:text-3xl text-indigo-400"></i>
+
+                <!-- Right: Hero Mini-Map -->
+                <div
+                    class="lg:col-span-2 p-4 sm:p-6 flex flex-col bg-gradient-to-br from-gray-800 to-gray-900"
+                >
+                    <div class="flex items-center justify-between mb-3">
+                        <p
+                            class="text-xs sm:text-sm font-black text-white uppercase tracking-wide"
+                        >
+                            <i
+                                class="fas fa-map-marked-alt text-indigo-400 mr-1.5"
+                            ></i
+                            >Venue Preview
+                        </p>
+                        <span
+                            class="text-[8px] sm:text-[10px] font-bold text-gray-500"
+                            >OpenStreetMap</span
+                        >
+                    </div>
+                    <div
+                        id="hero-mini-map"
+                        class="w-full flex-1 min-h-[200px] sm:min-h-[280px] rounded-2xl border border-white/10 overflow-hidden shadow-inner bg-gray-800 z-10"
+                    ></div>
+                    <div
+                        class="mt-3 grid grid-cols-3 gap-2 text-[10px] sm:text-xs"
+                    >
+                        <div
+                            class="bg-white/5 rounded-xl p-2 sm:p-2.5 border border-white/10 text-center"
+                        >
+                            <p
+                                class="font-black text-indigo-300 text-[8px] sm:text-[10px] uppercase tracking-wide"
+                            >
+                                Latitude
+                            </p>
+                            <p
+                                class="font-mono text-white font-bold text-[10px] sm:text-xs"
+                            >
+                                {{ next_session.latitude|default:"—" }}
+                            </p>
+                        </div>
+                        <div
+                            class="bg-white/5 rounded-xl p-2 sm:p-2.5 border border-white/10 text-center"
+                        >
+                            <p
+                                class="font-black text-indigo-300 text-[8px] sm:text-[10px] uppercase tracking-wide"
+                            >
+                                Longitude
+                            </p>
+                            <p
+                                class="font-mono text-white font-bold text-[10px] sm:text-xs"
+                            >
+                                {{ next_session.longitude|default:"—" }}
+                            </p>
+                        </div>
+                        <div
+                            class="bg-white/5 rounded-xl p-2 sm:p-2.5 border border-white/10 text-center"
+                        >
+                            <p
+                                class="font-black text-indigo-300 text-[8px] sm:text-[10px] uppercase tracking-wide"
+                            >
+                                Radius
+                            </p>
+                            <p
+                                class="font-mono text-white font-bold text-[10px] sm:text-xs"
+                            >
+                                {{ next_session.radius }}m
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="font-black text-white text-lg sm:text-xl mb-2">No Sessions Yet</h3>
-                <p class="text-sm sm:text-base text-gray-400 max-w-sm mx-auto mb-4 sm:mb-6">
-                    Create your first attendance session to start tracking student attendance with GPS geofencing and face verification.
-                </p>
-                <a href="/lecturer/create-attendance/" class="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm sm:text-base">
-                    <i class="fas fa-plus-circle"></i>Create Your First Session
-                </a>
             </div>
-            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- =============== STATS CARDS =============== -->
+        <div
+            class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8"
+        >
+            <div
+                class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10"
+            >
+                <div class="flex items-center justify-between mb-3">
+                    <p
+                        class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider"
+                    >
+                        Courses
+                    </p>
+                    <div
+                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center"
+                    >
+                        <i class="fas fa-book text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl sm:text-3xl font-black gradient-text">
+                    {{ lecturer.courses_taught.count }}
+                </p>
+                <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
+                    Taught this semester
+                </p>
+            </div>
+            <div
+                class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10"
+            >
+                <div class="flex items-center justify-between mb-3">
+                    <p
+                        class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider"
+                    >
+                        Total Check-Ins
+                    </p>
+                    <div
+                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center"
+                    >
+                        <i class="fas fa-user-check text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl sm:text-3xl font-black text-emerald-400">
+                    {{ total_marked_all }}
+                </p>
+                <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
+                    Across all sessions
+                </p>
+            </div>
+            <div
+                class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10"
+            >
+                <div class="flex items-center justify-between mb-3">
+                    <p
+                        class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider"
+                    >
+                        Active Now
+                    </p>
+                    <div
+                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center"
+                    >
+                        <i
+                            class="fas fa-circle text-[10px] sm:text-xs animate-pulse"
+                        ></i>
+                    </div>
+                </div>
+                <p class="text-2xl sm:text-3xl font-black text-orange-400">
+                    {{ active_count }}
+                </p>
+                <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
+                    Live sessions marking
+                </p>
+            </div>
+            <div
+                class="glass-card rounded-2xl p-4 sm:p-5 text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all border border-white/10"
+            >
+                <div class="flex items-center justify-between mb-3">
+                    <p
+                        class="text-gray-400 text-[10px] sm:text-xs font-black uppercase tracking-wider"
+                    >
+                        Upcoming
+                    </p>
+                    <div
+                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center"
+                    >
+                        <i class="fas fa-calendar-day text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl sm:text-3xl font-black text-blue-400">
+                    {{ upcoming_count }}
+                </p>
+                <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
+                    Sessions scheduled
+                </p>
+            </div>
         </div>
 
-        <!-- Right sidebar: Quick Actions + Pro Tips -->
-        <div class="space-y-4 sm:space-y-6">
-            <!-- Quick Actions -->
-            <div class="glass-card rounded-2xl shadow-xl p-4 sm:p-6 border border-white/10">
-                <h2 class="text-sm sm:text-base font-black text-white mb-3 sm:mb-4 uppercase tracking-wide">
-                    <i class="fas fa-bolt text-indigo-400 mr-2"></i>Quick Actions
-                </h2>
-                <div class="space-y-2 sm:space-y-2.5">
-                    <a href="/lecturer/create-attendance/" class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-plus text-sm sm:text-lg"></i>
+        <!-- =============== MAIN GRID =============== -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+            <!-- Scheduled Lectures (main area) -->
+            <div
+                class="lg:col-span-3 glass-card rounded-2xl shadow-xl border border-white/10 overflow-hidden"
+            >
+                <div
+                    class="p-4 sm:p-6 border-b border-white/10 flex flex-wrap items-center justify-between gap-3"
+                >
+                    <h2 class="text-base sm:text-lg font-black text-white">
+                        <i class="fas fa-calendar-alt text-indigo-400 mr-2"></i>
+                        All Sessions
+                    </h2>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button
+                            data-filter="all"
+                            class="filter-tab active px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md transition-all"
+                        >
+                            <i class="fas fa-globe mr-1"></i>All
+                        </button>
+                        <button
+                            data-filter="Active"
+                            class="filter-tab px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all"
+                        >
+                            🟢 Active
+                        </button>
+                        <button
+                            data-filter="Upcoming"
+                            class="filter-tab px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all"
+                        >
+                            🔵 Upcoming
+                        </button>
+                        <button
+                            data-filter="Expired"
+                            class="filter-tab px-2.5 sm:px-3.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg glass-card text-gray-300 border border-white/10 hover:bg-white/10 transition-all"
+                        >
+                            🔴 Past
+                        </button>
+                    </div>
+                </div>
+
+                {% if scheduled_lectures %}
+                <div class="divide-y divide-white/10" id="session-list">
+                    {% for class in scheduled_lectures %}
+                    <div
+                        class="session-item p-4 sm:p-5 hover:bg-white/5 transition-colors"
+                        data-status="{{ class.status_label }}"
+                        data-start="{{ class.start_time_iso }}"
+                        data-end="{{ class.end_time_iso }}"
+                        data-lat="{{ class.latitude|default:0 }}"
+                        data-lon="{{ class.longitude|default:0 }}"
+                        data-hall="{{ class.lecture_hall|escapejs }}"
+                        data-id="{{ class.id }}"
+                    >
+                        <div
+                            class="flex flex-col md:flex-row md:items-start gap-3 sm:gap-4"
+                        >
+                            <!-- Left: Status badge + mini map -->
+                            <div class="md:w-48 shrink-0">
+                                <div
+                                    class="flex md:flex-col gap-2 sm:gap-3 items-start"
+                                >
+                                    <div class="flex-1 md:w-full">
+                                        <span
+                                            class="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-black bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2"
+                                        >
+                                            {% if class.status_label == 'Active' %}
+                                            <i
+                                                class="fas fa-circle text-[6px] sm:text-[8px] animate-pulse"
+                                            ></i>
+                                            {% elif class.status_label == 'Upcoming' %}
+                                            <i
+                                                class="fas fa-hourglass-half text-[8px] sm:text-[10px]"
+                                            ></i>
+                                            {% else %}
+                                            <i
+                                                class="fas fa-check-double text-[8px] sm:text-[10px]"
+                                            ></i>
+                                            {% endif %} {{ class.status_label }}
+                                        </span>
+                                        <p
+                                            class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Session #{{ class.id }}
+                                        </p>
+                                    </div>
+                                    <div
+                                        id="row-map-{{ class.id }}"
+                                        class="w-32 h-24 sm:w-40 sm:h-28 md:w-full rounded-xl border border-white/10 overflow-hidden bg-gray-800 shrink-0 z-10"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <!-- Middle: Info -->
+                            <div class="flex-1 min-w-0">
+                                <div
+                                    class="flex flex-wrap items-start justify-between gap-2 mb-2 sm:mb-3"
+                                >
+                                    <div class="min-w-0">
+                                        <p
+                                            class="text-[10px] sm:text-xs font-black text-indigo-400 uppercase tracking-wider mb-0.5"
+                                        >
+                                            {{ class.course.course_code }}
+                                        </p>
+                                        <h3
+                                            class="font-black text-white text-base sm:text-lg truncate"
+                                        >
+                                            {{ class.course.course_title }}
+                                        </h3>
+                                    </div>
+                                    <div
+                                        class="flex items-center gap-2 shrink-0"
+                                    >
+                                        <span
+                                            class="px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] sm:text-xs font-bold border border-emerald-500/30"
+                                        >
+                                            <i class="fas fa-users mr-1"></i>{{
+                                            class.marked_count }} marked
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5 mb-3 sm:mb-4"
+                                >
+                                    <div
+                                        class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5"
+                                    >
+                                        <i
+                                            class="fas fa-building text-indigo-400 text-xs sm:text-sm"
+                                        ></i>
+                                        <div class="min-w-0">
+                                            <p
+                                                class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide"
+                                            >
+                                                Hall
+                                            </p>
+                                            <p
+                                                class="text-xs sm:text-sm font-bold text-white truncate"
+                                            >
+                                                {{ class.lecture_hall }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5"
+                                    >
+                                        <i
+                                            class="fas fa-clock text-indigo-400 text-xs sm:text-sm"
+                                        ></i>
+                                        <div class="min-w-0">
+                                            <p
+                                                class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide"
+                                            >
+                                                Date
+                                            </p>
+                                            <p
+                                                class="text-xs sm:text-sm font-bold text-white"
+                                            >
+                                                {{ class.start_time|date:"M d,
+                                                Y" }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5"
+                                    >
+                                        <i
+                                            class="fas fa-hourglass-start text-indigo-400 text-xs sm:text-sm"
+                                        ></i>
+                                        <div class="min-w-0">
+                                            <p
+                                                class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide"
+                                            >
+                                                Window
+                                            </p>
+                                            <p
+                                                class="text-xs sm:text-sm font-bold text-white font-mono"
+                                            >
+                                                {{ class.start_time|date:"H:i"
+                                                }}–{{ class.end_time|date:"H:i"
+                                                }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg bg-white/5"
+                                    >
+                                        <i
+                                            class="fas fa-compress-arrows-alt text-indigo-400 text-xs sm:text-sm"
+                                        ></i>
+                                        <div class="min-w-0">
+                                            <p
+                                                class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wide"
+                                            >
+                                                Fence
+                                            </p>
+                                            <p
+                                                class="text-xs sm:text-sm font-bold text-white"
+                                            >
+                                                {{ class.radius }}m
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Live countdown row -->
+                                <div
+                                    class="flex flex-wrap items-center justify-between gap-2 sm:gap-3"
+                                >
+                                    <div
+                                        class="flex items-center gap-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-2.5 sm:px-3.5 py-2 rounded-xl border border-indigo-500/30"
+                                    >
+                                        <i
+                                            class="fas fa-stopwatch text-indigo-400 text-xs sm:text-sm"
+                                        ></i>
+                                        <div>
+                                            <p
+                                                id="row-countdown-time-{{ class.id }}"
+                                                class="font-black text-white font-mono text-xs sm:text-sm leading-tight"
+                                            >
+                                                --:--:--
+                                            </p>
+                                            <p
+                                                id="row-countdown-caption-{{ class.id }}"
+                                                class="text-[8px] sm:text-[10px] text-indigo-300 font-bold leading-tight"
+                                            >
+                                                Calculating…
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="flex flex-wrap items-center gap-1.5 sm:gap-2"
+                                    >
+                                        <button
+                                            onclick="openRowDirections('google', {{ class.id }})"
+                                            class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-500/20 text-blue-300 rounded-lg font-bold text-[10px] sm:text-xs border border-blue-500/30 hover:bg-blue-500/30 transition-all"
+                                            title="Navigate via Google Maps"
+                                        >
+                                            <i
+                                                class="fab fa-google text-xs"
+                                            ></i>
+                                            <span class="hidden sm:inline"
+                                                >Maps</span
+                                            >
+                                        </button>
+                                        <button
+                                            onclick="openRowDirections('waze', {{ class.id }})"
+                                            class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-cyan-500/20 text-cyan-300 rounded-lg font-bold text-[10px] sm:text-xs border border-cyan-500/30 hover:bg-cyan-500/30 transition-all"
+                                            title="Navigate via Waze"
+                                        >
+                                            <i class="fas fa-route text-xs"></i>
+                                            <span class="hidden sm:inline"
+                                                >Waze</span
+                                            >
+                                        </button>
+                                        <a
+                                            href="/lecturer/session/{{ class.id }}/"
+                                            class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg font-bold text-[10px] sm:text-xs shadow-md hover:shadow-lg transition-all"
+                                        >
+                                            <i
+                                                class="fas fa-arrow-right text-xs"
+                                            ></i>
+                                            <span class="hidden sm:inline"
+                                                >View Details</span
+                                            >
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {% if class.notes %}
+                                <div
+                                    class="mt-2 sm:mt-3 p-2 sm:p-3 rounded-lg bg-amber-500/10 border border-amber-500/30"
+                                >
+                                    <p
+                                        class="text-[8px] sm:text-[10px] font-black text-amber-300 uppercase tracking-wider mb-1"
+                                    >
+                                        <i class="fas fa-sticky-note mr-1"></i
+                                        >Lecturer's Note
+                                    </p>
+                                    <p
+                                        class="text-xs sm:text-sm text-amber-200 italic"
+                                    >
+                                        "{{ class.notes }}"
+                                    </p>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-black text-xs sm:text-sm">New Attendance</p>
-                            <p class="text-[10px] sm:text-[11px] text-white/80">Geofence + Face ID</p>
-                        </div>
-                    </a>
-                    <a href="/lecturer/create-course/" class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-plus-circle text-sm sm:text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="font-black text-xs sm:text-sm">Create Course</p>
-                            <p class="text-[10px] sm:text-[11px] text-white/80">Add new course</p>
-                        </div>
-                    </a>
-                    <a href="/lecturer_courses" class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-white/5 hover:bg-emerald-500/10 hover:border-emerald-500/30 border border-white/10 transition-all group">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-book text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="font-black text-xs sm:text-sm text-white">Manage Courses</p>
-                            <p class="text-[10px] sm:text-[11px] text-gray-400">Add / remove courses</p>
-                        </div>
-                    </a>
-                    <a href="/lecturer/settings/" class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-white/5 hover:bg-orange-500/10 hover:border-orange-500/30 border border-white/10 transition-all group">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-cog text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="font-black text-xs sm:text-sm text-white">Profile Settings</p>
-                            <p class="text-[10px] sm:text-[11px] text-gray-400">Rank, office, phone</p>
-                        </div>
-                    </a>
-                    <a href="/lecturer/profile/" class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-white/5 hover:bg-blue-500/10 hover:border-blue-500/30 border border-white/10 transition-all group">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                            <i class="fas fa-id-card text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="font-black text-xs sm:text-sm text-white">My Profile</p>
-                            <p class="text-[10px] sm:text-[11px] text-gray-400">View public profile</p>
-                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12 sm:py-20 px-4 sm:px-6">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-5 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center"
+                    >
+                        <i
+                            class="fas fa-calendar-plus text-2xl sm:text-3xl text-indigo-400"
+                        ></i>
+                    </div>
+                    <h3 class="font-black text-white text-lg sm:text-xl mb-2">
+                        No Sessions Yet
+                    </h3>
+                    <p
+                        class="text-sm sm:text-base text-gray-400 max-w-sm mx-auto mb-4 sm:mb-6"
+                    >
+                        Create your first attendance session to start tracking
+                        student attendance with GPS geofencing and face
+                        verification.
+                    </p>
+                    <a
+                        href="/lecturer/create-attendance/"
+                        class="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm sm:text-base"
+                    >
+                        <i class="fas fa-plus-circle"></i>Create Your First
+                        Session
                     </a>
                 </div>
+                {% endif %}
             </div>
 
-            <!-- ClassMillia Pro Tips -->
-            <div class="bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-2xl p-4 sm:p-6 border border-amber-500/30 shadow-sm">
-                <h3 class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300 mb-2 sm:mb-3 flex items-center gap-1.5">
-                    <i class="fas fa-lightbulb text-xs sm:text-sm"></i>ClassMillia Pro Tips
-                </h3>
-                <ul class="space-y-2 sm:space-y-2.5 text-xs sm:text-sm">
-                    <li class="flex gap-1.5 sm:gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"></i>
-                        <span class="text-amber-200"><b>Stand near the GPS pin</b> when creating sessions for accurate fence center.</span>
-                    </li>
-                    <li class="flex gap-1.5 sm:gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"></i>
-                        <span class="text-amber-200"><b>Default 100m radius</b> fits most lecture halls. Use 200–300m for open-air venues.</span>
-                    </li>
-                    <li class="flex gap-1.5 sm:gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"></i>
-                        <span class="text-amber-200"><b>Add notes</b> with seating rows, test reminders, or material links.</span>
-                    </li>
-                    <li class="flex gap-1.5 sm:gap-2 items-start">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"></i>
-                        <span class="text-amber-200"><b>Download Excel</b> from session detail to export verified attendance CSV.</span>
-                    </li>
-                </ul>
+            <!-- Right sidebar: Quick Actions + Pro Tips -->
+            <div class="space-y-4 sm:space-y-6">
+                <!-- Quick Actions -->
+                <div
+                    class="glass-card rounded-2xl shadow-xl p-4 sm:p-6 border border-white/10"
+                >
+                    <h2
+                        class="text-sm sm:text-base font-black text-white mb-3 sm:mb-4 uppercase tracking-wide"
+                    >
+                        <i class="fas fa-bolt text-indigo-400 mr-2"></i>Quick
+                        Actions
+                    </h2>
+                    <div class="space-y-2 sm:space-y-2.5">
+                        <a
+                            href="/lecturer/create-attendance/"
+                            class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+                        >
+                            <div
+                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shrink-0"
+                            >
+                                <i class="fas fa-plus text-sm sm:text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-xs sm:text-sm">
+                                    New Attendance
+                                </p>
+                                <p
+                                    class="text-[10px] sm:text-[11px] text-white/80"
+                                >
+                                    Geofence + Face ID
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/lecturer/create-course/"
+                            class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+                        >
+                            <div
+                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shrink-0"
+                            >
+                                <i
+                                    class="fas fa-plus-circle text-sm sm:text-lg"
+                                ></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-xs sm:text-sm">
+                                    Create Course
+                                </p>
+                                <p
+                                    class="text-[10px] sm:text-[11px] text-white/80"
+                                >
+                                    Add new course
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/lecturer_courses"
+                            class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-white/5 hover:bg-emerald-500/10 hover:border-emerald-500/30 border border-white/10 transition-all group"
+                        >
+                            <div
+                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0"
+                            >
+                                <i class="fas fa-book text-sm"></i>
+                            </div>
+                            <div>
+                                <p
+                                    class="font-black text-xs sm:text-sm text-white"
+                                >
+                                    Manage Courses
+                                </p>
+                                <p
+                                    class="text-[10px] sm:text-[11px] text-gray-400"
+                                >
+                                    Add / remove courses
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/lecturer/settings/"
+                            class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-white/5 hover:bg-orange-500/10 hover:border-orange-500/30 border border-white/10 transition-all group"
+                        >
+                            <div
+                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0"
+                            >
+                                <i class="fas fa-cog text-sm"></i>
+                            </div>
+                            <div>
+                                <p
+                                    class="font-black text-xs sm:text-sm text-white"
+                                >
+                                    Profile Settings
+                                </p>
+                                <p
+                                    class="text-[10px] sm:text-[11px] text-gray-400"
+                                >
+                                    Rank, office, phone
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/lecturer/profile/"
+                            class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-white/5 hover:bg-blue-500/10 hover:border-blue-500/30 border border-white/10 transition-all group"
+                        >
+                            <div
+                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0"
+                            >
+                                <i class="fas fa-id-card text-sm"></i>
+                            </div>
+                            <div>
+                                <p
+                                    class="font-black text-xs sm:text-sm text-white"
+                                >
+                                    My Profile
+                                </p>
+                                <p
+                                    class="text-[10px] sm:text-[11px] text-gray-400"
+                                >
+                                    View public profile
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/millialms/lecturer/"
+                            class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+                        >
+                            <div
+                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shrink-0"
+                            >
+                                <i
+                                    class="fas fa-clipboard-list text-sm sm:text-lg"
+                                ></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-xs sm:text-sm">
+                                    MilliaLMS Studio
+                                </p>
+                                <p
+                                    class="text-[10px] sm:text-[11px] text-white/80"
+                                >
+                                    Assessments & grading
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ClassMillia Pro Tips -->
+                <div
+                    class="bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-2xl p-4 sm:p-6 border border-amber-500/30 shadow-sm"
+                >
+                    <h3
+                        class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300 mb-2 sm:mb-3 flex items-center gap-1.5"
+                    >
+                        <i class="fas fa-lightbulb text-xs sm:text-sm"></i
+                        >ClassMillia Pro Tips
+                    </h3>
+                    <ul class="space-y-2 sm:space-y-2.5 text-xs sm:text-sm">
+                        <li class="flex gap-1.5 sm:gap-2 items-start">
+                            <i
+                                class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"
+                            ></i>
+                            <span class="text-amber-200"
+                                ><b>Stand near the GPS pin</b> when creating
+                                sessions for accurate fence center.</span
+                            >
+                        </li>
+                        <li class="flex gap-1.5 sm:gap-2 items-start">
+                            <i
+                                class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"
+                            ></i>
+                            <span class="text-amber-200"
+                                ><b>Default 100m radius</b> fits most lecture
+                                halls. Use 200–300m for open-air venues.</span
+                            >
+                        </li>
+                        <li class="flex gap-1.5 sm:gap-2 items-start">
+                            <i
+                                class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"
+                            ></i>
+                            <span class="text-amber-200"
+                                ><b>Add notes</b> with seating rows, test
+                                reminders, or material links.</span
+                            >
+                        </li>
+                        <li class="flex gap-1.5 sm:gap-2 items-start">
+                            <i
+                                class="fas fa-check-circle text-emerald-400 mt-0.5 shrink-0 text-xs"
+                            ></i>
+                            <span class="text-amber-200"
+                                ><b>Download Excel</b> from session detail to
+                                export verified attendance CSV.</span
+                            >
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 <style>
-    .filter-tab.active { box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+    .filter-tab.active {
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
 </style>
 
 <script>

@@ -1,18 +1,18 @@
-from django.urls import include, path
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
     path("", views.welcome_page, name="welcome_page"),
-    path("accounts/", include("allauth.urls")),
-    # Custom logout that redirects to welcome page
-    path("logout/", views.custom_logout, name="custom_logout"),
-    # Restrict user from accessing here to force them use google auth
+    # Override default allauth login form BEFORE project-level allauth include.
+    # Prevents direct access to username/password login; forces Google OAuth.
     path(
         "accounts/login/",
         views.redirect_to_google_login,
         name="redirect_to_google_login",
     ),
+    # Custom logout that redirects to welcome page
+    path("logout/", views.custom_logout, name="custom_logout"),
     path("lecturer/login/", views.lecturer_google_login, name="lecturer_google_login"),
     path("student/login/", views.student_google_login, name="student_google_login"),
     path("student/dashboard/", views.student_dashboard, name="student_dashboard"),

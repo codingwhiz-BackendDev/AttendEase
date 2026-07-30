@@ -80,29 +80,36 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 if not LecturerProfile.objects.filter(user__email=email).exists():
                     logger.info(f"Will create LecturerProfile for {email}")
 
-        # Clear session data after login
-        request.session.pop("login_process", None)
+        # NOTE: Do NOT pop login_process here. It is consumed AFTER login in
+        # get_login_redirect_url(). Popping early would break role-based dashboard redirect.
 
     def get_login_redirect_url(self, request):
-        """Redirect based on stored session login type."""
+        """Redirect based on stored session login type (with email-domain fallback)."""
         from .models import StudentProfile, LecturerProfile
-        
+
         process = request.session.get("login_process", "")
         user = request.user
-        logger.info(f"Redirecting based on process: {process}")
+        logger.info(f"Social redirect: login_process={process!r}, email={user.email!r}")
 
-        # Use the main adapter logic for consistency
+        # Determine role: prefer explicit session process, fall back to email domain
+        if not process:
+            process = "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+            logger.info(f"No login_process in session; inferred role '{process}' from email domain")
+
+        # Consume the session flag now that we've read it (prevents stale state)
+        request.session.pop("login_process", None)
+
         if process == "student":
             with transaction.atomic():
-                if not StudentProfile.objects.filter(student_name=user).exists():
-                    StudentProfile.objects.create(student_name=user)
-                    logger.info(f"Created StudentProfile for user {user.email}")
+                StudentProfile.objects.get_or_create(student_name=user)
+            logger.info(f"Social login redirect: user {user.email} → student_dashboard")
             return reverse("student_dashboard")
         elif process == "lecturer":
             with transaction.atomic():
-                if not LecturerProfile.objects.filter(user=user).exists():
-                    LecturerProfile.objects.create(user=user)
-                    logger.info(f"Created LecturerProfile for user {user.email}")
+                LecturerProfile.objects.get_or_create(user=user)
+            logger.info(f"Social login redirect: user {user.email} → lecturer_dashboard")
             return reverse("lecturer_dashboard")
 
-        return super().get_login_redirect_url(request)  # Default
+        # Safety fallback (should never reach here due to email inference above)
+        logger.warning(f"Social redirect fallback triggered for user {user.email}")
+        return reverse("welcome_page")
