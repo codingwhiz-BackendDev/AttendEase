@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .float-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
+        <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+        <div class="mb-6 sm:mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <p class="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.22em] text-indigo-400 mb-1.5 sm:mb-2">
+                    Lecturer workspace
+                </p>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
+                    Create New Course
+                </h1>
+                <p class="text-xs sm:text-sm md:text-base text-gray-400 max-w-2xl">
+                    Add a new course to the system and automatically assign it to your teaching profile.
+                </p>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <a href="/lecturer_courses" class="inline-flex items-center gap-2 rounded-2xl glass-card border border-white/10 px-4 py-3 text-sm font-black text-white shadow-sm hover:bg-white/10 transition-all">
+                    <i class="fas fa-arrow-left"></i>Back to Courses
+                </a>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="px-4 py-3 rounded-2xl {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-300 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-300 border border-blue-500/30{% endif %}">
+                <div class="flex items-center gap-2">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="mb-6 sm:mb-8 overflow-hidden rounded-3xl border border-white/10 glass-card shadow-2xl">
+            <div class="border-b border-white/10 bg-gradient-to-r from-indigo-500/10 via-white/5 to-purple-500/10 px-4 sm:px-5 py-3 sm:py-4 md:px-6">
+                <h2 class="text-base sm:text-lg md:text-xl font-black text-white">
+                    Course Information
+                </h2>
+                <p class="mt-1 text-xs sm:text-sm text-gray-400">
+                    Enter the details for the new course you want to create.
+                </p>
+            </div>
+            <form action="" method="post" class="p-4 sm:p-5 md:p-6">
+                {% csrf_token %}
+                <div class="space-y-4 sm:space-y-6">
+                    <!-- Course Code -->
+                    <div>
+                        <label for="course_code" class="mb-2 block text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">
+                            Course Code
+                        </label>
+                        <div class="group relative">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex w-12 sm:w-14 items-center justify-center text-gray-400 group-focus-within:text-indigo-400">
+                                <i class="fas fa-hashtag text-sm sm:text-base"></i>
+                            </span>
+                            <input type="text" 
+                                   id="course_code" 
+                                   name="course_code" 
+                                   placeholder="e.g., CSC101" 
+                                   required 
+                                   class="h-12 sm:h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 sm:pl-14 pr-4 text-xs sm:text-sm font-medium text-white shadow-sm outline-none transition-all placeholder:text-gray-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 uppercase"
+                                   maxlength="20">
+                        </div>
+                        <p class="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400">
+                            Unique course identifier (max 20 characters, will be uppercase)
+                        </p>
+                    </div>
+
+                    <!-- Course Title -->
+                    <div>
+                        <label for="course_title" class="mb-2 block text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">
+                            Course Title
+                        </label>
+                        <div class="group relative">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex w-12 sm:w-14 items-center justify-center text-gray-400 group-focus-within:text-indigo-400">
+                                <i class="fas fa-book text-sm sm:text-base"></i>
+                            </span>
+                            <input type="text" 
+                                   id="course_title" 
+                                   name="course_title" 
+                                   placeholder="e.g., Introduction to Computer Science" 
+                                   required 
+                                   class="h-12 sm:h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 sm:pl-14 pr-4 text-xs sm:text-sm font-medium text-white shadow-sm outline-none transition-all placeholder:text-gray-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20"
+                                   maxlength="255">
+                        </div>
+                        <p class="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400">
+                            Full course name as it will appear to students
+                        </p>
+                    </div>
+
+                    <!-- Credit Units -->
+                    <div>
+                        <label for="credit" class="mb-2 block text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">
+                            Credit Units
+                        </label>
+                        <div class="group relative">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex w-12 sm:w-14 items-center justify-center text-gray-400 group-focus-within:text-indigo-400">
+                                <i class="fas fa-star text-sm sm:text-base"></i>
+                            </span>
+                            <input type="number" 
+                                   id="credit" 
+                                   name="credit" 
+                                   placeholder="e.g., 3" 
+                                   required 
+                                   min="1" 
+                                   max="10"
+                                   class="h-12 sm:h-14 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 sm:pl-14 pr-4 text-xs sm:text-sm font-medium text-white shadow-sm outline-none transition-all placeholder:text-gray-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20">
+                        </div>
+                        <p class="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400">
+                            Number of credit units (1-10)
+                        </p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4 sm:pt-6">
+                        <button type="submit" 
+                                class="inline-flex h-12 sm:h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 px-6 sm:px-8 text-xs sm:text-sm font-black text-white shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 hover:shadow-xl w-full sm:w-auto">
+                            <i class="fas fa-plus-circle"></i>
+                            <span class="hidden sm:inline">Create Course</span>
+                            <span class="sm:hidden">Create</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Information Card -->
+        <div class="mt-6 sm:mt-8 glass-card rounded-3xl p-4 sm:p-6 border border-white/10">
+            <div class="flex items-start gap-3 sm:gap-4">
+                <div class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-indigo-500/20 text-indigo-400 shrink-0">
+                    <i class="fas fa-info-circle text-lg sm:text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm sm:text-base font-black text-white mb-2">Important Information</h3>
+                    <ul class="text-xs sm:text-sm text-gray-400 space-y-1 sm:space-y-2">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check text-emerald-400 mt-0.5 sm:mt-1"></i>
+                            <span>Course code must be unique across the entire system</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check text-emerald-400 mt-0.5 sm:mt-1"></i>
+                            <span>You will be automatically assigned as the lecturer for this course</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check text-emerald-400 mt-0.5 sm:mt-1"></i>
+                            <span>Students can enroll in this course once it's created</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

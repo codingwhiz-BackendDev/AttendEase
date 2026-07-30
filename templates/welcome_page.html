@@ -591,6 +591,80 @@
                 });
             });
         }
+
+        // Compulsory PWA Install Prompt
+        let deferredPrompt;
+        let installShown = localStorage.getItem('pwa_install_shown');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Only show install prompt if not already installed
+            if (!installShown) {
+                showInstallModal();
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            localStorage.setItem('pwa_install_shown', 'true');
+            hideInstallModal();
+        });
+
+        function showInstallModal() {
+            // Create install modal
+            const modal = document.createElement('div');
+            modal.id = 'pwa-install-modal';
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 20px; max-width: 400px; text-align: center; color: white; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📱</div>
+                        <h2 style="margin: 0 0 15px 0; font-size: 24px; font-weight: bold;">Install ClassMillia</h2>
+                        <p style="margin: 0 0 25px 0; opacity: 0.9;">Get the full experience with our app - install it now for quick access and offline support!</p>
+                        <button id="install-btn" style="background: white; color: #667eea; border: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
+                            Install App
+                        </button>
+                        <button id="dismiss-btn" style="background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; margin-left: 10px;">
+                            Later
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Add event listeners
+            document.getElementById('install-btn').addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        localStorage.setItem('pwa_install_shown', 'true');
+                    }
+                    deferredPrompt = null;
+                    hideInstallModal();
+                }
+            });
+
+            document.getElementById('dismiss-btn').addEventListener('click', () => {
+                // Show again after 1 hour
+                setTimeout(() => {
+                    localStorage.removeItem('pwa_install_shown');
+                }, 3600000);
+                hideInstallModal();
+            });
+        }
+
+        function hideInstallModal() {
+            const modal = document.getElementById('pwa-install-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Check if already installed
+        if (installShown) {
+            console.log('PWA already installed');
+        }
     </script>
 </body>
 </html>

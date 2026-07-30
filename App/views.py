@@ -488,6 +488,66 @@ def lecturer_course_enrollment(request):
         return redirect("lecturer_courses")
 
 
+# Lecturer create new course
+@lecturer_required
+@transaction.atomic
+def create_course(request):
+    """Allow lecturers to create new courses"""
+    user = request.user
+    user_obj = User.objects.get(username=user)
+    
+    try:
+        lecturer_profile = LecturerProfile.objects.get(user=user_obj)
+    except LecturerProfile.DoesNotExist:
+        messages.error(request, "Lecturer profile not found. Please complete your profile first.")
+        return redirect("lecturer_settings")
+
+    if request.method == "POST":
+        course_code = request.POST.get("course_code", "").strip().upper()
+        course_title = request.POST.get("course_title", "").strip()
+        credit = request.POST.get("credit", "").strip()
+
+        # Validation
+        if not course_code or not course_title or not credit:
+            messages.error(request, "All fields are required.")
+            return render(request, "create_course.html")
+
+        try:
+            credit = int(credit)
+            if credit <= 0:
+                messages.error(request, "Credit units must be a positive number.")
+                return render(request, "create_course.html")
+        except ValueError:
+            messages.error(request, "Credit units must be a valid number.")
+            return render(request, "create_course.html")
+
+        # Check if course code already exists
+        if Course.objects.filter(course_code=course_code).exists():
+            messages.error(request, f"Course with code '{course_code}' already exists.")
+            return render(request, "create_course.html")
+
+        # Check if course title already exists
+        if Course.objects.filter(course_title__iexact=course_title).exists():
+            messages.error(request, f"Course with title '{course_title}' already exists.")
+            return render(request, "create_course.html")
+
+        # Create the course
+        course = Course.objects.create(
+            course_code=course_code,
+            course_title=course_title,
+            credit=credit
+        )
+
+        # Automatically assign the lecturer to the course
+        lecturer_profile.courses_taught.add(course)
+
+        logger.info(f"Course created: {course_code} - {course_title} by {user.username}")
+        messages.success(request, f"Course '{course_title}' created successfully and assigned to you!")
+        return redirect("lecturer_courses")
+
+    return render(request, "create_course.html", {"lecturer_profile": lecturer_profile})
+
+
 # Lecturer Unenroll for course
 @transaction.atomic
 def lecturer_course_unenrollment(request):

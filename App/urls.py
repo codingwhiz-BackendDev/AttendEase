@@ -27,6 +27,7 @@ urlpatterns = [
         views.lecturer_course_enrollment,
         name="lecturer_course_enrollment",
     ),
+    path("lecturer/create-course/", views.create_course, name="create_course"),
     path(
         "lecturer/create-attendance/", views.create_attendance, name="create_attendance"
     ),
