@@ -1,626 +1,1122 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassMillia - The Future of Classroom Attendance</title>
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ClassMillia">
-    <!-- Favicon using your custom logo -->
-    <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg">
-    <link rel="apple-touch-icon" href="/static/icons/logo.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        * { font-family: 'Inter', sans-serif; }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .hero-gradient {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .glow-button {
-            box-shadow: 0 0 40px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
-        }
-        
-        .glow-button:hover {
-            box-shadow: 0 0 60px rgba(102, 126, 234, 0.6);
-            transform: translateY(-2px);
-        }
-        
-        .float-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .pulse-glow {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(102, 126, 234, 0.5);
-        }
-        
-        .scroll-reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
-        }
-        
-        .scroll-reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Mobile menu improvements */
-        #mobile-menu {
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ClassMillia - The Future of Classroom Attendance</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/static/manifest.json" />
+        <meta name="theme-color" content="#667eea" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+        <meta name="apple-mobile-web-app-title" content="ClassMillia" />
+        <!-- Favicon using your custom logo -->
+        <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg" />
+        <link rel="apple-touch-icon" href="/static/icons/logo.svg" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+            * {
+                font-family: "Inter", sans-serif;
             }
-            to {
+
+            .gradient-text {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-gradient {
+                background: linear-gradient(
+                    135deg,
+                    #0f0c29 0%,
+                    #302b63 50%,
+                    #24243e 100%
+                );
+            }
+
+            .glass-card {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .glow-button {
+                box-shadow: 0 0 40px rgba(102, 126, 234, 0.4);
+                transition: all 0.3s ease;
+            }
+
+            .glow-button:hover {
+                box-shadow: 0 0 60px rgba(102, 126, 234, 0.6);
+                transform: translateY(-2px);
+            }
+
+            .float-animation {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            .pulse-glow {
+                animation: pulse-glow 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse-glow {
+                0%,
+                100% {
+                    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+                }
+                50% {
+                    box-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+                }
+            }
+
+            .stat-card {
+                background: linear-gradient(
+                    135deg,
+                    rgba(102, 126, 234, 0.1) 0%,
+                    rgba(118, 75, 162, 0.1) 100%
+                );
+                border: 1px solid rgba(102, 126, 234, 0.2);
+            }
+
+            .feature-card:hover {
+                transform: translateY(-10px);
+                border-color: rgba(102, 126, 234, 0.5);
+            }
+
+            .scroll-reveal {
+                opacity: 0;
+                transform: translateY(30px);
+                transition: all 0.8s ease;
+            }
+
+            .scroll-reveal.visible {
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
 
-        @media (max-width: 768px) {
-            .glass-card {
-                backdrop-filter: blur(10px);
+            /* Mobile menu improvements */
+            #mobile-menu {
+                animation: slideDown 0.3s ease-out;
             }
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-white overflow-x-hidden">
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 glass-card">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                        <i class="fas fa-check-circle text-white text-xl"></i>
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .glass-card {
+                    backdrop-filter: blur(10px);
+                }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-white overflow-x-hidden">
+        <!-- Navigation -->
+        <nav class="fixed top-0 left-0 right-0 z-50 glass-card">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div
+                            class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white/10 p-1 shadow-lg shadow-indigo-950/20 backdrop-blur-sm"
+                        >
+                            <img
+                                src="/static/icons/logo.svg"
+                                alt="ClassMillia logo"
+                                class="h-full w-full object-contain"
+                            />
+                        </div>
+                        <span class="text-xl font-bold">ClassMillia</span>
                     </div>
-                    <span class="text-xl font-bold">ClassMillia</span>
+                    <div class="hidden md:flex items-center space-x-8">
+                        <a
+                            href="#features"
+                            class="text-gray-300 hover:text-white transition-colors"
+                            >Features</a
+                        >
+                        <a
+                            href="#how-it-works"
+                            class="text-gray-300 hover:text-white transition-colors"
+                            >How It Works</a
+                        >
+                        <a
+                            href="#testimonials"
+                            class="text-gray-300 hover:text-white transition-colors"
+                            >Testimonials</a
+                        >
+                    </div>
+                    <div
+                        class="hidden md:flex items-center space-x-2 sm:space-x-4"
+                    >
+                        <a
+                            href="/student/login/"
+                            class="px-3 py-2 sm:px-4 text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
+                            >Student</a
+                        >
+                        <a
+                            href="/lecturer/login/"
+                            class="px-4 py-2 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all text-sm sm:text-base"
+                            >Lecturer</a
+                        >
+                    </div>
+                    <button
+                        id="mobile-menu-btn"
+                        class="md:hidden text-white p-2 ml-2"
+                    >
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#features" class="text-gray-300 hover:text-white transition-colors">Features</a>
-                    <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors">How It Works</a>
-                    <a href="#testimonials" class="text-gray-300 hover:text-white transition-colors">Testimonials</a>
+                <!-- Mobile Menu -->
+                <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
+                    <div class="flex flex-col space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-white font-semibold">Menu</span>
+                            <button
+                                id="close-menu-btn"
+                                class="text-gray-400 hover:text-white p-1"
+                            >
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+                        <div class="h-px bg-white/20"></div>
+                        <a
+                            href="#features"
+                            class="text-gray-300 hover:text-white transition-colors py-2"
+                            >Features</a
+                        >
+                        <a
+                            href="#how-it-works"
+                            class="text-gray-300 hover:text-white transition-colors py-2"
+                            >How It Works</a
+                        >
+                        <a
+                            href="#testimonials"
+                            class="text-gray-300 hover:text-white transition-colors py-2"
+                            >Testimonials</a
+                        >
+                        <div class="h-px bg-white/20 my-2"></div>
+                        <a
+                            href="/student/login/"
+                            class="text-gray-300 hover:text-white transition-colors font-semibold py-2"
+                            >Student Portal</a
+                        >
+                        <a
+                            href="/lecturer/login/"
+                            class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-3 rounded-xl font-semibold text-center"
+                            >Lecturer Portal</a
+                        >
+                    </div>
                 </div>
-                <div class="hidden md:flex items-center space-x-2 sm:space-x-4">
-                    <a href="/student/login/" class="px-3 py-2 sm:px-4 text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Student</a>
-                    <a href="/lecturer/login/" class="px-4 py-2 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all text-sm sm:text-base">Lecturer</a>
-                </div>
-                <button id="mobile-menu-btn" class="md:hidden text-white p-2 ml-2">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
             </div>
-            <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
-                <div class="flex flex-col space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-white font-semibold">Menu</span>
-                        <button id="close-menu-btn" class="text-gray-400 hover:text-white p-1">
-                            <i class="fas fa-times text-lg"></i>
-                        </button>
-                    </div>
-                    <div class="h-px bg-white/20"></div>
-                    <a href="#features" class="text-gray-300 hover:text-white transition-colors py-2">Features</a>
-                    <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors py-2">How It Works</a>
-                    <a href="#testimonials" class="text-gray-300 hover:text-white transition-colors py-2">Testimonials</a>
-                    <div class="h-px bg-white/20 my-2"></div>
-                    <a href="/student/login/" class="text-gray-300 hover:text-white transition-colors font-semibold py-2">Student Portal</a>
-                    <a href="/lecturer/login/" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-3 rounded-xl font-semibold text-center">Lecturer Portal</a>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section
+            class="hero-gradient min-h-screen flex items-center relative overflow-hidden"
+        >
+            <!-- Background Elements -->
+            <div class="absolute inset-0">
+                <div
+                    class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 float-animation"
+                ></div>
+                <div
+                    class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 float-animation"
+                    style="animation-delay: 2s"
+                ></div>
+                <div
+                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
+                    style="animation-delay: 4s"
+                ></div>
             </div>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient min-h-screen flex items-center relative overflow-hidden">
-        <!-- Background Elements -->
-        <div class="absolute inset-0">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 float-animation"></div>
-            <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 float-animation" style="animation-delay: 2s;"></div>
-            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 4s;"></div>
-        </div>
+            <div
+                class="max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-32 relative z-10"
+            >
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6 sm:space-y-8">
+                        <div
+                            class="inline-flex items-center space-x-2 bg-white/10 rounded-full px-3 sm:px-4 py-2 border border-white/20"
+                        >
+                            <span
+                                class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+                            ></span>
+                            <span class="text-xs sm:text-sm text-gray-300"
+                                >Trusted by 50+ Universities</span
+                            >
+                        </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-32 relative z-10">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6 sm:space-y-8">
-                    <div class="inline-flex items-center space-x-2 bg-white/10 rounded-full px-3 sm:px-4 py-2 border border-white/20">
-                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <span class="text-xs sm:text-sm text-gray-300">Trusted by 50+ Universities</span>
+                        <h1
+                            class="text-4xl sm:text-5xl md:text-7xl font-black leading-tight"
+                        >
+                            Attendance
+                            <span class="gradient-text"> Reimagined</span>
+                            <br />for the Modern Era
+                        </h1>
+
+                        <p
+                            class="text-lg sm:text-xl text-gray-300 max-w-xl leading-relaxed"
+                        >
+                            Eliminate attendance fraud, save hours of
+                            administrative work, and create a seamless classroom
+                            experience with AI-powered face recognition and
+                            real-time geofencing.
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a
+                                href="/student/login/"
+                                class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all"
+                            >
+                                <i class="fas fa-user-graduate mr-2"></i>Student
+                                Portal
+                            </a>
+                            <a
+                                href="/lecturer/login/"
+                                class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all"
+                            >
+                                <i class="fas fa-chalkboard-teacher mr-2"></i
+                                >Lecturer Portal
+                            </a>
+                        </div>
+
+                        <div
+                            class="flex flex-wrap items-center justify-center sm:justify-start gap-6 sm:gap-8 pt-4"
+                        >
+                            <div class="text-center">
+                                <p
+                                    class="text-2xl sm:text-3xl font-black gradient-text"
+                                >
+                                    99.9%
+                                </p>
+                                <p class="text-xs sm:text-sm text-gray-400">
+                                    Accuracy Rate
+                                </p>
+                            </div>
+                            <div
+                                class="hidden sm:block w-px h-12 bg-gray-700"
+                            ></div>
+                            <div class="text-center">
+                                <p
+                                    class="text-2xl sm:text-3xl font-black gradient-text"
+                                >
+                                    50K+
+                                </p>
+                                <p class="text-xs sm:text-sm text-gray-400">
+                                    Daily Check-ins
+                                </p>
+                            </div>
+                            <div
+                                class="hidden sm:block w-px h-12 bg-gray-700"
+                            ></div>
+                            <div class="text-center">
+                                <p
+                                    class="text-2xl sm:text-3xl font-black gradient-text"
+                                >
+                                    0.3s
+                                </p>
+                                <p class="text-xs sm:text-sm text-gray-400">
+                                    Response Time
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-black leading-tight">
-                        Attendance
-                        <span class="gradient-text"> Reimagined</span>
-                        <br>for the Modern Era
-                    </h1>
-
-                    <p class="text-lg sm:text-xl text-gray-300 max-w-xl leading-relaxed">
-                        Eliminate attendance fraud, save hours of administrative work, and create a seamless classroom experience with AI-powered face recognition and real-time geofencing.
-                    </p>
-
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="/student/login/" class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all">
-                            <i class="fas fa-user-graduate mr-2"></i>Student Portal
-                        </a>
-                        <a href="/lecturer/login/" class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all">
-                            <i class="fas fa-chalkboard-teacher mr-2"></i>Lecturer Portal
-                        </a>
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-6 sm:gap-8 pt-4">
-                        <div class="text-center">
-                            <p class="text-2xl sm:text-3xl font-black gradient-text">99.9%</p>
-                            <p class="text-xs sm:text-sm text-gray-400">Accuracy Rate</p>
-                        </div>
-                        <div class="hidden sm:block w-px h-12 bg-gray-700"></div>
-                        <div class="text-center">
-                            <p class="text-2xl sm:text-3xl font-black gradient-text">50K+</p>
-                            <p class="text-xs sm:text-sm text-gray-400">Daily Check-ins</p>
-                        </div>
-                        <div class="hidden sm:block w-px h-12 bg-gray-700"></div>
-                        <div class="text-center">
-                            <p class="text-2xl sm:text-3xl font-black gradient-text">0.3s</p>
-                            <p class="text-xs sm:text-sm text-gray-400">Response Time</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="relative hidden lg:block">
-                    <div class="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-                        <img src="{% static 'images/students in a lecture room.png' %}" alt="Students in lecture room" class="w-full h-auto object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
-                        <div class="absolute bottom-6 left-6 right-6">
-                            <div class="glass-card rounded-2xl p-4">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-400">Live Session</p>
-                                        <p class="font-bold">CS401 - Data Structures</p>
+                    <div class="relative hidden lg:block">
+                        <div
+                            class="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+                        >
+                            <img
+                                src="{% static 'images/students in a lecture room.png' %}"
+                                alt="Students in lecture room"
+                                class="w-full h-auto object-cover"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"
+                            ></div>
+                            <div class="absolute bottom-6 left-6 right-6">
+                                <div class="glass-card rounded-2xl p-4">
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
+                                        <div>
+                                            <p class="text-sm text-gray-400">
+                                                Live Session
+                                            </p>
+                                            <p class="font-bold">
+                                                CS401 - Data Structures
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="flex items-center space-x-2"
+                                        >
+                                            <span
+                                                class="w-3 h-3 bg-green-400 rounded-full animate-pulse"
+                                            ></span>
+                                            <span class="text-sm font-bold"
+                                                >47/50 Present</span
+                                            >
+                                        </div>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                        <span class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
-                                        <span class="text-sm font-bold">47/50 Present</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute -top-4 -right-4 glass-card rounded-2xl p-4 pulse-glow"
+                        >
+                            <div class="flex items-center space-x-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center"
+                                >
+                                    <i class="fas fa-check text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold">
+                                        Face Verified
+                                    </p>
+                                    <p class="text-xs text-gray-400">
+                                        98% Match
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Section -->
+        <section class="py-16 sm:py-24 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
+                    <h2
+                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
+                    >
+                        The <span class="gradient-text">Pain</span> is Real
+                    </h2>
+                    <p
+                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
+                    >
+                        Traditional attendance systems are broken. Here's why
+                        universities are switching to ClassMillia.
+                    </p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-red-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-user-secret text-2xl sm:text-3xl text-red-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Proxy Attendance
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            Students signing in for friends costs institutions
+                            millions in lost productivity and inaccurate
+                            records.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
+                        style="animation-delay: 0.2s"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-orange-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-clock text-2xl sm:text-3xl text-orange-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Time Wasted
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            Manual roll calls consume valuable lecture time. 10
+                            minutes per class × 5 classes = 50+ hours weekly
+                            lost.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
+                        style="animation-delay: 0.4s"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-yellow-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-chart-line-down text-2xl sm:text-3xl text-yellow-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Poor Analytics
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            Paper records and spreadsheets make it impossible to
+                            track patterns, identify at-risk students, or
+                            generate reports.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solution Section -->
+        <section
+            id="features"
+            class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
+                    <h2
+                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
+                    >
+                        The <span class="gradient-text">Solution</span>
+                    </h2>
+                    <p
+                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
+                    >
+                        ClassMillia combines cutting-edge AI with seamless UX to
+                        solve attendance once and for all.
+                    </p>
+                </div>
+
+                <div
+                    class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mb-16 sm:mb-24"
+                >
+                    <div class="scroll-reveal order-2 lg:order-1">
+                        <div
+                            class="relative rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <img
+                                src="{% static 'images/image of girl o campus holding a phone whie going to class.jpg' %}"
+                                alt="Student using phone"
+                                class="w-full h-auto object-cover"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"
+                            ></div>
+                            <div
+                                class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6"
+                            >
+                                <div class="glass-card rounded-2xl p-3 sm:p-4">
+                                    <div
+                                        class="flex items-center space-x-3 sm:space-x-4"
+                                    >
+                                        <div
+                                            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
+                                        >
+                                            <i
+                                                class="fas fa-face-smile text-white text-lg sm:text-xl"
+                                            ></i>
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="text-sm sm:text-base font-bold"
+                                            >
+                                                Face Verification Complete
+                                            </p>
+                                            <p
+                                                class="text-xs sm:text-sm text-gray-400"
+                                            >
+                                                Location: Lecture Hall A • 5m
+                                                from center
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="absolute -top-4 -right-4 glass-card rounded-2xl p-4 pulse-glow">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                                <i class="fas fa-check text-white"></i>
+
+                    <div
+                        class="space-y-4 sm:space-y-6 scroll-reveal order-1 lg:order-2"
+                    >
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-face-smile text-lg sm:text-xl text-indigo-400"
+                                ></i>
                             </div>
                             <div>
-                                <p class="text-sm font-bold">Face Verified</p>
-                                <p class="text-xs text-gray-400">98% Match</p>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    AI Face Recognition
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Military-grade facial recognition with 99.9%
+                                    accuracy. No more proxy attendance - only
+                                    the enrolled student can check in.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-location-dot text-lg sm:text-xl text-purple-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Smart Geofencing
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    GPS-based location verification ensures
+                                    students are physically present in the
+                                    lecture hall. Customizable radius per room.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-pink-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-bolt text-lg sm:text-xl text-pink-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Lightning Fast
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Check-in takes less than 3 seconds. No
+                                    lines, no waiting, no disruption to your
+                                    lecture.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-shield-halved text-lg sm:text-xl text-cyan-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Enterprise Security
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    End-to-end encryption, GDPR compliant, and
+                                    SOC 2 Type II certified. Your data is safe
+                                    with us.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Problem Section -->
-    <section class="py-16 sm:py-24 bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="text-center mb-12 sm:mb-16 scroll-reveal">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-4">The <span class="gradient-text">Pain</span> is Real</h2>
-                <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4">Traditional attendance systems are broken. Here's why universities are switching to ClassMillia.</p>
-            </div>
+                <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+                    <div class="space-y-4 sm:space-y-6 scroll-reveal">
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-chart-pie text-lg sm:text-xl text-green-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Real-Time Analytics
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Live dashboards showing attendance rates,
+                                    patterns, and trends. Export reports in one
+                                    click.
+                                </p>
+                            </div>
+                        </div>
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                <div class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-red-500/20 flex items-center justify-center mb-4 sm:mb-6">
-                        <i class="fas fa-user-secret text-2xl sm:text-3xl text-red-400"></i>
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-bell text-lg sm:text-xl text-yellow-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Smart Notifications
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Automated alerts for students at risk of
+                                    falling below attendance thresholds. Early
+                                    intervention saves grades.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-mobile-screen text-lg sm:text-xl text-red-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Mobile First
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Works seamlessly on any device. No app
+                                    download required - just use your browser.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Proxy Attendance</h3>
-                    <p class="text-sm sm:text-base text-gray-400 leading-relaxed">Students signing in for friends costs institutions millions in lost productivity and inaccurate records.</p>
-                </div>
 
-                <div class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal" style="animation-delay: 0.2s;">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-orange-500/20 flex items-center justify-center mb-4 sm:mb-6">
-                        <i class="fas fa-clock text-2xl sm:text-3xl text-orange-400"></i>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Time Wasted</h3>
-                    <p class="text-sm sm:text-base text-gray-400 leading-relaxed">Manual roll calls consume valuable lecture time. 10 minutes per class × 5 classes = 50+ hours weekly lost.</p>
-                </div>
-
-                <div class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal" style="animation-delay: 0.4s;">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-yellow-500/20 flex items-center justify-center mb-4 sm:mb-6">
-                        <i class="fas fa-chart-line-down text-2xl sm:text-3xl text-yellow-400"></i>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Poor Analytics</h3>
-                    <p class="text-sm sm:text-base text-gray-400 leading-relaxed">Paper records and spreadsheets make it impossible to track patterns, identify at-risk students, or generate reports.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Solution Section -->
-    <section id="features" class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="text-center mb-12 sm:mb-16 scroll-reveal">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-4">The <span class="gradient-text">Solution</span></h2>
-                <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4">ClassMillia combines cutting-edge AI with seamless UX to solve attendance once and for all.</p>
-            </div>
-
-            <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mb-16 sm:mb-24">
-                <div class="scroll-reveal order-2 lg:order-1">
-                    <div class="relative rounded-3xl overflow-hidden shadow-2xl">
-                        <img src="{% static 'images/image of girl o campus holding a phone whie going to class.jpg' %}" alt="Student using phone" class="w-full h-auto object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"></div>
-                        <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
-                            <div class="glass-card rounded-2xl p-3 sm:p-4">
-                                <div class="flex items-center space-x-3 sm:space-x-4">
-                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                                        <i class="fas fa-face-smile text-white text-lg sm:text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm sm:text-base font-bold">Face Verification Complete</p>
-                                        <p class="text-xs sm:text-sm text-gray-400">Location: Lecture Hall A • 5m from center</p>
+                    <div class="scroll-reveal">
+                        <div
+                            class="relative rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <img
+                                src="{% static 'images/interractive map.jpg' %}"
+                                alt="Interactive map"
+                                class="w-full h-auto object-cover"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"
+                            ></div>
+                            <div
+                                class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6"
+                            >
+                                <div class="glass-card rounded-2xl p-3 sm:p-4">
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
+                                        <div>
+                                            <p
+                                                class="text-sm sm:text-base font-bold"
+                                            >
+                                                Live Geofence Map
+                                            </p>
+                                            <p
+                                                class="text-xs sm:text-sm text-gray-400"
+                                            >
+                                                3 active sessions • 127 students
+                                                nearby
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500 flex items-center justify-center animate-pulse"
+                                        >
+                                            <i
+                                                class="fas fa-signal text-white text-sm"
+                                            ></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="space-y-4 sm:space-y-6 scroll-reveal order-1 lg:order-2">
-                    <div class="flex items-start space-x-3 sm:space-x-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-face-smile text-lg sm:text-xl text-indigo-400"></i>
+        <!-- How It Works -->
+        <section id="how-it-works" class="py-16 sm:py-24 bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
+                    <h2
+                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
+                    >
+                        How It <span class="gradient-text">Works</span>
+                    </h2>
+                    <p
+                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
+                    >
+                        Three simple steps to revolutionize your attendance
+                        system.
+                    </p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <div class="text-center scroll-reveal">
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl"
+                        >
+                            <span class="text-3xl sm:text-4xl font-black"
+                                >1</span
+                            >
                         </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold mb-2">AI Face Recognition</h3>
-                            <p class="text-sm sm:text-base text-gray-400">Military-grade facial recognition with 99.9% accuracy. No more proxy attendance - only the enrolled student can check in.</p>
-                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Lecturer Creates Session
+                        </h3>
+                        <p class="text-sm sm:text-base text-gray-400 px-4">
+                            Set up attendance windows with location, time, and
+                            course details in seconds.
+                        </p>
                     </div>
 
-                    <div class="flex items-start space-x-3 sm:space-x-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-location-dot text-lg sm:text-xl text-purple-400"></i>
+                    <div
+                        class="text-center scroll-reveal"
+                        style="animation-delay: 0.2s"
+                    >
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-2xl"
+                        >
+                            <span class="text-3xl sm:text-4xl font-black"
+                                >2</span
+                            >
                         </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold mb-2">Smart Geofencing</h3>
-                            <p class="text-sm sm:text-base text-gray-400">GPS-based location verification ensures students are physically present in the lecture hall. Customizable radius per room.</p>
-                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Student Checks In
+                        </h3>
+                        <p class="text-sm sm:text-base text-gray-400 px-4">
+                            Students verify their face and location through
+                            their phone - takes 3 seconds.
+                        </p>
                     </div>
 
-                    <div class="flex items-start space-x-3 sm:space-x-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-pink-500/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-bolt text-lg sm:text-xl text-pink-400"></i>
+                    <div
+                        class="text-center scroll-reveal sm:col-span-2 lg:col-span-1"
+                        style="animation-delay: 0.4s"
+                    >
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center shadow-2xl"
+                        >
+                            <span class="text-3xl sm:text-4xl font-black"
+                                >3</span
+                            >
                         </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold mb-2">Lightning Fast</h3>
-                            <p class="text-sm sm:text-base text-gray-400">Check-in takes less than 3 seconds. No lines, no waiting, no disruption to your lecture.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-3 sm:space-x-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-shield-halved text-lg sm:text-xl text-cyan-400"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold mb-2">Enterprise Security</h3>
-                            <p class="text-sm sm:text-base text-gray-400">End-to-end encryption, GDPR compliant, and SOC 2 Type II certified. Your data is safe with us.</p>
-                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Real-Time Tracking
+                        </h3>
+                        <p class="text-sm sm:text-base text-gray-400 px-4">
+                            Live dashboard shows who's present, with instant
+                            reports and analytics.
+                        </p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-                <div class="space-y-4 sm:space-y-6 scroll-reveal">
-                    <div class="flex items-start space-x-3 sm:space-x-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-chart-pie text-lg sm:text-xl text-green-400"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold mb-2">Real-Time Analytics</h3>
-                            <p class="text-sm sm:text-base text-gray-400">Live dashboards showing attendance rates, patterns, and trends. Export reports in one click.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-3 sm:space-x-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-bell text-lg sm:text-xl text-yellow-400"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold mb-2">Smart Notifications</h3>
-                            <p class="text-sm sm:text-base text-gray-400">Automated alerts for students at risk of falling below attendance thresholds. Early intervention saves grades.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-3 sm:space-x-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-mobile-screen text-lg sm:text-xl text-red-400"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold mb-2">Mobile First</h3>
-                            <p class="text-sm sm:text-base text-gray-400">Works seamlessly on any device. No app download required - just use your browser.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="scroll-reveal">
-                    <div class="relative rounded-3xl overflow-hidden shadow-2xl">
-                        <img src="{% static 'images/interractive map.jpg' %}" alt="Interactive map" class="w-full h-auto object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"></div>
-                        <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
-                            <div class="glass-card rounded-2xl p-3 sm:p-4">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm sm:text-base font-bold">Live Geofence Map</p>
-                                        <p class="text-xs sm:text-sm text-gray-400">3 active sessions • 127 students nearby</p>
-                                    </div>
-                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500 flex items-center justify-center animate-pulse">
-                                        <i class="fas fa-signal text-white text-sm"></i>
-                                    </div>
-                                </div>
+        <!-- Campus Image Section -->
+        <section
+            class="py-16 sm:py-24 bg-gradient-to-b from-gray-800 to-gray-900"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div
+                    class="relative rounded-3xl overflow-hidden shadow-2xl scroll-reveal"
+                >
+                    <img
+                        src="{% static 'images/modern campus backgroud.jpg' %}"
+                        alt="Modern campus"
+                        class="w-full h-auto object-cover"
+                    />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-gray-900/90 to-transparent"
+                    ></div>
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="max-w-2xl px-4 sm:px-6 md:px-12">
+                            <h2
+                                class="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6"
+                            >
+                                Built for Modern
+                                <span class="gradient-text">Universities</span>
+                            </h2>
+                            <p
+                                class="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed"
+                            >
+                                From small colleges to large universities,
+                                ClassMillia scales to meet your needs. Our
+                                platform handles thousands of concurrent
+                                check-ins without breaking a sweat.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <a
+                                    href="/lecturer/login/"
+                                    class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all"
+                                >
+                                    Start Free Trial
+                                </a>
+                                <a
+                                    href="#features"
+                                    class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all"
+                                >
+                                    Learn More
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- How It Works -->
-    <section id="how-it-works" class="py-16 sm:py-24 bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="text-center mb-12 sm:mb-16 scroll-reveal">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-4">How It <span class="gradient-text">Works</span></h2>
-                <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4">Three simple steps to revolutionize your attendance system.</p>
+        <!-- Stats Section -->
+        <section class="py-16 sm:py-24 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+                    <div
+                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
+                    >
+                        <p
+                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
+                        >
+                            50+
+                        </p>
+                        <p class="text-sm sm:text-base text-gray-400">
+                            Universities
+                        </p>
+                    </div>
+                    <div
+                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
+                        style="animation-delay: 0.1s"
+                    >
+                        <p
+                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
+                        >
+                            500K+
+                        </p>
+                        <p class="text-sm sm:text-base text-gray-400">
+                            Students
+                        </p>
+                    </div>
+                    <div
+                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
+                        style="animation-delay: 0.2s"
+                    >
+                        <p
+                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
+                        >
+                            10M+
+                        </p>
+                        <p class="text-sm sm:text-base text-gray-400">
+                            Check-ins
+                        </p>
+                    </div>
+                    <div
+                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
+                        style="animation-delay: 0.3s"
+                    >
+                        <p
+                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
+                        >
+                            99.9%
+                        </p>
+                        <p class="text-sm sm:text-base text-gray-400">Uptime</p>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                <div class="text-center scroll-reveal">
-                    <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl">
-                        <span class="text-3xl sm:text-4xl font-black">1</span>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Lecturer Creates Session</h3>
-                    <p class="text-sm sm:text-base text-gray-400 px-4">Set up attendance windows with location, time, and course details in seconds.</p>
-                </div>
-
-                <div class="text-center scroll-reveal" style="animation-delay: 0.2s;">
-                    <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-2xl">
-                        <span class="text-3xl sm:text-4xl font-black">2</span>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Student Checks In</h3>
-                    <p class="text-sm sm:text-base text-gray-400 px-4">Students verify their face and location through their phone - takes 3 seconds.</p>
-                </div>
-
-                <div class="text-center scroll-reveal sm:col-span-2 lg:col-span-1" style="animation-delay: 0.4s;">
-                    <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center shadow-2xl">
-                        <span class="text-3xl sm:text-4xl font-black">3</span>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Real-Time Tracking</h3>
-                    <p class="text-sm sm:text-base text-gray-400 px-4">Live dashboard shows who's present, with instant reports and analytics.</p>
+        <!-- CTA Section -->
+        <section
+            class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800"
+        >
+            <div
+                class="max-w-4xl mx-auto px-4 sm:px-6 text-center scroll-reveal"
+            >
+                <h2
+                    class="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6"
+                >
+                    Ready to Transform Your
+                    <span class="gradient-text">Attendance?</span>
+                </h2>
+                <p class="text-lg sm:text-xl text-gray-400 mb-6 sm:mb-8 px-4">
+                    Join 50+ universities already using ClassMillia to eliminate
+                    attendance fraud and save countless hours.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a
+                        href="/student/login/"
+                        class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all"
+                    >
+                        <i class="fas fa-user-graduate mr-2"></i>Student Portal
+                    </a>
+                    <a
+                        href="/lecturer/login/"
+                        class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold hover:bg-white/20 transition-all"
+                    >
+                        <i class="fas fa-chalkboard-teacher mr-2"></i>Lecturer
+                        Portal
+                    </a>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Campus Image Section -->
-    <section class="py-16 sm:py-24 bg-gradient-to-b from-gray-800 to-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="relative rounded-3xl overflow-hidden shadow-2xl scroll-reveal">
-                <img src="{% static 'images/modern campus backgroud.jpg' %}" alt="Modern campus" class="w-full h-auto object-cover">
-                <div class="absolute inset-0 bg-gradient-to-r from-gray-900/90 to-transparent"></div>
-                <div class="absolute inset-0 flex items-center">
-                    <div class="max-w-2xl px-4 sm:px-6 md:px-12">
-                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6">Built for Modern <span class="gradient-text">Universities</span></h2>
-                        <p class="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed">From small colleges to large universities, ClassMillia scales to meet your needs. Our platform handles thousands of concurrent check-ins without breaking a sweat.</p>
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <a href="/lecturer/login/" class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all">
-                                Start Free Trial
-                            </a>
-                            <a href="#features" class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all">
-                                Learn More
-                            </a>
+        <!-- Footer -->
+        <footer class="py-8 sm:py-12 bg-gray-900 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div
+                    class="flex flex-col sm:flex-row items-center justify-between gap-4"
+                >
+                    <div class="flex items-center space-x-3">
+                        <div
+                            class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white/10 p-1 shadow-lg shadow-indigo-950/20 backdrop-blur-sm"
+                        >
+                            <img
+                                src="/static/icons/logo.svg"
+                                alt="ClassMillia logo"
+                                class="h-full w-full object-contain"
+                            />
                         </div>
+                        <span class="text-xl font-bold">ClassMillia</span>
                     </div>
+                    <p class="text-gray-400 text-xs sm:text-sm text-center">
+                        © 2025 ClassMillia. All rights reserved. Built for the
+                        future of education.
+                    </p>
                 </div>
             </div>
-        </div>
-    </section>
+        </footer>
 
-    <!-- Stats Section -->
-    <section class="py-16 sm:py-24 bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-                <div class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal">
-                    <p class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2">50+</p>
-                    <p class="text-sm sm:text-base text-gray-400">Universities</p>
-                </div>
-                <div class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal" style="animation-delay: 0.1s;">
-                    <p class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2">500K+</p>
-                    <p class="text-sm sm:text-base text-gray-400">Students</p>
-                </div>
-                <div class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal" style="animation-delay: 0.2s;">
-                    <p class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2">10M+</p>
-                    <p class="text-sm sm:text-base text-gray-400">Check-ins</p>
-                </div>
-                <div class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal" style="animation-delay: 0.3s;">
-                    <p class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2">99.9%</p>
-                    <p class="text-sm sm:text-base text-gray-400">Uptime</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        <script>
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+            const closeMenuBtn = document.getElementById("close-menu-btn");
+            const mobileMenu = document.getElementById("mobile-menu");
 
-    <!-- CTA Section -->
-    <section class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center scroll-reveal">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6">Ready to Transform Your <span class="gradient-text">Attendance?</span></h2>
-            <p class="text-lg sm:text-xl text-gray-400 mb-6 sm:mb-8 px-4">Join 50+ universities already using ClassMillia to eliminate attendance fraud and save countless hours.</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/student/login/" class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all">
-                    <i class="fas fa-user-graduate mr-2"></i>Student Portal
-                </a>
-                <a href="/lecturer/login/" class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold hover:bg-white/20 transition-all">
-                    <i class="fas fa-chalkboard-teacher mr-2"></i>Lecturer Portal
-                </a>
-            </div>
-        </div>
-    </section>
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener("click", () => {
+                    mobileMenu.classList.toggle("hidden");
+                });
+            }
 
-    <!-- Footer -->
-    <footer class="py-8 sm:py-12 bg-gray-900 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                        <i class="fas fa-check-circle text-white text-xl"></i>
-                    </div>
-                    <span class="text-xl font-bold">ClassMillia</span>
-                </div>
-                <p class="text-gray-400 text-xs sm:text-sm text-center">© 2025 ClassMillia. All rights reserved. Built for the future of education.</p>
-            </div>
-        </div>
-    </footer>
+            if (closeMenuBtn && mobileMenu) {
+                closeMenuBtn.addEventListener("click", () => {
+                    mobileMenu.classList.add("hidden");
+                });
+            }
 
-    <script>
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const closeMenuBtn = document.getElementById('close-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
+            // Scroll reveal animation
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px",
+            };
 
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-
-        if (closeMenuBtn && mobileMenu) {
-            closeMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-            });
-        }
-
-        // Scroll reveal animation
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.scroll-reveal').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    // Close mobile menu if open
-                    if (mobileMenu) {
-                        mobileMenu.classList.add('hidden');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
                     }
-                }
-            });
-        });
+                });
+            }, observerOptions);
 
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/static/service-worker.js', {
-                    scope: '/'
-                })
-                .then(function(registration) {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                    registration.update();
-                })
-                .catch(function(error) {
-                    console.log('Service Worker registration failed:', error);
+            document.querySelectorAll(".scroll-reveal").forEach((el) => {
+                observer.observe(el);
+            });
+
+            // Smooth scroll for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(
+                        this.getAttribute("href"),
+                    );
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                        // Close mobile menu if open
+                        if (mobileMenu) {
+                            mobileMenu.classList.add("hidden");
+                        }
+                    }
                 });
             });
-        }
 
-        // Compulsory PWA Install Banner
-        let deferredPrompt;
-        let installShown = localStorage.getItem('pwa_install_shown');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Always show banner unless already installed
-            if (!installShown) {
-                showInstallBanner();
-            }
-        });
-
-        window.addEventListener('appinstalled', () => {
-            localStorage.setItem('pwa_install_shown', 'true');
-            hideInstallBanner();
-        });
-
-        function showInstallBanner() {
-            // Check if banner already exists
-            if (document.getElementById('pwa-install-banner')) {
-                return;
+            // PWA Service Worker Registration
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", function () {
+                    navigator.serviceWorker
+                        .register("/static/service-worker.js", {
+                            scope: "/",
+                        })
+                        .then(function (registration) {
+                            console.log(
+                                "Service Worker registered with scope:",
+                                registration.scope,
+                            );
+                            registration.update();
+                        })
+                        .catch(function (error) {
+                            console.log(
+                                "Service Worker registration failed:",
+                                error,
+                            );
+                        });
+                });
             }
 
-            // Create install banner
-            const banner = document.createElement('div');
-            banner.id = 'pwa-install-banner';
-            banner.innerHTML = `
+            // Compulsory PWA Install Banner
+            let deferredPrompt;
+            let installShown = localStorage.getItem("pwa_install_shown");
+
+            window.addEventListener("beforeinstallprompt", (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+
+                // Always show banner unless already installed
+                if (!installShown) {
+                    showInstallBanner();
+                }
+            });
+
+            window.addEventListener("appinstalled", () => {
+                localStorage.setItem("pwa_install_shown", "true");
+                hideInstallBanner();
+            });
+
+            function showInstallBanner() {
+                // Check if banner already exists
+                if (document.getElementById("pwa-install-banner")) {
+                    return;
+                }
+
+                // Create install banner
+                const banner = document.createElement("div");
+                banner.id = "pwa-install-banner";
+                banner.innerHTML = `
                 <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 8px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
                     <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
@@ -640,46 +1136,53 @@
                     </div>
                 </div>
             `;
-            document.body.prepend(banner);
+                document.body.prepend(banner);
 
-            // Add event listeners
-            document.getElementById('install-btn').addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        localStorage.setItem('pwa_install_shown', 'true');
-                    }
-                    deferredPrompt = null;
-                    hideInstallBanner();
-                }
-            });
+                // Add event listeners
+                document
+                    .getElementById("install-btn")
+                    .addEventListener("click", async () => {
+                        if (deferredPrompt) {
+                            deferredPrompt.prompt();
+                            const { outcome } = await deferredPrompt.userChoice;
+                            if (outcome === "accepted") {
+                                localStorage.setItem(
+                                    "pwa_install_shown",
+                                    "true",
+                                );
+                            }
+                            deferredPrompt = null;
+                            hideInstallBanner();
+                        }
+                    });
 
-            document.getElementById('dismiss-btn').addEventListener('click', () => {
-                // Show again after 30 minutes
-                setTimeout(() => {
-                    localStorage.removeItem('pwa_install_shown');
-                }, 1800000);
-                hideInstallBanner();
-            });
-        }
-
-        function hideInstallBanner() {
-            const banner = document.getElementById('pwa-install-banner');
-            if (banner) {
-                banner.remove();
+                document
+                    .getElementById("dismiss-btn")
+                    .addEventListener("click", () => {
+                        // Show again after 30 minutes
+                        setTimeout(() => {
+                            localStorage.removeItem("pwa_install_shown");
+                        }, 1800000);
+                        hideInstallBanner();
+                    });
             }
-        }
 
-        // Check if already installed and show banner if not
-        if (!installShown) {
-            // Try to show banner after a short delay
-            setTimeout(() => {
-                if (deferredPrompt) {
-                    showInstallBanner();
+            function hideInstallBanner() {
+                const banner = document.getElementById("pwa-install-banner");
+                if (banner) {
+                    banner.remove();
                 }
-            }, 2000);
-        }
-    </script>
-</body>
+            }
+
+            // Check if already installed and show banner if not
+            if (!installShown) {
+                // Try to show banner after a short delay
+                setTimeout(() => {
+                    if (deferredPrompt) {
+                        showInstallBanner();
+                    }
+                }, 2000);
+            }
+        </script>
+    </body>
 </html>

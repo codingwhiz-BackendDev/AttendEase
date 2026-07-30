@@ -9,11 +9,14 @@
         <link rel="manifest" href="/static/manifest.json" />
         <meta name="theme-color" content="#667eea" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
         <meta name="apple-mobile-web-app-title" content="ClassMillia" />
         <!-- Favicon using your custom logo -->
-        <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg">
-        <link rel="apple-touch-icon" href="/static/icons/logo.svg">
+        <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg" />
+        <link rel="apple-touch-icon" href="/static/icons/logo.svg" />
         <script src="https://cdn.tailwindcss.com"></script>
         <link
             rel="stylesheet"
@@ -77,11 +80,13 @@
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
                             <div
-                                class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-lg shadow-indigo-950/50"
+                                class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white/15 p-1.5 backdrop-blur-sm shadow-lg shadow-indigo-950/50"
                             >
-                                <i
-                                    class="fas fa-check-circle text-xl text-white"
-                                ></i>
+                                <img
+                                    src="/static/icons/logo.svg"
+                                    alt="ClassMillia logo"
+                                    class="h-full w-full object-contain"
+                                />
                             </div>
                             <div>
                                 <p class="text-lg font-black tracking-tight">
@@ -294,17 +299,28 @@
                     >
                         <i class="fas fa-bars"></i>
                     </button>
-                    <div class="text-center">
-                        <p
-                            class="text-sm font-black tracking-tight text-slate-900"
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-1 shadow-sm"
                         >
-                            ClassMillia
-                        </p>
-                        <p
-                            class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500"
-                        >
-                            Workspace
-                        </p>
+                            <img
+                                src="/static/icons/logo.svg"
+                                alt="ClassMillia logo"
+                                class="h-full w-full object-contain"
+                            />
+                        </div>
+                        <div class="text-center sm:text-left">
+                            <p
+                                class="text-sm font-black tracking-tight text-slate-900"
+                            >
+                                ClassMillia
+                            </p>
+                            <p
+                                class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500"
+                            >
+                                Workspace
+                            </p>
+                        </div>
                     </div>
                     <div
                         class="h-11 w-11 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black shadow-md"
@@ -381,49 +397,56 @@
 
         <!-- PWA Service Worker Registration -->
         <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/static/service-worker.js', {
-                        scope: '/'
-                    })
-                    .then(function(registration) {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                        registration.update();
-                    })
-                    .catch(function(error) {
-                        console.log('Service Worker registration failed:', error);
-                    });
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", function () {
+                    navigator.serviceWorker
+                        .register("/static/service-worker.js", {
+                            scope: "/",
+                        })
+                        .then(function (registration) {
+                            console.log(
+                                "Service Worker registered with scope:",
+                                registration.scope,
+                            );
+                            registration.update();
+                        })
+                        .catch(function (error) {
+                            console.log(
+                                "Service Worker registration failed:",
+                                error,
+                            );
+                        });
                 });
             }
 
             // Compulsory PWA Install Banner
             let deferredPrompt;
-            let installShown = localStorage.getItem('pwa_install_shown');
+            let installShown = localStorage.getItem("pwa_install_shown");
 
-            window.addEventListener('beforeinstallprompt', (e) => {
+            window.addEventListener("beforeinstallprompt", (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
-                
+
                 // Always show banner unless already installed
                 if (!installShown) {
                     showInstallBanner();
                 }
             });
 
-            window.addEventListener('appinstalled', () => {
-                localStorage.setItem('pwa_install_shown', 'true');
+            window.addEventListener("appinstalled", () => {
+                localStorage.setItem("pwa_install_shown", "true");
                 hideInstallBanner();
             });
 
             function showInstallBanner() {
                 // Check if banner already exists
-                if (document.getElementById('pwa-install-banner')) {
+                if (document.getElementById("pwa-install-banner")) {
                     return;
                 }
 
                 // Create install banner
-                const banner = document.createElement('div');
-                banner.id = 'pwa-install-banner';
+                const banner = document.createElement("div");
+                banner.id = "pwa-install-banner";
                 banner.innerHTML = `
                     <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 8px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
                         <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -447,29 +470,36 @@
                 document.body.prepend(banner);
 
                 // Add event listeners
-                document.getElementById('install-btn').addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') {
-                            localStorage.setItem('pwa_install_shown', 'true');
+                document
+                    .getElementById("install-btn")
+                    .addEventListener("click", async () => {
+                        if (deferredPrompt) {
+                            deferredPrompt.prompt();
+                            const { outcome } = await deferredPrompt.userChoice;
+                            if (outcome === "accepted") {
+                                localStorage.setItem(
+                                    "pwa_install_shown",
+                                    "true",
+                                );
+                            }
+                            deferredPrompt = null;
+                            hideInstallBanner();
                         }
-                        deferredPrompt = null;
-                        hideInstallBanner();
-                    }
-                });
+                    });
 
-                document.getElementById('dismiss-btn').addEventListener('click', () => {
-                    // Show again after 30 minutes
-                    setTimeout(() => {
-                        localStorage.removeItem('pwa_install_shown');
-                    }, 1800000);
-                    hideInstallBanner();
-                });
+                document
+                    .getElementById("dismiss-btn")
+                    .addEventListener("click", () => {
+                        // Show again after 30 minutes
+                        setTimeout(() => {
+                            localStorage.removeItem("pwa_install_shown");
+                        }, 1800000);
+                        hideInstallBanner();
+                    });
             }
 
             function hideInstallBanner() {
-                const banner = document.getElementById('pwa-install-banner');
+                const banner = document.getElementById("pwa-install-banner");
                 if (banner) {
                     banner.remove();
                 }
