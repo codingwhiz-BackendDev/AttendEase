@@ -76,6 +76,28 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Mobile menu improvements */
+        #mobile-menu {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .glass-card {
+                backdrop-filter: blur(10px);
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white overflow-x-hidden">
@@ -94,20 +116,30 @@
                     <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors">How It Works</a>
                     <a href="#testimonials" class="text-gray-300 hover:text-white transition-colors">Testimonials</a>
                 </div>
-                <div class="flex items-center space-x-2 sm:space-x-4">
+                <div class="hidden md:flex items-center space-x-2 sm:space-x-4">
                     <a href="/student/login/" class="px-3 py-2 sm:px-4 text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Student</a>
                     <a href="/lecturer/login/" class="px-4 py-2 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all text-sm sm:text-base">Lecturer</a>
                 </div>
-                <button id="mobile-menu-btn" class="md:hidden text-white p-2">
+                <button id="mobile-menu-btn" class="md:hidden text-white p-2 ml-2">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
                 <div class="flex flex-col space-y-4">
-                    <a href="#features" class="text-gray-300 hover:text-white transition-colors">Features</a>
-                    <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors">How It Works</a>
-                    <a href="#testimonials" class="text-gray-300 hover:text-white transition-colors">Testimonials</a>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white font-semibold">Menu</span>
+                        <button id="close-menu-btn" class="text-gray-400 hover:text-white p-1">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                    <div class="h-px bg-white/20"></div>
+                    <a href="#features" class="text-gray-300 hover:text-white transition-colors py-2">Features</a>
+                    <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors py-2">How It Works</a>
+                    <a href="#testimonials" class="text-gray-300 hover:text-white transition-colors py-2">Testimonials</a>
+                    <div class="h-px bg-white/20 my-2"></div>
+                    <a href="/student/login/" class="text-gray-300 hover:text-white transition-colors font-semibold py-2">Student Portal</a>
+                    <a href="/lecturer/login/" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-3 rounded-xl font-semibold text-center">Lecturer Portal</a>
                 </div>
             </div>
         </div>
@@ -484,11 +516,18 @@
     <script>
         // Mobile menu toggle
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
 
         if (mobileMenuBtn && mobileMenu) {
             mobileMenuBtn.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        if (closeMenuBtn && mobileMenu) {
+            closeMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
             });
         }
 
