@@ -10,7 +10,7 @@
   "scope": "/",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23667eea' rx='100'/%3E%3Ccircle cx='256' cy='200' r='80' fill='white' opacity='0.9'/%3E%3Cpath d='M 256 300 C 180 300 120 340 120 400 L 120 420 C 120 460 392 460 392 420 L 392 400 C 392 340 332 300 256 300' fill='white' opacity='0.9'/%3E%3Ccircle cx='256' cy='180' r='60' fill='%23667eea'/%3E%3Cpath d='M 256 260 C 200 260 160 290 160 340 L 160 360 C 160 390 352 390 352 360 L 352 340 C 352 290 312 260 256 260' fill='%23667eea'/%3E%3Ccircle cx='256' cy='170' r='40' fill='white'/%3E%3Cpath d='M 256 230 C 220 230 200 250 200 280 L 200 290 C 200 310 312 310 312 290 L 312 280 C 312 250 292 230 256 230' fill='white'/%3E%3C/svg%3E",
+      "src": "/static/icons/logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
