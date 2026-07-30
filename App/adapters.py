@@ -46,20 +46,32 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """Ensure login is for students or lecturers and validate emails accordingly."""
         from .models import StudentProfile, LecturerProfile
         from django.contrib.auth.models import User
-        
+
         process = request.session.get("login_process", "")
         email = sociallogin.account.extra_data.get("email", "")
 
         logger.info(f"Login process: {process}, Email: {email}")
 
         if process == "student" and not email.endswith("@run.edu.ng"):
-            messages.error(request, "Only student emails (@run.edu.ng) are allowed.")
-            logger.warning(f"Blocked non-student email: {email}")
-            raise ImmediateHttpResponse(redirect("/student/login/"))
+            messages.error(
+                request,
+                f"🚫 Student portal requires a school email (@run.edu.ng).\n"
+                f"You tried logging in with '{email}'.\n"
+                f"Please use your official Redeemer's University student email, or click the Lecturer portal instead.",
+            )
+            logger.warning(f"Blocked non-student email for student portal: {email}")
+            # Redirect to welcome_page (RENDERED, not another redirect) so messages display
+            raise ImmediateHttpResponse(redirect("welcome_page"))
         elif process == "lecturer" and not email.endswith("@gmail.com"):
-            messages.error(request, "Only lecturer emails (@gmail.com) are allowed.")
-            logger.warning(f"Blocked non-lecturer email: {email}")
-            raise ImmediateHttpResponse(redirect("/lecturer/login/"))
+            messages.error(
+                request,
+                f"🚫 Lecturer portal requires a Gmail account (@gmail.com).\n"
+                f"You tried logging in with '{email}'.\n"
+                f"Please sign in with your Gmail address, or click the Student portal instead.",
+            )
+            logger.warning(f"Blocked non-lecturer email for lecturer portal: {email}")
+            # Redirect to welcome_page (RENDERED, not another redirect) so messages display
+            raise ImmediateHttpResponse(redirect("welcome_page"))
 
         # Auto-link social account to existing user by email
         if not sociallogin.is_existing:

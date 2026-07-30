@@ -134,6 +134,354 @@
                     backdrop-filter: blur(10px);
                 }
             }
+
+            /* ---------- Animated Flash Messages ---------- */
+
+            .flash-wrap {
+                position: fixed;
+                top: 6rem;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 60;
+                width: 92%;
+                max-width: 36rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                pointer-events: none;
+            }
+
+            .flash-card {
+                position: relative;
+                pointer-events: auto;
+                overflow: hidden;
+                border-radius: 1.25rem;
+                padding: 0;
+                box-shadow:
+                    0 25px 50px -12px rgba(0, 0, 0, 0.65),
+                    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+                backdrop-filter: blur(22px) saturate(180%);
+                -webkit-backdrop-filter: blur(22px) saturate(180%);
+                animation:
+                    flash-in 0.55s cubic-bezier(0.22, 1.2, 0.36, 1) both,
+                    flash-float 4.5s ease-in-out 1.2s infinite;
+            }
+
+            .flash-card.flash-error {
+                background:
+                    radial-gradient(
+                        120% 80% at 0% 0%,
+                        rgba(248, 113, 113, 0.22) 0%,
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(127, 29, 29, 0.92) 0%,
+                        rgba(153, 27, 27, 0.88) 45%,
+                        rgba(69, 10, 10, 0.92) 100%
+                    );
+                color: #fff1f2;
+            }
+
+            .flash-card.flash-warning {
+                background:
+                    radial-gradient(
+                        120% 80% at 0% 0%,
+                        rgba(251, 191, 36, 0.22) 0%,
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(120, 53, 15, 0.92) 0%,
+                        rgba(146, 64, 14, 0.88) 45%,
+                        rgba(69, 26, 3, 0.92) 100%
+                    );
+                color: #fffbeb;
+            }
+
+            .flash-card.flash-success {
+                background:
+                    radial-gradient(
+                        120% 80% at 0% 0%,
+                        rgba(52, 211, 153, 0.22) 0%,
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(6, 78, 59, 0.92) 0%,
+                        rgba(6, 95, 70, 0.88) 45%,
+                        rgba(2, 44, 34, 0.92) 100%
+                    );
+                color: #ecfdf5;
+            }
+
+            .flash-card.flash-info {
+                background:
+                    radial-gradient(
+                        120% 80% at 0% 0%,
+                        rgba(129, 140, 248, 0.25) 0%,
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(49, 46, 129, 0.92) 0%,
+                        rgba(67, 56, 202, 0.88) 45%,
+                        rgba(30, 27, 75, 0.92) 100%
+                    );
+                color: #eef2ff;
+            }
+
+            .flash-card.flash-dismiss {
+                animation: flash-out 0.42s cubic-bezier(0.55, 0, 1, 0.45) forwards !important;
+            }
+
+            /* Gradient left-side accent stripe */
+            .flash-stripe {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 5px;
+                background: linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.7),
+                    rgba(255, 255, 255, 0.15) 40%,
+                    rgba(255, 255, 255, 0.7)
+                );
+                opacity: 0.9;
+            }
+
+            .flash-error .flash-stripe {
+                background: linear-gradient(180deg, #fca5a5 0%, #ef4444 50%, #fca5a5 100%);
+            }
+            .flash-warning .flash-stripe {
+                background: linear-gradient(180deg, #fde68a 0%, #f59e0b 50%, #fde68a 100%);
+            }
+            .flash-success .flash-stripe {
+                background: linear-gradient(180deg, #86efac 0%, #10b981 50%, #86efac 100%);
+            }
+            .flash-info .flash-stripe {
+                background: linear-gradient(180deg, #c7d2fe 0%, #6366f1 50%, #c7d2fe 100%);
+            }
+
+            .flash-inner {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.9rem;
+                padding: 1rem 1.05rem 1rem 1.25rem;
+            }
+
+            .flash-icon {
+                flex-shrink: 0;
+                width: 2.75rem;
+                height: 2.75rem;
+                display: grid;
+                place-items: center;
+                border-radius: 0.95rem;
+                font-size: 1.25rem;
+                margin-top: 0.1rem;
+                position: relative;
+                isolation: isolate;
+            }
+
+            .flash-error .flash-icon {
+                background:
+                    radial-gradient(circle at 30% 30%, rgba(254, 202, 202, 0.5), transparent 60%),
+                    linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(185, 28, 28, 0.2));
+                box-shadow:
+                    inset 0 0 0 1px rgba(254, 202, 202, 0.35),
+                    0 10px 30px -8px rgba(239, 68, 68, 0.65);
+            }
+            .flash-warning .flash-icon {
+                background:
+                    radial-gradient(circle at 30% 30%, rgba(253, 230, 138, 0.5), transparent 60%),
+                    linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(180, 83, 9, 0.2));
+                box-shadow:
+                    inset 0 0 0 1px rgba(253, 230, 138, 0.4),
+                    0 10px 30px -8px rgba(245, 158, 11, 0.6);
+            }
+            .flash-success .flash-icon {
+                background:
+                    radial-gradient(circle at 30% 30%, rgba(187, 247, 208, 0.5), transparent 60%),
+                    linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.2));
+                box-shadow:
+                    inset 0 0 0 1px rgba(187, 247, 208, 0.4),
+                    0 10px 30px -8px rgba(16, 185, 129, 0.6);
+            }
+            .flash-info .flash-icon {
+                background:
+                    radial-gradient(circle at 30% 30%, rgba(199, 210, 254, 0.55), transparent 60%),
+                    linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(79, 70, 229, 0.2));
+                box-shadow:
+                    inset 0 0 0 1px rgba(199, 210, 254, 0.45),
+                    0 10px 30px -8px rgba(99, 102, 241, 0.65);
+            }
+
+            .flash-icon::after {
+                content: "";
+                position: absolute;
+                inset: -4px;
+                border-radius: 1.1rem;
+                opacity: 0.7;
+                filter: blur(12px);
+                z-index: -1;
+                animation: flash-icon-glow 2.4s ease-in-out infinite;
+            }
+            .flash-error   .flash-icon::after { background: #ef4444; }
+            .flash-warning .flash-icon::after { background: #f59e0b; }
+            .flash-success .flash-icon::after { background: #10b981; }
+            .flash-info    .flash-icon::after { background: #6366f1; }
+
+            .flash-body {
+                flex: 1;
+                min-width: 0;
+                padding-right: 0.25rem;
+            }
+
+            .flash-title {
+                font-weight: 800;
+                font-size: 0.98rem;
+                letter-spacing: -0.01em;
+                line-height: 1.3;
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .flash-chip {
+                font-size: 0.65rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                padding: 0.12rem 0.5rem;
+                border-radius: 999px;
+                line-height: 1.6;
+            }
+            .flash-error   .flash-chip { background: rgba(254, 202, 202, 0.2); color: #fecaca; }
+            .flash-warning .flash-chip { background: rgba(253, 230, 138, 0.22); color: #fde68a; }
+            .flash-success .flash-chip { background: rgba(187, 247, 208, 0.22); color: #bbf7d0; }
+            .flash-info    .flash-chip { background: rgba(199, 210, 254, 0.22); color: #c7d2fe; }
+
+            .flash-text {
+                font-size: 0.85rem;
+                line-height: 1.62;
+                opacity: 0.93;
+                white-space: pre-line;
+                word-break: break-word;
+            }
+
+            /* Email chip inside message for visual emphasis */
+            .flash-email {
+                display: inline-block;
+                margin: 0.2rem 0;
+                padding: 0.18rem 0.55rem;
+                border-radius: 0.5rem;
+                font-weight: 700;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-size: 0.8rem;
+            }
+            .flash-error   .flash-email { background: rgba(254, 202, 202, 0.15); border: 1px solid rgba(252, 165, 165, 0.4); }
+            .flash-warning .flash-email { background: rgba(253, 230, 138, 0.15); border: 1px solid rgba(252, 211, 77, 0.45); }
+            .flash-success .flash-email { background: rgba(187, 247, 208, 0.16); border: 1px solid rgba(134, 239, 172, 0.4); }
+            .flash-info    .flash-email { background: rgba(199, 210, 254, 0.16); border: 1px solid rgba(165, 180, 252, 0.45); }
+
+            .flash-close {
+                flex-shrink: 0;
+                width: 1.75rem;
+                height: 1.75rem;
+                display: grid;
+                place-items: center;
+                border-radius: 0.55rem;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: rgba(255, 255, 255, 0.75);
+                cursor: pointer;
+                transition:
+                    transform 0.2s ease,
+                    background 0.2s ease,
+                    color 0.2s ease;
+                font-size: 0.95rem;
+                line-height: 1;
+                padding: 0;
+                margin-top: 0.1rem;
+            }
+
+            .flash-close:hover {
+                background: rgba(255, 255, 255, 0.18);
+                color: #fff;
+                transform: rotate(90deg) scale(1.06);
+            }
+            .flash-close:active { transform: rotate(90deg) scale(0.94); }
+
+            /* Countdown progress bar at bottom of card */
+            .flash-progress {
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: 3px;
+                overflow: hidden;
+                background: rgba(255, 255, 255, 0.1);
+            }
+            .flash-progress::after {
+                content: "";
+                display: block;
+                height: 100%;
+                width: 100%;
+                transform-origin: left center;
+                animation: flash-progress 12s linear forwards;
+            }
+            .flash-error   .flash-progress::after { background: linear-gradient(90deg, #fecaca, #ef4444, #fecaca); }
+            .flash-warning .flash-progress::after { background: linear-gradient(90deg, #fde68a, #f59e0b, #fde68a); }
+            .flash-success .flash-progress::after { background: linear-gradient(90deg, #bbf7d0, #10b981, #bbf7d0); }
+            .flash-info    .flash-progress::after { background: linear-gradient(90deg, #c7d2fe, #6366f1, #c7d2fe); }
+
+            /* ---------- Keyframes ---------- */
+            @keyframes flash-in {
+                0% {
+                    opacity: 0;
+                    transform: translateY(-28px) scale(0.92);
+                    filter: blur(6px);
+                }
+                60% {
+                    opacity: 1;
+                    transform: translateY(6px) scale(1.015);
+                    filter: blur(0);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                    filter: blur(0);
+                }
+            }
+
+            @keyframes flash-out {
+                0% {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateX(42px) scale(0.92);
+                    filter: blur(4px);
+                }
+            }
+
+            @keyframes flash-float {
+                0%, 100% { transform: translateY(0); }
+                50%      { transform: translateY(-3px); }
+            }
+
+            @keyframes flash-icon-glow {
+                0%, 100% { opacity: 0.45; transform: scale(1);   }
+                50%      { opacity: 0.85; transform: scale(1.2); }
+            }
+
+            @keyframes flash-progress {
+                from { transform: scaleX(1); }
+                to   { transform: scaleX(0); }
+            }
         </style>
     </head>
     <body class="bg-gray-900 text-white overflow-x-hidden">
@@ -175,11 +523,15 @@
                     >
                         <a
                             href="/student/login/"
+                            data-login-role="student"
+                            title="Requires @run.edu.ng email"
                             class="px-3 py-2 sm:px-4 text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
                             >Student</a
                         >
                         <a
                             href="/lecturer/login/"
+                            data-login-role="lecturer"
+                            title="Requires @gmail.com email"
                             class="px-4 py-2 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all text-sm sm:text-base"
                             >Lecturer</a
                         >
@@ -222,18 +574,92 @@
                         <div class="h-px bg-white/20 my-2"></div>
                         <a
                             href="/student/login/"
+                            data-login-role="student"
                             class="text-gray-300 hover:text-white transition-colors font-semibold py-2"
-                            >Student Portal</a
-                        >
+                            >Student Portal
+                            <span class="block text-[11px] font-normal text-indigo-300/80 mt-1">
+                                <i class="fas fa-envelope-circle-check mr-1"></i>Requires
+                                @run.edu.ng email
+                            </span>
+                        </a>
                         <a
                             href="/lecturer/login/"
+                            data-login-role="lecturer"
                             class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-3 rounded-xl font-semibold text-center"
-                            >Lecturer Portal</a
-                        >
+                            >Lecturer Portal
+                            <span class="block text-[11px] font-normal text-white/75 mt-1">
+                                <i class="fas fa-envelope-circle-check mr-1"></i>Requires
+                                @gmail.com email
+                            </span>
+                        </a>
                     </div>
                 </div>
             </div>
         </nav>
+
+        <!-- Django Messages (beautiful animated flash cards) -->
+        {% if messages %}
+        <div class="flash-wrap" id="flash-wrap">
+            {% for message in messages %}
+            <div
+                class="flash-card
+                    {% if message.tags == 'error' %}flash-error{% elif message.tags == 'warning' %}flash-warning{% elif message.tags == 'success' %}flash-success{% else %}flash-info{% endif %}"
+                data-flash
+            >
+                <!-- Left accent stripe -->
+                <div class="flash-stripe" aria-hidden="true"></div>
+
+                <div class="flash-inner">
+                    <!-- Icon badge with glow halo -->
+                    <div class="flash-icon" aria-hidden="true">
+                        {% if message.tags == 'error' %}
+                        <i class="fas fa-ban"></i>
+                        {% elif message.tags == 'warning' %}
+                        <i class="fas fa-triangle-exclamation"></i>
+                        {% elif message.tags == 'success' %}
+                        <i class="fas fa-circle-check"></i>
+                        {% else %}
+                        <i class="fas fa-circle-info"></i>
+                        {% endif %}
+                    </div>
+
+                    <!-- Body: title chip + text with embedded email chip -->
+                    <div class="flash-body">
+                        <div class="flash-title">
+                            {% if message.tags == 'error' %}
+                            <span class="flash-chip">Access Denied</span>
+                            Wrong email type
+                            {% elif message.tags == 'warning' %}
+                            <span class="flash-chip">Heads up</span>
+                            Please review before continuing
+                            {% elif message.tags == 'success' %}
+                            <span class="flash-chip">Success</span>
+                            Operation completed
+                            {% else %}
+                            <span class="flash-chip">Info</span>
+                            Quick note
+                            {% endif %}
+                        </div>
+                        <div class="flash-text" data-flash-text>{{ message }}</div>
+                    </div>
+
+                    <!-- Dismiss button (spins 90deg on hover) -->
+                    <button
+                        type="button"
+                        class="flash-close"
+                        aria-label="Dismiss notification"
+                        data-flash-close
+                    >
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Bottom countdown progress bar -->
+                <div class="flash-progress" aria-hidden="true"></div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <!-- Hero Section -->
         <section
@@ -288,20 +714,36 @@
                         </p>
 
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <a
-                                href="/student/login/"
-                                class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all"
-                            >
-                                <i class="fas fa-user-graduate mr-2"></i>Student
-                                Portal
-                            </a>
-                            <a
-                                href="/lecturer/login/"
-                                class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all"
-                            >
-                                <i class="fas fa-chalkboard-teacher mr-2"></i
-                                >Lecturer Portal
-                            </a>
+                            <div class="flex flex-col gap-2 w-full sm:w-auto">
+                                <a
+                                    href="/student/login/"
+                                    data-login-role="student"
+                                    class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all"
+                                >
+                                    <i class="fas fa-user-graduate mr-2"></i>Student
+                                    Portal
+                                </a>
+                                <p class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2">
+                                    <i class="fas fa-envelope-circle-check mr-1"></i>Requires
+                                    <span class="font-bold text-indigo-200">@run.edu.ng</span>
+                                    email
+                                </p>
+                            </div>
+                            <div class="flex flex-col gap-2 w-full sm:w-auto">
+                                <a
+                                    href="/lecturer/login/"
+                                    data-login-role="lecturer"
+                                    class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all"
+                                >
+                                    <i class="fas fa-chalkboard-teacher mr-2"></i
+                                    >Lecturer Portal
+                                </a>
+                                <p class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2">
+                                    <i class="fas fa-envelope-circle-check mr-1"></i>Requires
+                                    <span class="font-bold text-white/80">@gmail.com</span>
+                                    email
+                                </p>
+                            </div>
                         </div>
 
                         <div
@@ -966,19 +1408,35 @@
                     attendance fraud and save countless hours.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a
-                        href="/student/login/"
-                        class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all"
-                    >
-                        <i class="fas fa-user-graduate mr-2"></i>Student Portal
-                    </a>
-                    <a
-                        href="/lecturer/login/"
-                        class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold hover:bg-white/20 transition-all"
-                    >
-                        <i class="fas fa-chalkboard-teacher mr-2"></i>Lecturer
-                        Portal
-                    </a>
+                    <div class="flex flex-col gap-2 w-full sm:w-auto">
+                        <a
+                            href="/student/login/"
+                            data-login-role="student"
+                            class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all"
+                        >
+                            <i class="fas fa-user-graduate mr-2"></i>Student Portal
+                        </a>
+                        <p class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2">
+                            <i class="fas fa-envelope-circle-check mr-1"></i>Requires
+                            <span class="font-bold text-indigo-200">@run.edu.ng</span>
+                            email
+                        </p>
+                    </div>
+                    <div class="flex flex-col gap-2 w-full sm:w-auto">
+                        <a
+                            href="/lecturer/login/"
+                            data-login-role="lecturer"
+                            class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold hover:bg-white/20 transition-all"
+                        >
+                            <i class="fas fa-chalkboard-teacher mr-2"></i>Lecturer
+                            Portal
+                        </a>
+                        <p class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2">
+                            <i class="fas fa-envelope-circle-check mr-1"></i>Requires
+                            <span class="font-bold text-white/80">@gmail.com</span>
+                            email
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1183,6 +1641,59 @@
                     }
                 }, 2000);
             }
+
+            // ------------------------------------------------------------
+            // Beautiful animated flash messages: email-chip decorator, dismiss handlers,
+            // smooth auto-dismiss after 12s (matches CSS countdown bar timing).
+            // ------------------------------------------------------------
+            (function setupFlashCards() {
+                const AUTO_DISMISS_MS = 12000;
+
+                // Helper: wraps any email in single quotes or bare emails with <span class="flash-email">
+                // Matches: ............. 'user@domain.tld'  or  bare user@domain.tld
+                const EMAIL_CHIP_RE = /'([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)'|([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)/g;
+
+                document.querySelectorAll("[data-flash-text]").forEach((el) => {
+                    // Decorate emails inside the text without breaking whitespace-pre-line.
+                    // Walk text nodes only so nested tags remain intact.
+                    const html = el.innerHTML;
+                    const decorated = html.replace(
+                        EMAIL_CHIP_RE,
+                        (m, quoted, bare) => {
+                            const email = quoted || bare;
+                            return `<span class="flash-email">${email}</span>`;
+                        },
+                    );
+                    if (decorated !== html) el.innerHTML = decorated;
+                });
+
+                function dismissCard(card) {
+                    if (!card || card.classList.contains("flash-dismiss")) return;
+                    card.classList.add("flash-dismiss");
+                    card.addEventListener(
+                        "animationend",
+                        () => {
+                            card.remove();
+                            const wrap = document.getElementById("flash-wrap");
+                            if (wrap && !wrap.querySelector("[data-flash]")) wrap.remove();
+                        },
+                        { once: true },
+                    );
+                }
+
+                // Manual dismiss buttons (close on click (playsmoothly animates then removes
+                document.querySelectorAll("[data-flash-close]").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const card = btn.closest("[data-flash]");
+                        if (card) dismissCard(card);
+                    });
+                });
+
+                // Auto-dismiss every flash card once the 12s countdown is over
+                document.querySelectorAll("[data-flash]").forEach((card) => {
+                    setTimeout(() => dismissCard(card), AUTO_DISMISS_MS);
+                });
+            })();
         </script>
     </body>
 </html>
