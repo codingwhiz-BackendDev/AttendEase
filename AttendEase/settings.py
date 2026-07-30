@@ -53,6 +53,12 @@ INSTALLED_APPS = [
  
 SITE_ID = 1
 
+# Authentication backends for allauth
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
 # Login and Logout Redirects
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "/"  # Let adapter handle redirect
@@ -74,14 +80,16 @@ SOCIALACCOUNT_ADAPTER = "App.adapters.CustomSocialAccountAdapter"
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-# Configure Google OAuth using environment variables
+# Configure Google OAuth - credentials come from Social Application in Django Admin
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'APP': {
-            'client_id': os.getenv('GOOGLE_CLIENT_ID', ''),
-            'secret': os.getenv('GOOGLE_CLIENT_SECRET', ''),
-            'key': '',
-        }
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
     }
 }
 
@@ -99,7 +107,8 @@ MIDDLEWARE = [
 
 # Session settings (optional, but recommended)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
-SESSION_COOKIE_SECURE = False  # Set to True in production if using HTTP
+SESSION_COOKIE_SECURE = not DEBUG  # Set to True in production
+CSRF_COOKIE_SECURE = not DEBUG  # Set to True in production
 
 
 ROOT_URLCONF = 'AttendEase.urls'
