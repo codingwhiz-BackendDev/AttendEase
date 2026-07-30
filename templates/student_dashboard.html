@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %} 
+{% load static %} 
+{% block content %}
 <style>
     .countdown-cell {
         font-variant-numeric: tabular-nums;
@@ -102,11 +104,7 @@
                         class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-1"
                     >
                         Welcome back,
-                        <span class="gradient-text"
-                            >{{
-                            user.get_full_name|default:user.last_name|default:user.username
-                            }}</span
-                        >! 👋
+                        <span class="gradient-text">{{  user.get_full_name|default:user.last_name|default:user.username }}</span>! 👋
                     </h1>
                     <p class="text-xs sm:text-sm lg:text-base text-gray-400">
                         Track your attendance, get to class on time, and stay in

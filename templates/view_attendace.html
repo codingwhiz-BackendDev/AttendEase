@@ -350,8 +350,7 @@
                             Students Here
                         </p>
                         <p class="font-bold text-white">
-                            <i class="fas fa-users text-indigo-400 mr-1"></i>{{
-                            att.attendance_count }} marked
+                            <i class="fas fa-users text-indigo-400 mr-1"></i>{{ att.attendance_count }} marked
                         </p>
                     </div>
                 </div>
@@ -363,13 +362,11 @@
                         Session Window (Lagos/WAT)
                     </p>
                     <p class="font-bold text-white text-sm">
-                        <i class="fas fa-clock text-indigo-400 mr-1"></i>{{
-                        att.formatted_start|slice:"11:16" }} → {{
-                        att.formatted_end|slice:"11:16" }}
+                        <i class="fas fa-clock text-indigo-400 mr-1"></i>
+                        {{att.formatted_start|slice:"11:16" }} → {{att.formatted_end|slice:"11:16" }}
                     </p>
                     <p class="text-xs text-gray-500 mt-0.5">
-                        {{ att.formatted_start|slice:":11" }} · Radius {{
-                        att.radius }}m
+                        {{ att.formatted_start|slice:":11" }} · Radius {{att.radius }}m
                     </p>
                 </div>
 
@@ -385,8 +382,7 @@
                         ✅ You marked attendance
                     </p>
                     <p class="text-xs text-white font-bold">
-                        Time: {{
-                        att.student_marked_time|default:"N/A"|slice:"11:19" }}
+                        Time: {{ att.student_marked_time|default:"N/A"|slice:"11:19" }}
                     </p>
                     {% if att.student_distance is not None %}
                     <p class="text-[11px] text-gray-400 mt-0.5 font-semibold">
