@@ -1,0 +1,88 @@
+{
+  "name": "ClassMillia - Smart Attendance System",
+  "short_name": "ClassMillia",
+  "description": "AI-powered attendance system with face recognition and real-time geofencing for universities",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0c29",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "https://placehold.co/72x72/667eea/FFFFFF?text=CM",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://placehold.co/96x96/667eea/FFFFFF?text=CM",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://placehold.co/128x128/667eea/FFFFFF?text=CM",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://placehold.co/144x144/667eea/FFFFFF?text=CM",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://placehold.co/152x152/667eea/FFFFFF?text=CM",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://placehold.co/192x192/667eea/FFFFFF?text=CM",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://placehold.co/384x384/667eea/FFFFFF?text=CM",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://placehold.co/512x512/667eea/FFFFFF?text=CM",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Student Dashboard",
+      "short_name": "Students",
+      "description": "Go to student dashboard",
+      "url": "/student/dashboard/",
+      "icons": [
+        {
+          "src": "https://placehold.co/96x96/667eea/FFFFFF?text=CM",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Lecturer Dashboard", 
+      "short_name": "Lecturers",
+      "description": "Go to lecturer dashboard",
+      "url": "/lecturer/dashboard/",
+      "icons": [
+        {
+          "src": "https://placehold.co/96x96/667eea/FFFFFF?text=CM",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

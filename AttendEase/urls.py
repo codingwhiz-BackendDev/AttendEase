@@ -25,4 +25,11 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 ]
 
-urlpatterns = urlpatterns+ static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+# Serve static files in development and serve media files
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Serve static files in development (for PWA files)
+if settings.DEBUG:
+    from django.conf import settings
+    from django.conf.urls.static import static
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
