@@ -6,83 +6,15 @@
   "display": "standalone",
   "background_color": "#0f0c29",
   "theme_color": "#667eea",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "scope": "/",
   "icons": [
     {
-      "src": "https://placehold.co/72x72/667eea/FFFFFF?text=CM",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/96x96/667eea/FFFFFF?text=CM",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/128x128/667eea/FFFFFF?text=CM",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/144x144/667eea/FFFFFF?text=CM",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/152x152/667eea/FFFFFF?text=CM",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/192x192/667eea/FFFFFF?text=CM",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/384x384/667eea/FFFFFF?text=CM",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/512x512/667eea/FFFFFF?text=CM",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23667eea' rx='100'/%3E%3Ccircle cx='256' cy='200' r='80' fill='white' opacity='0.9'/%3E%3Cpath d='M 256 300 C 180 300 120 340 120 400 L 120 420 C 120 460 392 460 392 420 L 392 400 C 392 340 332 300 256 300' fill='white' opacity='0.9'/%3E%3Ccircle cx='256' cy='180' r='60' fill='%23667eea'/%3E%3Cpath d='M 256 260 C 200 260 160 290 160 340 L 160 360 C 160 390 352 390 352 360 L 352 340 C 352 290 312 260 256 260' fill='%23667eea'/%3E%3Ccircle cx='256' cy='170' r='40' fill='white'/%3E%3Cpath d='M 256 230 C 220 230 200 250 200 280 L 200 290 C 200 310 312 310 312 290 L 312 280 C 312 250 292 230 256 230' fill='white'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "productivity"],
-  "shortcuts": [
-    {
-      "name": "Student Dashboard",
-      "short_name": "Students",
-      "description": "Go to student dashboard",
-      "url": "/student/dashboard/",
-      "icons": [
-        {
-          "src": "https://placehold.co/96x96/667eea/FFFFFF?text=CM",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Lecturer Dashboard", 
-      "short_name": "Lecturers",
-      "description": "Go to lecturer dashboard",
-      "url": "/lecturer/dashboard/",
-      "icons": [
-        {
-          "src": "https://placehold.co/96x96/667eea/FFFFFF?text=CM",
-          "sizes": "96x96"
-        }
-      ]
-    }
-  ]
+  "categories": ["education", "productivity"]
 }
