@@ -82,10 +82,14 @@
                                 <input type="text" id="longitude" name="longitude" placeholder="Longitude" readonly class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-white/10 bg-white/5 text-gray-400 text-xs sm:text-sm">
                             </div>
                         </div>
-                        <div id="location-status" class="flex items-center text-xs sm:text-sm">
-                            <i class="fas fa-spinner fa-spin mr-2 text-indigo-400"></i>
-                            <span class="text-gray-400">Fetching location...</span>
+                        <div id="location-status" class="flex items-center text-xs sm:text-sm mb-3">
+                            <i id="location-status-icon" class="fas fa-map-marker-alt mr-2 text-indigo-400"></i>
+                            <span id="location-status-text" class="text-gray-400">Location required for geofencing.</span>
                         </div>
+                        <button type="button" id="enable-location-btn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-md">
+                            <i class="fas fa-location-crosshairs"></i>
+                            <span id="enable-location-btn-text">Allow Location Access</span>
+                        </button>
                     </div>
 
                 <!-- Geofencing Radius Section -->
@@ -137,9 +141,10 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 focus:ring-4 focus:ring-indigo-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base">
+                <button type="submit" id="submit-btn" disabled class="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 focus:ring-4 focus:ring-indigo-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg">
                     <i class="fas fa-plus-circle mr-2"></i>Create Attendance Session
                 </button>
+                <p id="submit-hint" class="text-center text-[10px] sm:text-xs text-gray-500">Allow location access above before creating a session.</p>
             </form>
         </div>
     </div>
@@ -147,23 +152,115 @@
 </div>
 
 <script>
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function (position) {
-                    document.getElementById("latitude").value = position.coords.latitude;
-                    document.getElementById("longitude").value = position.coords.longitude;
-                    document.getElementById("location-status").innerHTML = '<i class="fas fa-check-circle mr-2 text-emerald-400"></i><span class="text-emerald-300">Location fetched successfully!</span>';
-                },
-                function (error) {
-                    document.getElementById("location-status").innerHTML = '<i class="fas fa-exclamation-circle mr-2 text-red-400"></i><span class="text-red-300">Failed to fetch location. Please enable location access.</span>';
-                }
-            );
-        } else {
-            document.getElementById("location-status").innerHTML = '<i class="fas fa-exclamation-circle mr-2 text-red-400"></i><span class="text-red-300">Geolocation is not supported by your browser.</span>';
+    (function () {
+        const GEO_OPTIONS = { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 };
+        const latEl = document.getElementById('latitude');
+        const lngEl = document.getElementById('longitude');
+        const statusIcon = document.getElementById('location-status-icon');
+        const statusText = document.getElementById('location-status-text');
+        const enableBtn = document.getElementById('enable-location-btn');
+        const enableBtnText = document.getElementById('enable-location-btn-text');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitHint = document.getElementById('submit-hint');
+
+        function isMobileOrPWA() {
+            const ua = navigator.userAgent || '';
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone === true;
+            const isTouch = window.matchMedia('(pointer: coarse)').matches;
+            return isMobile || isStandalone || isTouch;
         }
-    }
-    getLocation();
+
+        function setLocationStatus(type, message) {
+            const icons = {
+                idle: 'fa-map-marker-alt text-indigo-400',
+                loading: 'fa-spinner fa-spin text-indigo-400',
+                success: 'fa-check-circle text-emerald-400',
+                error: 'fa-exclamation-circle text-red-400',
+            };
+            const textColors = {
+                idle: 'text-gray-400',
+                loading: 'text-gray-400',
+                success: 'text-emerald-300',
+                error: 'text-red-300',
+            };
+            statusIcon.className = 'fas mr-2 ' + (icons[type] || icons.idle);
+            statusText.className = textColors[type] || textColors.idle;
+            statusText.textContent = message;
+        }
+
+        function setSubmitReady(ready) {
+            submitBtn.disabled = !ready;
+            submitHint.classList.toggle('hidden', ready);
+        }
+
+        function geolocationErrorMessage(error) {
+            if (!error) return 'Could not get your location. Please try again.';
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    return 'Location permission denied. Tap "Allow Location Access" and choose Allow in your browser or device settings.';
+                case error.POSITION_UNAVAILABLE:
+                    return 'Location unavailable. Turn on GPS / Location Services on your device and try again.';
+                case error.TIMEOUT:
+                    return 'Location request timed out. Move to an open area and try again.';
+                default:
+                    return error.message || 'Could not get your location. Please try again.';
+            }
+        }
+
+        function onLocationSuccess(position) {
+            latEl.value = position.coords.latitude;
+            lngEl.value = position.coords.longitude;
+            const acc = Math.round(position.coords.accuracy || 0);
+            setLocationStatus('success', 'Location captured successfully' + (acc ? ' (±' + acc + 'm)' : '') + '.');
+            enableBtnText.textContent = 'Refresh Location';
+            enableBtn.disabled = false;
+            setSubmitReady(true);
+        }
+
+        function onLocationError(error) {
+            latEl.value = '';
+            lngEl.value = '';
+            setLocationStatus('error', geolocationErrorMessage(error));
+            enableBtnText.textContent = 'Allow Location Access';
+            enableBtn.disabled = false;
+            setSubmitReady(false);
+        }
+
+        function requestLocation() {
+            if (!navigator.geolocation) {
+                setLocationStatus('error', 'Geolocation is not supported on this device or browser.');
+                enableBtn.disabled = true;
+                setSubmitReady(false);
+                return;
+            }
+
+            if (!window.isSecureContext) {
+                setLocationStatus('error', 'Location requires a secure connection (HTTPS). Open this site over HTTPS and try again.');
+                setSubmitReady(false);
+                return;
+            }
+
+            enableBtn.disabled = true;
+            enableBtnText.textContent = 'Getting location...';
+            setLocationStatus('loading', 'Requesting location — please allow access when prompted.');
+
+            navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, GEO_OPTIONS);
+        }
+
+        enableBtn.addEventListener('click', requestLocation);
+
+        // Desktop: auto-fetch on load (works without user gesture).
+        // Mobile / PWA: require explicit tap so the browser shows the permission prompt.
+        if (isMobileOrPWA()) {
+            setLocationStatus('idle', 'Tap the button below to allow location access for this session.');
+            setSubmitReady(false);
+        } else {
+            setLocationStatus('loading', 'Fetching location...');
+            requestLocation();
+        }
+    })();
 
     // ============================================================
     // TIMEZONE FIX (v2 - robust) - NO silent validation failures
@@ -261,6 +358,16 @@
         // Submit handler — final sanity check before sending to server
         // ------------------------------------------------------------
         form.addEventListener('submit', function (e) {
+            const latEl = document.getElementById('latitude');
+            const lngEl = document.getElementById('longitude');
+            if (!latEl.value || !lngEl.value) {
+                alert('Location is required. Tap "Allow Location Access" and grant permission before creating the session.');
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('enable-location-btn')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
             // Ensure mirrors are up-to-date
             const r1 = updateMirror('start');
             const r2 = updateMirror('end');
