@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>ClassMillia - The Future of Classroom Attendance</title>
+        <title>ClassMillia - The Smart Academic Management Platform</title>
         <!-- PWA Manifest -->
         <link rel="manifest" href="/static/manifest.json" />
         <meta name="theme-color" content="#667eea" />
@@ -13,7 +13,10 @@
             name="apple-mobile-web-app-status-bar-style"
             content="black-translucent"
         />
-        <meta name="apple-mobile-web-app-title" content="ClassMillia" />
+        <meta
+            name="apple-mobile-web-app-title"
+            content="ClassMillia - Academic Platform"
+        />
         <!-- Favicon using your custom logo -->
         <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg" />
         <link rel="apple-touch-icon" href="/static/icons/logo.svg" />
@@ -232,7 +235,8 @@
             }
 
             .flash-card.flash-dismiss {
-                animation: flash-out 0.42s cubic-bezier(0.55, 0, 1, 0.45) forwards !important;
+                animation: flash-out 0.42s cubic-bezier(0.55, 0, 1, 0.45)
+                    forwards !important;
             }
 
             /* Gradient left-side accent stripe */
@@ -252,16 +256,36 @@
             }
 
             .flash-error .flash-stripe {
-                background: linear-gradient(180deg, #fca5a5 0%, #ef4444 50%, #fca5a5 100%);
+                background: linear-gradient(
+                    180deg,
+                    #fca5a5 0%,
+                    #ef4444 50%,
+                    #fca5a5 100%
+                );
             }
             .flash-warning .flash-stripe {
-                background: linear-gradient(180deg, #fde68a 0%, #f59e0b 50%, #fde68a 100%);
+                background: linear-gradient(
+                    180deg,
+                    #fde68a 0%,
+                    #f59e0b 50%,
+                    #fde68a 100%
+                );
             }
             .flash-success .flash-stripe {
-                background: linear-gradient(180deg, #86efac 0%, #10b981 50%, #86efac 100%);
+                background: linear-gradient(
+                    180deg,
+                    #86efac 0%,
+                    #10b981 50%,
+                    #86efac 100%
+                );
             }
             .flash-info .flash-stripe {
-                background: linear-gradient(180deg, #c7d2fe 0%, #6366f1 50%, #c7d2fe 100%);
+                background: linear-gradient(
+                    180deg,
+                    #c7d2fe 0%,
+                    #6366f1 50%,
+                    #c7d2fe 100%
+                );
             }
 
             .flash-inner {
@@ -286,32 +310,64 @@
 
             .flash-error .flash-icon {
                 background:
-                    radial-gradient(circle at 30% 30%, rgba(254, 202, 202, 0.5), transparent 60%),
-                    linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(185, 28, 28, 0.2));
+                    radial-gradient(
+                        circle at 30% 30%,
+                        rgba(254, 202, 202, 0.5),
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(239, 68, 68, 0.35),
+                        rgba(185, 28, 28, 0.2)
+                    );
                 box-shadow:
                     inset 0 0 0 1px rgba(254, 202, 202, 0.35),
                     0 10px 30px -8px rgba(239, 68, 68, 0.65);
             }
             .flash-warning .flash-icon {
                 background:
-                    radial-gradient(circle at 30% 30%, rgba(253, 230, 138, 0.5), transparent 60%),
-                    linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(180, 83, 9, 0.2));
+                    radial-gradient(
+                        circle at 30% 30%,
+                        rgba(253, 230, 138, 0.5),
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(245, 158, 11, 0.35),
+                        rgba(180, 83, 9, 0.2)
+                    );
                 box-shadow:
                     inset 0 0 0 1px rgba(253, 230, 138, 0.4),
                     0 10px 30px -8px rgba(245, 158, 11, 0.6);
             }
             .flash-success .flash-icon {
                 background:
-                    radial-gradient(circle at 30% 30%, rgba(187, 247, 208, 0.5), transparent 60%),
-                    linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.2));
+                    radial-gradient(
+                        circle at 30% 30%,
+                        rgba(187, 247, 208, 0.5),
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(16, 185, 129, 0.35),
+                        rgba(5, 150, 105, 0.2)
+                    );
                 box-shadow:
                     inset 0 0 0 1px rgba(187, 247, 208, 0.4),
                     0 10px 30px -8px rgba(16, 185, 129, 0.6);
             }
             .flash-info .flash-icon {
                 background:
-                    radial-gradient(circle at 30% 30%, rgba(199, 210, 254, 0.55), transparent 60%),
-                    linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(79, 70, 229, 0.2));
+                    radial-gradient(
+                        circle at 30% 30%,
+                        rgba(199, 210, 254, 0.55),
+                        transparent 60%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        rgba(99, 102, 241, 0.35),
+                        rgba(79, 70, 229, 0.2)
+                    );
                 box-shadow:
                     inset 0 0 0 1px rgba(199, 210, 254, 0.45),
                     0 10px 30px -8px rgba(99, 102, 241, 0.65);
@@ -327,10 +383,18 @@
                 z-index: -1;
                 animation: flash-icon-glow 2.4s ease-in-out infinite;
             }
-            .flash-error   .flash-icon::after { background: #ef4444; }
-            .flash-warning .flash-icon::after { background: #f59e0b; }
-            .flash-success .flash-icon::after { background: #10b981; }
-            .flash-info    .flash-icon::after { background: #6366f1; }
+            .flash-error .flash-icon::after {
+                background: #ef4444;
+            }
+            .flash-warning .flash-icon::after {
+                background: #f59e0b;
+            }
+            .flash-success .flash-icon::after {
+                background: #10b981;
+            }
+            .flash-info .flash-icon::after {
+                background: #6366f1;
+            }
 
             .flash-body {
                 flex: 1;
@@ -358,10 +422,22 @@
                 border-radius: 999px;
                 line-height: 1.6;
             }
-            .flash-error   .flash-chip { background: rgba(254, 202, 202, 0.2); color: #fecaca; }
-            .flash-warning .flash-chip { background: rgba(253, 230, 138, 0.22); color: #fde68a; }
-            .flash-success .flash-chip { background: rgba(187, 247, 208, 0.22); color: #bbf7d0; }
-            .flash-info    .flash-chip { background: rgba(199, 210, 254, 0.22); color: #c7d2fe; }
+            .flash-error .flash-chip {
+                background: rgba(254, 202, 202, 0.2);
+                color: #fecaca;
+            }
+            .flash-warning .flash-chip {
+                background: rgba(253, 230, 138, 0.22);
+                color: #fde68a;
+            }
+            .flash-success .flash-chip {
+                background: rgba(187, 247, 208, 0.22);
+                color: #bbf7d0;
+            }
+            .flash-info .flash-chip {
+                background: rgba(199, 210, 254, 0.22);
+                color: #c7d2fe;
+            }
 
             .flash-text {
                 font-size: 0.85rem;
@@ -378,13 +454,26 @@
                 padding: 0.18rem 0.55rem;
                 border-radius: 0.5rem;
                 font-weight: 700;
-                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
                 font-size: 0.8rem;
             }
-            .flash-error   .flash-email { background: rgba(254, 202, 202, 0.15); border: 1px solid rgba(252, 165, 165, 0.4); }
-            .flash-warning .flash-email { background: rgba(253, 230, 138, 0.15); border: 1px solid rgba(252, 211, 77, 0.45); }
-            .flash-success .flash-email { background: rgba(187, 247, 208, 0.16); border: 1px solid rgba(134, 239, 172, 0.4); }
-            .flash-info    .flash-email { background: rgba(199, 210, 254, 0.16); border: 1px solid rgba(165, 180, 252, 0.45); }
+            .flash-error .flash-email {
+                background: rgba(254, 202, 202, 0.15);
+                border: 1px solid rgba(252, 165, 165, 0.4);
+            }
+            .flash-warning .flash-email {
+                background: rgba(253, 230, 138, 0.15);
+                border: 1px solid rgba(252, 211, 77, 0.45);
+            }
+            .flash-success .flash-email {
+                background: rgba(187, 247, 208, 0.16);
+                border: 1px solid rgba(134, 239, 172, 0.4);
+            }
+            .flash-info .flash-email {
+                background: rgba(199, 210, 254, 0.16);
+                border: 1px solid rgba(165, 180, 252, 0.45);
+            }
 
             .flash-close {
                 flex-shrink: 0;
@@ -412,7 +501,9 @@
                 color: #fff;
                 transform: rotate(90deg) scale(1.06);
             }
-            .flash-close:active { transform: rotate(90deg) scale(0.94); }
+            .flash-close:active {
+                transform: rotate(90deg) scale(0.94);
+            }
 
             /* Countdown progress bar at bottom of card */
             .flash-progress {
@@ -432,10 +523,18 @@
                 transform-origin: left center;
                 animation: flash-progress 12s linear forwards;
             }
-            .flash-error   .flash-progress::after { background: linear-gradient(90deg, #fecaca, #ef4444, #fecaca); }
-            .flash-warning .flash-progress::after { background: linear-gradient(90deg, #fde68a, #f59e0b, #fde68a); }
-            .flash-success .flash-progress::after { background: linear-gradient(90deg, #bbf7d0, #10b981, #bbf7d0); }
-            .flash-info    .flash-progress::after { background: linear-gradient(90deg, #c7d2fe, #6366f1, #c7d2fe); }
+            .flash-error .flash-progress::after {
+                background: linear-gradient(90deg, #fecaca, #ef4444, #fecaca);
+            }
+            .flash-warning .flash-progress::after {
+                background: linear-gradient(90deg, #fde68a, #f59e0b, #fde68a);
+            }
+            .flash-success .flash-progress::after {
+                background: linear-gradient(90deg, #bbf7d0, #10b981, #bbf7d0);
+            }
+            .flash-info .flash-progress::after {
+                background: linear-gradient(90deg, #c7d2fe, #6366f1, #c7d2fe);
+            }
 
             /* ---------- Keyframes ---------- */
             @keyframes flash-in {
@@ -469,18 +568,34 @@
             }
 
             @keyframes flash-float {
-                0%, 100% { transform: translateY(0); }
-                50%      { transform: translateY(-3px); }
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-3px);
+                }
             }
 
             @keyframes flash-icon-glow {
-                0%, 100% { opacity: 0.45; transform: scale(1);   }
-                50%      { opacity: 0.85; transform: scale(1.2); }
+                0%,
+                100% {
+                    opacity: 0.45;
+                    transform: scale(1);
+                }
+                50% {
+                    opacity: 0.85;
+                    transform: scale(1.2);
+                }
             }
 
             @keyframes flash-progress {
-                from { transform: scaleX(1); }
-                to   { transform: scaleX(0); }
+                from {
+                    transform: scaleX(1);
+                }
+                to {
+                    transform: scaleX(0);
+                }
             }
         </style>
     </head>
@@ -513,9 +628,9 @@
                             >How It Works</a
                         >
                         <a
-                            href="#testimonials"
+                            href="#benefits"
                             class="text-gray-300 hover:text-white transition-colors"
-                            >Testimonials</a
+                            >Benefits</a
                         >
                     </div>
                     <div
@@ -567,9 +682,9 @@
                             >How It Works</a
                         >
                         <a
-                            href="#testimonials"
+                            href="#benefits"
                             class="text-gray-300 hover:text-white transition-colors py-2"
-                            >Testimonials</a
+                            >Benefits</a
                         >
                         <div class="h-px bg-white/20 my-2"></div>
                         <a
@@ -577,9 +692,11 @@
                             data-login-role="student"
                             class="text-gray-300 hover:text-white transition-colors font-semibold py-2"
                             >Student Portal
-                            <span class="block text-[11px] font-normal text-indigo-300/80 mt-1">
-                                <i class="fas fa-envelope-circle-check mr-1"></i>Requires
-                                @run.edu.ng email
+                            <span
+                                class="block text-[11px] font-normal text-indigo-300/80 mt-1"
+                            >
+                                <i class="fas fa-envelope-circle-check mr-1"></i
+                                >Requires @run.edu.ng email
                             </span>
                         </a>
                         <a
@@ -587,9 +704,11 @@
                             data-login-role="lecturer"
                             class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-3 rounded-xl font-semibold text-center"
                             >Lecturer Portal
-                            <span class="block text-[11px] font-normal text-white/75 mt-1">
-                                <i class="fas fa-envelope-circle-check mr-1"></i>Requires
-                                @gmail.com email
+                            <span
+                                class="block text-[11px] font-normal text-white/75 mt-1"
+                            >
+                                <i class="fas fa-envelope-circle-check mr-1"></i
+                                >Requires @gmail.com email
                             </span>
                         </a>
                     </div>
@@ -602,8 +721,7 @@
         <div class="flash-wrap" id="flash-wrap">
             {% for message in messages %}
             <div
-                class="flash-card
-                    {% if message.tags == 'error' %}flash-error{% elif message.tags == 'warning' %}flash-warning{% elif message.tags == 'success' %}flash-success{% else %}flash-info{% endif %}"
+                class="flash-card {% if message.tags == 'error' %}flash-error{% elif message.tags == 'warning' %}flash-warning{% elif message.tags == 'success' %}flash-success{% else %}flash-info{% endif %}"
                 data-flash
             >
                 <!-- Left accent stripe -->
@@ -628,19 +746,19 @@
                         <div class="flash-title">
                             {% if message.tags == 'error' %}
                             <span class="flash-chip">Access Denied</span>
-                            Wrong email type
-                            {% elif message.tags == 'warning' %}
+                            Wrong email type {% elif message.tags == 'warning'
+                            %}
                             <span class="flash-chip">Heads up</span>
-                            Please review before continuing
-                            {% elif message.tags == 'success' %}
+                            Please review before continuing {% elif message.tags
+                            == 'success' %}
                             <span class="flash-chip">Success</span>
-                            Operation completed
-                            {% else %}
+                            Operation completed {% else %}
                             <span class="flash-chip">Info</span>
-                            Quick note
-                            {% endif %}
+                            Quick note {% endif %}
                         </div>
-                        <div class="flash-text" data-flash-text>{{ message }}</div>
+                        <div class="flash-text" data-flash-text>
+                            {{ message }}
+                        </div>
                     </div>
 
                     <!-- Dismiss button (spins 90deg on hover) -->
@@ -688,29 +806,33 @@
                         <div
                             class="inline-flex items-center space-x-2 bg-white/10 rounded-full px-3 sm:px-4 py-2 border border-white/20"
                         >
+                            <img
+                                src="/static/icons/logo.svg"
+                                alt="ClassMillia"
+                                class="w-5 h-5"
+                            />
                             <span
-                                class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
-                            ></span>
-                            <span class="text-xs sm:text-sm text-gray-300"
-                                >Trusted by 50+ Universities</span
+                                class="text-xs sm:text-sm text-gray-300 font-bold"
+                                >Trusted by Leading Universities</span
                             >
                         </div>
 
                         <h1
                             class="text-4xl sm:text-5xl md:text-7xl font-black leading-tight"
                         >
-                            Attendance
-                            <span class="gradient-text"> Reimagined</span>
-                            <br />for the Modern Era
+                            The Smart
+                            <span class="gradient-text"> Academic</span>
+                            <br />Management Platform
                         </h1>
 
                         <p
                             class="text-lg sm:text-xl text-gray-300 max-w-xl leading-relaxed"
                         >
-                            Eliminate attendance fraud, save hours of
-                            administrative work, and create a seamless classroom
-                            experience with AI-powered face recognition and
-                            real-time geofencing.
+                            Complete classroom ecosystem with AI-powered
+                            attendance tracking, intelligent assessment
+                            management (MilliaLMS), real-time analytics,
+                            seamless course coordination, and automated grading
+                            — all unified in one platform.
                         </p>
 
                         <div class="flex flex-col sm:flex-row gap-4">
@@ -720,12 +842,19 @@
                                     data-login-role="student"
                                     class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all"
                                 >
-                                    <i class="fas fa-user-graduate mr-2"></i>Student
-                                    Portal
+                                    <i class="fas fa-user-graduate mr-2"></i
+                                    >Student Portal
                                 </a>
-                                <p class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2">
-                                    <i class="fas fa-envelope-circle-check mr-1"></i>Requires
-                                    <span class="font-bold text-indigo-200">@run.edu.ng</span>
+                                <p
+                                    class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2"
+                                >
+                                    <i
+                                        class="fas fa-envelope-circle-check mr-1"
+                                    ></i
+                                    >Requires
+                                    <span class="font-bold text-indigo-200"
+                                        >@run.edu.ng</span
+                                    >
                                     email
                                 </p>
                             </div>
@@ -735,12 +864,21 @@
                                     data-login-role="lecturer"
                                     class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all"
                                 >
-                                    <i class="fas fa-chalkboard-teacher mr-2"></i
+                                    <i
+                                        class="fas fa-chalkboard-teacher mr-2"
+                                    ></i
                                     >Lecturer Portal
                                 </a>
-                                <p class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2">
-                                    <i class="fas fa-envelope-circle-check mr-1"></i>Requires
-                                    <span class="font-bold text-white/80">@gmail.com</span>
+                                <p
+                                    class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2"
+                                >
+                                    <i
+                                        class="fas fa-envelope-circle-check mr-1"
+                                    ></i
+                                    >Requires
+                                    <span class="font-bold text-white/80"
+                                        >@gmail.com</span
+                                    >
                                     email
                                 </p>
                             </div>
@@ -766,10 +904,10 @@
                                 <p
                                     class="text-2xl sm:text-3xl font-black gradient-text"
                                 >
-                                    50K+
+                                    5-in-1
                                 </p>
                                 <p class="text-xs sm:text-sm text-gray-400">
-                                    Daily Check-ins
+                                    Complete Platform
                                 </p>
                             </div>
                             <div
@@ -793,8 +931,8 @@
                             class="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10"
                         >
                             <img
-                                src="{% static 'images/students in a lecture room.png' %}"
-                                alt="Students in lecture room"
+                                src="{% static 'images/university at sunset.jpg' %}"
+                                alt="University campus at sunset"
                                 class="w-full h-auto object-cover"
                             />
                             <div
@@ -858,13 +996,15 @@
                     <h2
                         class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
                     >
-                        The <span class="gradient-text">Pain</span> is Real
+                        Why Universities Choose
+                        <span class="gradient-text">ClassMillia</span>
                     </h2>
                     <p
                         class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
                     >
-                        Traditional attendance systems are broken. Here's why
-                        universities are switching to ClassMillia.
+                        Traditional academic management is fragmented and
+                        inefficient. ClassMillia unifies everything in one
+                        intelligent platform.
                     </p>
                 </div>
 
@@ -950,13 +1090,15 @@
                     <h2
                         class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
                     >
-                        The <span class="gradient-text">Solution</span>
+                        Complete
+                        <span class="gradient-text">Academic Platform</span>
                     </h2>
                     <p
                         class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
                     >
-                        ClassMillia combines cutting-edge AI with seamless UX to
-                        solve attendance once and for all.
+                        Five powerful modules working in perfect harmony: Smart
+                        Attendance, MilliaLMS Assessments, Course Management,
+                        Real-Time Analytics, and Student Portals.
                     </p>
                 </div>
 
@@ -1093,7 +1235,146 @@
                     </div>
                 </div>
 
-                <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+                <!-- MilliaLMS Assessment Showcase -->
+                <div
+                    class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mt-16 sm:mt-24"
+                >
+                    <div class="scroll-reveal">
+                        <div
+                            class="relative rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <img
+                                src="{% static 'images/students taking tests.jpg' %}"
+                                alt="Students taking assessments"
+                                class="w-full h-auto object-cover"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"
+                            ></div>
+                            <div
+                                class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6"
+                            >
+                                <div class="glass-card rounded-2xl p-3 sm:p-4">
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
+                                        <div>
+                                            <p
+                                                class="text-sm sm:text-base font-bold"
+                                            >
+                                                MilliaLMS Active
+                                            </p>
+                                            <p
+                                                class="text-xs sm:text-sm text-gray-400"
+                                            >
+                                                Assessment in progress •
+                                                Auto-grading enabled
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="flex items-center space-x-2"
+                                        >
+                                            <span
+                                                class="w-3 h-3 bg-green-400 rounded-full animate-pulse"
+                                            ></span>
+                                            <span class="text-sm font-bold"
+                                                >Live</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 sm:space-y-6 scroll-reveal">
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-list-check text-lg sm:text-xl text-emerald-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    MilliaLMS Assessment System
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Create quizzes, timed tests, and assignments
+                                    with 5 question types (MCQ, True/False,
+                                    Fill-blank, Short Answer, Essay).
+                                    Auto-grading for objective questions, manual
+                                    grading for essays.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-robot text-lg sm:text-xl text-blue-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Automatic Grading
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Instant results for objective questions.
+                                    Lecturers manually grade essays and short
+                                    answers with personalized feedback.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-clock text-lg sm:text-xl text-purple-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Timed Assessments
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Set time limits, attempt limits, randomize
+                                    questions and answers. Full control over
+                                    assessment parameters.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0"
+                            >
+                                <i
+                                    class="fas fa-file-export text-lg sm:text-xl text-amber-400"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">
+                                    Export Results
+                                </h3>
+                                <p class="text-sm sm:text-base text-gray-400">
+                                    Download assessment results as CSV or PDF.
+                                    Full submission history, scores, and
+                                    analytics at your fingertips.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mt-16 sm:mt-24"
+                >
                     <div class="space-y-4 sm:space-y-6 scroll-reveal">
                         <div class="flex items-start space-x-3 sm:space-x-4">
                             <div
@@ -1197,6 +1478,89 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Powered Features Section -->
+        <section class="py-16 sm:py-24 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+                    <div class="space-y-4 sm:space-y-6 scroll-reveal">
+                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black">
+                            Powered by <span class="gradient-text">AI</span>
+                        </h2>
+                        <p class="text-lg sm:text-xl text-gray-400">
+                            Military-grade facial recognition with 99.9%
+                            accuracy. Smart analytics predict at-risk students
+                            before it's too late.
+                        </p>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center space-x-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fas fa-check text-white text-sm"
+                                    ></i>
+                                </div>
+                                <span class="font-bold text-white"
+                                    >InsightFace AI Engine</span
+                                >
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fas fa-check text-white text-sm"
+                                    ></i>
+                                </div>
+                                <span class="font-bold text-white"
+                                    >Real-Time Analytics Dashboard</span
+                                >
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fas fa-check text-white text-sm"
+                                    ></i>
+                                </div>
+                                <span class="font-bold text-white"
+                                    >Predictive Attendance Insights</span
+                                >
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fas fa-check text-white text-sm"
+                                    ></i>
+                                </div>
+                                <span class="font-bold text-white"
+                                    >Automated Assessment Grading</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scroll-reveal">
+                        <div
+                            class="relative rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <img
+                                src="{% static 'images/ai powered assistance.png' %}"
+                                alt="AI powered features"
+                                class="w-full h-auto object-cover"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"
+                            ></div>
                         </div>
                     </div>
                 </div>
@@ -1333,6 +1697,140 @@
             </div>
         </section>
 
+        <!-- 5 Modules Section -->
+        <section
+            id="benefits"
+            class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
+                    <h2
+                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
+                    >
+                        Five Powerful <span class="gradient-text">Modules</span>
+                    </h2>
+                    <p
+                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
+                    >
+                        Everything you need to manage your academic institution,
+                        unified in one intelligent platform.
+                    </p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-face-smile text-2xl sm:text-3xl text-indigo-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Smart Attendance
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            AI-powered face recognition + GPS geofencing.
+                            Eliminate proxy attendance and save lecture time.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
+                        style="animation-delay: 0.1s"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-graduation-cap text-2xl sm:text-3xl text-purple-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            MilliaLMS Assessments
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            Create quizzes with 5 question types. Auto-grading
+                            for MCQ, manual grading for essays. Export results
+                            instantly.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
+                        style="animation-delay: 0.2s"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-chart-line text-2xl sm:text-3xl text-emerald-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Real-Time Analytics
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            Live dashboards, attendance trends, performance
+                            metrics. Export comprehensive reports in one click.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
+                        style="animation-delay: 0.3s"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-cyan-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-book text-2xl sm:text-3xl text-cyan-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Course Management
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            Organize courses, manage enrollments, track rosters.
+                            Complete academic coordination in one place.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal sm:col-span-2 lg:col-span-1"
+                        style="animation-delay: 0.4s"
+                    >
+                        <div
+                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-pink-500/20 flex items-center justify-center mb-4 sm:mb-6"
+                        >
+                            <i
+                                class="fas fa-users text-2xl sm:text-3xl text-pink-400"
+                            ></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
+                            Student & Lecturer Portals
+                        </h3>
+                        <p
+                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
+                        >
+                            Dedicated dashboards for students and lecturers.
+                            Mobile-first PWA accessible anywhere, anytime.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Stats Section -->
         <section class="py-16 sm:py-24 bg-gray-900">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1414,11 +1912,17 @@
                             data-login-role="student"
                             class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all"
                         >
-                            <i class="fas fa-user-graduate mr-2"></i>Student Portal
+                            <i class="fas fa-user-graduate mr-2"></i>Student
+                            Portal
                         </a>
-                        <p class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2">
-                            <i class="fas fa-envelope-circle-check mr-1"></i>Requires
-                            <span class="font-bold text-indigo-200">@run.edu.ng</span>
+                        <p
+                            class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2"
+                        >
+                            <i class="fas fa-envelope-circle-check mr-1"></i
+                            >Requires
+                            <span class="font-bold text-indigo-200"
+                                >@run.edu.ng</span
+                            >
                             email
                         </p>
                     </div>
@@ -1428,12 +1932,17 @@
                             data-login-role="lecturer"
                             class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold hover:bg-white/20 transition-all"
                         >
-                            <i class="fas fa-chalkboard-teacher mr-2"></i>Lecturer
-                            Portal
+                            <i class="fas fa-chalkboard-teacher mr-2"></i
+                            >Lecturer Portal
                         </a>
-                        <p class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2">
-                            <i class="fas fa-envelope-circle-check mr-1"></i>Requires
-                            <span class="font-bold text-white/80">@gmail.com</span>
+                        <p
+                            class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2"
+                        >
+                            <i class="fas fa-envelope-circle-check mr-1"></i
+                            >Requires
+                            <span class="font-bold text-white/80"
+                                >@gmail.com</span
+                            >
                             email
                         </p>
                     </div>
@@ -1580,7 +2089,7 @@
                         <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
                             <img src="/static/icons/logo.svg" alt="ClassMillia" style="width: 32px; height: 32px; border-radius: 6px; background: white; padding: 2px; flex-shrink: 0;">
                             <div style="flex: 1; min-width: 0;">
-                                <p style="margin: 0; font-size: 12px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ClassMillia - Smart Attendance</p>
+                                <p style="margin: 0; font-size: 12px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ClassMillia - Academic Platform</p>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
@@ -1651,7 +2160,8 @@
 
                 // Helper: wraps any email in single quotes or bare emails with <span class="flash-email">
                 // Matches: ............. 'user@domain.tld'  or  bare user@domain.tld
-                const EMAIL_CHIP_RE = /'([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)'|([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)/g;
+                const EMAIL_CHIP_RE =
+                    /'([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)'|([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)/g;
 
                 document.querySelectorAll("[data-flash-text]").forEach((el) => {
                     // Decorate emails inside the text without breaking whitespace-pre-line.
@@ -1668,26 +2178,30 @@
                 });
 
                 function dismissCard(card) {
-                    if (!card || card.classList.contains("flash-dismiss")) return;
+                    if (!card || card.classList.contains("flash-dismiss"))
+                        return;
                     card.classList.add("flash-dismiss");
                     card.addEventListener(
                         "animationend",
                         () => {
                             card.remove();
                             const wrap = document.getElementById("flash-wrap");
-                            if (wrap && !wrap.querySelector("[data-flash]")) wrap.remove();
+                            if (wrap && !wrap.querySelector("[data-flash]"))
+                                wrap.remove();
                         },
                         { once: true },
                     );
                 }
 
                 // Manual dismiss buttons (close on click (playsmoothly animates then removes
-                document.querySelectorAll("[data-flash-close]").forEach((btn) => {
-                    btn.addEventListener("click", () => {
-                        const card = btn.closest("[data-flash]");
-                        if (card) dismissCard(card);
+                document
+                    .querySelectorAll("[data-flash-close]")
+                    .forEach((btn) => {
+                        btn.addEventListener("click", () => {
+                            const card = btn.closest("[data-flash]");
+                            if (card) dismissCard(card);
+                        });
                     });
-                });
 
                 // Auto-dismiss every flash card once the 12s countdown is over
                 document.querySelectorAll("[data-flash]").forEach((card) => {
