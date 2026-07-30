@@ -14,6 +14,7 @@ import numpy as np
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.core.files.base import ContentFile
 from django.core.paginator import EmptyPage, Paginator
 from django.db import transaction
@@ -45,6 +46,13 @@ logger = logging.getLogger(__name__)
 def get_user_role(user):
     """Helper function to determine user role based on email domain."""
     return "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+
+
+def custom_logout(request):
+    """Custom logout view that redirects to welcome page."""
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect("welcome_page")
 
 
 # Initialize InsightFace model (lazy loading)

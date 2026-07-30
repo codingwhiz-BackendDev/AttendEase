@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
     path("", views.welcome_page, name="welcome_page"),
     path("accounts/", include("allauth.urls")),
+    # Custom logout that redirects to welcome page
+    path("logout/", views.custom_logout, name="custom_logout"),
     # Restrict user from accessing here to force them use google auth
     path(
         "accounts/login/",

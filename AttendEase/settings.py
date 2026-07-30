@@ -79,6 +79,7 @@ ACCOUNT_ADAPTER = "App.adapters.CustomAccountAdapter"
 SOCIALACCOUNT_ADAPTER = "App.adapters.CustomSocialAccountAdapter"
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = True
 
 # Configure Google OAuth - credentials come from Social Application in Django Admin
 SOCIALACCOUNT_PROVIDERS = {
