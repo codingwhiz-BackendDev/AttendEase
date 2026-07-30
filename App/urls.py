@@ -66,6 +66,56 @@ urlpatterns = [
     ),
     path("reports/", views.lecturer_reports, name="lecturer_reports"),
     path(
+        "millialms/lecturer/",
+        views.millialms_lecturer_dashboard,
+        name="millialms_lecturer_dashboard",
+    ),
+    path(
+        "millialms/lecturer/create/",
+        views.millialms_create_assessment,
+        name="millialms_create_assessment",
+    ),
+    path(
+        "millialms/lecturer/assessment/<int:pk>/",
+        views.millialms_lecturer_assessment_detail,
+        name="millialms_lecturer_assessment_detail",
+    ),
+    path(
+        "millialms/lecturer/assessment/<int:pk>/toggle/",
+        views.millialms_toggle_assessment_publish,
+        name="millialms_toggle_assessment_publish",
+    ),
+    path(
+        "millialms/lecturer/assessment/<int:pk>/export/",
+        views.millialms_export_results,
+        name="millialms_export_results",
+    ),
+    path(
+        "millialms/lecturer/attempt/<int:attempt_id>/grade/",
+        views.millialms_grade_attempt,
+        name="millialms_grade_attempt",
+    ),
+    path(
+        "millialms/student/",
+        views.millialms_student_dashboard,
+        name="millialms_student_dashboard",
+    ),
+    path(
+        "millialms/student/assessment/<int:pk>/",
+        views.millialms_student_assessment_detail,
+        name="millialms_student_assessment_detail",
+    ),
+    path(
+        "millialms/student/assessment/<int:pk>/take/",
+        views.millialms_take_assessment,
+        name="millialms_take_assessment",
+    ),
+    path(
+        "millialms/student/result/<int:attempt_id>/",
+        views.millialms_student_result,
+        name="millialms_student_result",
+    ),
+    path(
         "lecturer/roster/", views.lecturer_course_roster, name="lecturer_course_roster"
     ),
     path(

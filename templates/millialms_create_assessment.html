@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2">MilliaLMS</p>
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900">Create assessment</h1>
+            <p class="mt-2 max-w-3xl text-gray-600">Build quizzes, timed tests, and practice tests. MCQ, true/false, and fill-in-the-blank are auto-graded. Short answers are ready for manual grading. Essay is intentionally deferred.</p>
+        </div>
+        <a href="{% url 'millialms_lecturer_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"><i class="fas fa-arrow-left"></i>Back to studio</a>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div class="xl:col-span-2 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-6">
+                <div>
+                    <label class="block text-sm font-black text-gray-900 mb-2">Assessment title</label>
+                    <input name="title" required class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="e.g. CSC 401 Mid-Semester Quiz" />
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-black text-gray-900 mb-2">Type</label>
+                        <select name="assessment_type" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400">
+                            <option value="quiz">Quiz</option>
+                            <option value="timed_test">Timed Test</option>
+                            <option value="practice">Practice Test</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-black text-gray-900 mb-2">Attempt limit</label>
+                        <input type="number" min="1" name="max_attempts" value="1" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-black text-gray-900 mb-2">Start time</label>
+                        <input type="datetime-local" name="start_time" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-black text-gray-900 mb-2">End time</label>
+                        <input type="datetime-local" name="end_time" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-black text-gray-900 mb-2">Time limit (mins)</label>
+                        <input type="number" min="1" name="time_limit_minutes" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" placeholder="Optional" />
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-black text-gray-900 mb-2">Instructions</label>
+                    <textarea name="instructions" rows="4" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="What should students know before starting?"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-black text-gray-900 mb-3">Assign to courses</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {% for course in lecturer_courses %}
+                        <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
+                            <input type="checkbox" name="courses" value="{{ course.id }}" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                            <span>{{ course.course_code }} — {{ course.course_title }}</span>
+                        </label>
+                        {% empty %}
+                        <p class="text-sm text-red-600 font-semibold">You need at least one taught course before creating an assessment.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
+                        <input type="checkbox" name="randomize_question_order" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                        <span>Randomize question order</span>
+                    </label>
+                    <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
+                        <input type="checkbox" name="randomize_answer_options" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                        <span>Randomize answer options</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm h-fit">
+                <h2 class="text-lg font-black text-amber-900">Question builder rules</h2>
+                <ul class="mt-4 space-y-3 text-sm font-medium text-amber-900">
+                    <li>• MCQ requires four options and one correct answer.</li>
+                    <li>• True/False is auto-marked from the correct answer selector.</li>
+                    <li>• Fill in the blank accepts multiple correct answers separated by new lines.</li>
+                    <li>• Short answer is manually graded.</li>
+                    <li>• Essay is visible for future use, but grading is intentionally deferred for now.</li>
+                </ul>
+            </div>
+        </div>
+
+        <input type="hidden" name="question_total" value="5" />
+        <div class="space-y-4">
+            <h2 class="text-2xl font-black text-gray-900">Questions</h2>
+
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 1</h3><span class="text-xs font-black uppercase tracking-wide text-emerald-600">MCQ</span></div>
+                <input type="hidden" name="question_type_1" value="mcq" />
+                <input type="text" name="question_text_1" value="What is Python?" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium focus:border-indigo-400 outline-none" />
+                <input type="hidden" name="points_1" value="1" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" name="option_1_1" value="Database" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                    <input type="text" name="option_1_2" value="Programming Language" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                    <input type="text" name="option_1_3" value="Browser" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                    <input type="text" name="option_1_4" value="Operating System" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                </div>
+                <div>
+                    <label class="block text-sm font-black text-gray-900 mb-2">Correct option</label>
+                    <select name="correct_option_1" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium">
+                        <option value="2" selected>Option 2 — Programming Language</option>
+                        <option value="1">Option 1</option>
+                        <option value="3">Option 3</option>
+                        <option value="4">Option 4</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 2</h3><span class="text-xs font-black uppercase tracking-wide text-indigo-600">True / False</span></div>
+                <input type="hidden" name="question_type_2" value="true_false" />
+                <input type="text" name="question_text_2" value="Python is compiled." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                <input type="hidden" name="points_2" value="1" />
+                <select name="correct_tf_2" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium">
+                    <option value="false" selected>False</option>
+                    <option value="true">True</option>
+                </select>
+            </div>
+
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 3</h3><span class="text-xs font-black uppercase tracking-wide text-blue-600">Fill in the blank</span></div>
+                <input type="hidden" name="question_type_3" value="fill_blank" />
+                <input type="text" name="question_text_3" value="The capital of France is ______." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                <input type="hidden" name="points_3" value="1" />
+                <textarea name="accepted_answers_3" rows="3" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium">Paris
+paris</textarea>
+            </div>
+
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 4</h3><span class="text-xs font-black uppercase tracking-wide text-amber-600">Short answer</span></div>
+                <input type="hidden" name="question_type_4" value="short_answer" />
+                <input type="text" name="question_text_4" value="Explain polymorphism." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                <input type="hidden" name="points_4" value="5" />
+                <p class="text-sm text-amber-700 font-semibold">This will require manual grading by the lecturer.</p>
+            </div>
+
+            <div class="rounded-3xl border border-dashed border-gray-300 bg-white p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 5</h3><span class="text-xs font-black uppercase tracking-wide text-rose-600">Essay</span></div>
+                <input type="hidden" name="question_type_5" value="essay" />
+                <input type="text" name="question_text_5" value="Discuss the importance of cloud computing." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
+                <input type="hidden" name="points_5" value="10" />
+                <p class="text-sm text-rose-700 font-semibold">Essay grading is intentionally deferred for now. Keep this as a reminder for your later implementation pass.</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <button type="submit" name="action" value="draft" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"><i class="fas fa-floppy-disk"></i>Save Draft</button>
+            <button type="submit" name="action" value="publish" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition-all"><i class="fas fa-rocket"></i>Publish Assessment</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

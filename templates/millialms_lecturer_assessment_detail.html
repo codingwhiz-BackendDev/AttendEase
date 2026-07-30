@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black {% if assessment.status_label == 'Live' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif assessment.status_label == 'Upcoming' %}bg-indigo-50 text-indigo-700 border border-indigo-200{% elif assessment.status_label == 'Closed' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-gray-100 text-gray-700 border border-gray-200{% endif %}">{{ assessment.status_label }}</span>
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black bg-purple-50 text-purple-700 border border-purple-200">{{ assessment.type_label }}</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900">{{ assessment.title }}</h1>
+            <p class="mt-2 max-w-3xl text-gray-600">{{ assessment.instructions|default:'No instructions supplied yet.' }}</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'millialms_export_results' assessment.id %}?format=csv" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm font-black text-emerald-700 shadow-sm hover:bg-emerald-50 transition-all"><i class="fas fa-file-csv"></i>Excel/CSV</a>
+            <a href="{% url 'millialms_export_results' assessment.id %}?format=pdf" class="inline-flex items-center gap-2 rounded-2xl border border-rose-100 bg-white px-4 py-3 text-sm font-black text-rose-700 shadow-sm hover:bg-rose-50 transition-all"><i class="fas fa-file-pdf"></i>PDF</a>
+            <a href="{% url 'millialms_toggle_assessment_publish' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition-all"><i class="fas fa-toggle-on"></i>{% if assessment.is_published %}Unpublish{% else %}Publish{% endif %}</a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Questions</p><p class="mt-3 text-3xl font-black text-gray-900">{{ assessment.total_questions }}</p></div>
+        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempts</p><p class="mt-3 text-3xl font-black text-indigo-700">{{ attempts|length }}</p></div>
+        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempt Limit</p><p class="mt-3 text-3xl font-black text-emerald-700">{{ assessment.max_attempts }}</p></div>
+        <div class="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-amber-700">Essay note</p><p class="mt-3 text-sm font-bold text-amber-900">{{ essay_reminder }}</p></div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="xl:col-span-2 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="text-xl font-black text-gray-900 mb-4">Questions</h2>
+            <div class="space-y-4">
+                {% for question in assessment.questions.all %}
+                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-gray-700 border border-gray-200">Q{{ forloop.counter }}</span>
+                        <span class="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-black text-indigo-700 border border-indigo-200">{{ question.get_question_type_display }}</span>
+                        <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black text-emerald-700 border border-emerald-200">{{ question.points }} pts</span>
+                    </div>
+                    <p class="font-bold text-gray-900">{{ question.question_text }}</p>
+                    {% if question.options.all %}
+                    <div class="mt-3 space-y-2">
+                        {% for option in question.options.all %}
+                        <div class="rounded-xl bg-white px-3 py-2 text-sm border {% if option.is_correct %}border-emerald-200 text-emerald-800{% else %}border-gray-200 text-gray-600{% endif %}">{{ option.option_text }} {% if option.is_correct %}<span class="font-black">✓</span>{% endif %}</div>
+                        {% endfor %}
+                    </div>
+                    {% elif question.accepted_answers %}
+                    <div class="mt-3 rounded-xl bg-white px-3 py-3 text-sm border border-gray-200 text-gray-700 whitespace-pre-line">{{ question.accepted_answers }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-black text-gray-900 mb-4">Assigned courses</h2>
+                <div class="flex flex-wrap gap-2">
+                    {% for course in assessment.courses.all %}
+                    <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-black text-indigo-700">{{ course.course_code }}</span>
+                    {% empty %}
+                    <p class="text-sm text-gray-500">No courses assigned.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-black text-gray-900 mb-4">Manual grading queue</h2>
+                {% if pending_manual %}
+                <form method="post" action="{% url 'millialms_grade_attempt' pending_manual.0.attempt.id %}" class="space-y-4">
+                    {% csrf_token %}
+                    {% for item in pending_manual %}
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                        <p class="text-sm font-black text-amber-900">{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}</p>
+                        <p class="mt-1 text-sm text-amber-800">{{ item.question.question_text }}</p>
+                        <div class="mt-3 rounded-xl bg-white p-3 border border-amber-100 text-sm text-gray-700">{{ item.text_answer|default:'No response submitted.' }}</div>
+                        <div class="mt-3 grid grid-cols-1 gap-3">
+                            <input name="score_{{ item.id }}" type="number" step="0.01" min="0" max="{{ item.question.points }}" class="rounded-2xl border-2 border-white px-4 py-3 text-sm font-medium" placeholder="Score / {{ item.question.points }}" />
+                            <textarea name="feedback_{{ item.id }}" rows="2" class="rounded-2xl border-2 border-white px-4 py-3 text-sm font-medium" placeholder="Feedback for student"></textarea>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="w-full rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-sm font-black text-white shadow-lg hover:-translate-y-0.5 transition-all">Save grading</button>
+                </form>
+                {% else %}
+                <p class="text-sm text-gray-500">No short-answer responses are waiting for manual grading.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div class="border-b border-gray-100 px-6 py-4"><h2 class="text-lg font-black text-gray-900">Student attempts</h2></div>
+        {% if attempts %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-[11px] tracking-wider">
+                    <tr>
+                        <th class="p-4 text-left font-black">Student</th>
+                        <th class="p-4 text-left font-black">Attempt</th>
+                        <th class="p-4 text-left font-black">Status</th>
+                        <th class="p-4 text-left font-black">Submitted</th>
+                        <th class="p-4 text-left font-black">Score</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for attempt in attempts %}
+                    <tr>
+                        <td class="p-4 font-bold text-gray-900">{{ attempt.student.get_full_name|default:attempt.student.username }}</td>
+                        <td class="p-4 text-gray-700">{{ attempt.attempt_number }}</td>
+                        <td class="p-4 text-gray-700">{{ attempt.get_status_display }}</td>
+                        <td class="p-4 text-gray-700">{% if attempt.submitted_at %}{{ attempt.submitted_at }}{% else %}—{% endif %}</td>
+                        <td class="p-4 font-black text-indigo-700">{{ attempt.total_score }}/{{ attempt.total_possible_score }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-12 text-center text-gray-500">No student attempts yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

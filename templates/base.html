@@ -161,6 +161,22 @@
                             </div>
                         </a>
                         <a
+                            href="/millialms/student/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if '/millialms/student/' in request.path %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-clipboard-check w-5 text-center {% if '/millialms/student/' in request.path %}text-indigo-600{% endif %}"
+                            ></i>
+                            <div class="flex-1">
+                                <p>MilliaLMS</p>
+                                <p
+                                    class="text-[11px] font-medium {% if '/millialms/student/' in request.path %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Quizzes, tests, and instant scores
+                                </p>
+                            </div>
+                        </a>
+                        <a
                             href="/student/settings/"
                             class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student/settings/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
                         >
@@ -216,6 +232,22 @@
                                     class="text-[11px] font-medium {% if request.path == '/reports/' %}text-indigo-500{% else %}text-white/45{% endif %}"
                                 >
                                     Attendance intelligence and export
+                                </p>
+                            </div>
+                        </a>
+                        <a
+                            href="/millialms/lecturer/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if '/millialms/lecturer/' in request.path %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-clipboard-list w-5 text-center {% if '/millialms/lecturer/' in request.path %}text-indigo-600{% endif %}"
+                            ></i>
+                            <div class="flex-1">
+                                <p>MilliaLMS</p>
+                                <p
+                                    class="text-[11px] font-medium {% if '/millialms/lecturer/' in request.path %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Assessments, grading, and exports
                                 </p>
                             </div>
                         </a>

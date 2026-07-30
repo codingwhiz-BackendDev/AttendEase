@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-6 md:p-8 max-w-6xl mx-auto space-y-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2">MilliaLMS</p>
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900">Assessment result</h1>
+            <p class="mt-2 max-w-3xl text-gray-600">{{ attempt.assessment.title }}</p>
+        </div>
+        <a href="{% url 'millialms_student_assessment_detail' attempt.assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"><i class="fas fa-arrow-left"></i>Back to assessment</a>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempt</p><p class="mt-3 text-3xl font-black text-gray-900">{{ attempt.attempt_number }}</p></div>
+        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Status</p><p class="mt-3 text-3xl font-black text-indigo-700">{{ attempt.get_status_display }}</p></div>
+        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Score</p><p class="mt-3 text-3xl font-black text-emerald-700">{{ attempt.total_score }}</p></div>
+        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Possible</p><p class="mt-3 text-3xl font-black text-purple-700">{{ attempt.total_possible_score }}</p></div>
+    </div>
+
+    <div class="rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div class="border-b border-gray-100 px-6 py-4"><h2 class="text-lg font-black text-gray-900">Question breakdown</h2></div>
+        <div class="divide-y divide-gray-100">
+            {% for response in responses %}
+            <div class="p-6">
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-black text-gray-700">Question {{ forloop.counter }}</span>
+                    <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-black text-indigo-700 border border-indigo-200">{{ response.question.get_question_type_display }}</span>
+                    <span class="rounded-full px-3 py-1 text-xs font-black {% if response.is_correct %}bg-emerald-50 text-emerald-700 border border-emerald-200{% else %}bg-gray-100 text-gray-700 border border-gray-200{% endif %}">{% if response.is_correct %}Correct{% else %}Submitted{% endif %}</span>
+                </div>
+                <h3 class="text-lg font-black text-gray-900">{{ response.question.question_text }}</h3>
+                <div class="mt-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
+                    {% if response.selected_option %}
+                        {{ response.selected_option.option_text }}
+                    {% else %}
+                        {{ response.text_answer|default:'No answer submitted.' }}
+                    {% endif %}
+                </div>
+                <div class="mt-3 flex flex-wrap gap-3 text-xs font-bold text-gray-500">
+                    <span class="rounded-xl bg-white px-3 py-1.5 border border-gray-200">Auto score: {{ response.auto_score }}</span>
+                    <span class="rounded-xl bg-white px-3 py-1.5 border border-gray-200">Manual score: {{ response.manual_score }}</span>
+                    {% if response.lecturer_feedback %}<span class="rounded-xl bg-amber-50 px-3 py-1.5 border border-amber-200 text-amber-800">Feedback: {{ response.lecturer_feedback }}</span>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
