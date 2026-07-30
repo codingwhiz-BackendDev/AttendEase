@@ -1,159 +1,615 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+<style>
+    .purple-gradient-bg {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    }
+    .purple-card {
+        background: #ffffff;
+        border: 1px solid rgba(118, 75, 162, 0.15);
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08);
+    }
+    .purple-input {
+        border: 2px solid rgba(118, 75, 162, 0.15);
+        transition: all 0.2s ease;
+    }
+    .purple-input:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        outline: none;
+    }
+    .purple-chip {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(167, 139, 250, 0.15));
+        border: 1px solid rgba(139, 92, 246, 0.25);
+        color: #6d28d9;
+    }
+    .question-card {
+        background: linear-gradient(180deg, #ffffff 0%, rgba(139, 92, 246, 0.02) 100%);
+        border: 1px solid rgba(118, 75, 162, 0.18);
+        box-shadow: 0 2px 12px rgba(102, 126, 234, 0.06);
+    }
+    .btn-purple {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+        transition: all 0.25s ease;
+    }
+    .btn-purple:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.35);
+    }
+    .btn-outline-purple {
+        border: 1.5px solid rgba(118, 75, 162, 0.3);
+        background: white;
+        color: #6d28d9;
+        transition: all 0.2s ease;
+    }
+    .btn-outline-purple:hover {
+        background: rgba(139, 92, 246, 0.06);
+        border-color: #8b5cf6;
+    }
+    .question-type-label {
+        font-size: 10px;
+        letter-spacing: 0.15em;
+    }
+    .add-question-btn {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(167, 139, 250, 0.12));
+        border: 2px dashed rgba(139, 92, 246, 0.4);
+        color: #6d28d9;
+        transition: all 0.2s ease;
+    }
+    .add-question-btn:hover {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.2));
+        border-color: #8b5cf6;
+    }
+</style>
+
+<div class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2">MilliaLMS</p>
-            <h1 class="text-3xl md:text-4xl font-black text-gray-900">Create assessment</h1>
-            <p class="mt-2 max-w-3xl text-gray-600">Build quizzes, timed tests, and practice tests. MCQ, true/false, and fill-in-the-blank are auto-graded. Short answers are ready for manual grading. Essay is intentionally deferred.</p>
+            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-purple-600 mb-2">
+                <i class="fas fa-sparkles mr-1.5"></i>MilliaLMS Studio
+            </p>
+            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
+                {% if edit_mode %}Edit assessment{% else %}Create new assessment{% endif %}
+            </h1>
+            <p class="mt-2 max-w-3xl text-gray-600 font-medium">
+                Build custom quizzes, timed tests, and practice assessments. Choose your question types,
+                set point values, and assign to any of your courses. No generic templates required.
+            </p>
         </div>
-        <a href="{% url 'millialms_lecturer_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"><i class="fas fa-arrow-left"></i>Back to studio</a>
+        <a href="{% url 'millialms_lecturer_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-3 text-sm font-black transition-all">
+            <i class="fas fa-arrow-left"></i>Back to dashboard
+        </a>
     </div>
 
-    <form method="post" class="space-y-8">
+    {% if messages %}
+    <div class="space-y-3">
+        {% for message in messages %}
+        <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" id="assessmentForm" class="space-y-8" onsubmit="return validateForm();">
         {% csrf_token %}
+
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div class="xl:col-span-2 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-6">
+            <div class="xl:col-span-2 rounded-3xl purple-card p-6 md:p-8 space-y-6">
+                <h2 class="text-xl font-black text-purple-900 flex items-center gap-2">
+                    <i class="fas fa-circle-info text-purple-500"></i>Assessment details
+                </h2>
+
                 <div>
-                    <label class="block text-sm font-black text-gray-900 mb-2">Assessment title</label>
-                    <input name="title" required class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="e.g. CSC 401 Mid-Semester Quiz" />
+                    <label class="block text-sm font-black text-gray-800 mb-2">Assessment title <span class="text-red-500">*</span></label>
+                    <input name="title" id="id_title" required
+                        class="w-full rounded-2xl purple-input px-4 py-3.5 text-sm font-semibold text-gray-900"
+                        placeholder="e.g. CSC 401 Mid-Semester Quiz — Object Oriented Programming"
+                        {% if edit_mode and assessment %}value="{{ assessment.title }}"{% endif %} />
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-black text-gray-900 mb-2">Type</label>
-                        <select name="assessment_type" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400">
-                            <option value="quiz">Quiz</option>
-                            <option value="timed_test">Timed Test</option>
-                            <option value="practice">Practice Test</option>
+                        <label class="block text-sm font-black text-gray-800 mb-2">Assessment type</label>
+                        <select name="assessment_type" id="id_assessment_type" class="w-full rounded-2xl purple-input px-4 py-3.5 text-sm font-semibold text-gray-900">
+                            <option value="quiz" {% if edit_mode and assessment and assessment.assessment_type == 'quiz' %}selected{% endif %}>Quiz</option>
+                            <option value="timed_test" {% if edit_mode and assessment and assessment.assessment_type == 'timed_test' %}selected{% endif %}>Timed Test</option>
+                            <option value="practice" {% if edit_mode and assessment and assessment.assessment_type == 'practice' %}selected{% endif %}>Practice Test</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-black text-gray-900 mb-2">Attempt limit</label>
-                        <input type="number" min="1" name="max_attempts" value="1" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" />
+                        <label class="block text-sm font-black text-gray-800 mb-2">Maximum attempts</label>
+                        <input type="number" min="1" name="max_attempts" id="id_max_attempts"
+                            {% if edit_mode and assessment %}value="{{ assessment.max_attempts }}"{% else %}value="1"{% endif %}
+                            class="w-full rounded-2xl purple-input px-4 py-3.5 text-sm font-semibold text-gray-900" />
                     </div>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-black text-gray-900 mb-2">Start time</label>
-                        <input type="datetime-local" name="start_time" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" />
+                        <label class="block text-sm font-black text-gray-800 mb-2">Start time</label>
+                        <input type="datetime-local" name="start_time" id="id_start_time"
+                            {% if edit_mode and assessment and assessment.start_time %}value="{{ assessment.start_time|date:'Y-m-d\TH:i' }}"{% endif %}
+                            class="w-full rounded-2xl purple-input px-4 py-3.5 text-sm font-semibold text-gray-900" />
                     </div>
                     <div>
-                        <label class="block text-sm font-black text-gray-900 mb-2">End time</label>
-                        <input type="datetime-local" name="end_time" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" />
+                        <label class="block text-sm font-black text-gray-800 mb-2">End time</label>
+                        <input type="datetime-local" name="end_time" id="id_end_time"
+                            {% if edit_mode and assessment and assessment.end_time %}value="{{ assessment.end_time|date:'Y-m-d\TH:i' }}"{% endif %}
+                            class="w-full rounded-2xl purple-input px-4 py-3.5 text-sm font-semibold text-gray-900" />
                     </div>
                     <div>
-                        <label class="block text-sm font-black text-gray-900 mb-2">Time limit (mins)</label>
-                        <input type="number" min="1" name="time_limit_minutes" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400" placeholder="Optional" />
+                        <label class="block text-sm font-black text-gray-800 mb-2">Time limit (minutes)</label>
+                        <input type="number" min="1" name="time_limit_minutes" id="id_time_limit_minutes"
+                            {% if edit_mode and assessment and assessment.time_limit_minutes %}value="{{ assessment.time_limit_minutes }}"{% endif %}
+                            placeholder="Optional"
+                            class="w-full rounded-2xl purple-input px-4 py-3.5 text-sm font-semibold text-gray-900" />
                     </div>
                 </div>
+
                 <div>
-                    <label class="block text-sm font-black text-gray-900 mb-2">Instructions</label>
-                    <textarea name="instructions" rows="4" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="What should students know before starting?"></textarea>
+                    <label class="block text-sm font-black text-gray-800 mb-2">Instructions for students</label>
+                    <textarea name="instructions" id="id_instructions" rows="4"
+                        class="w-full rounded-2xl purple-input px-4 py-3.5 text-sm font-semibold text-gray-900"
+                        placeholder="Example: Answer all questions. Calculators allowed. Time limit is strictly enforced.">{% if edit_mode and assessment %}{{ assessment.instructions }}{% endif %}</textarea>
                 </div>
+
                 <div>
-                    <label class="block text-sm font-black text-gray-900 mb-3">Assign to courses</label>
+                    <label class="block text-sm font-black text-gray-800 mb-3">Assign to courses</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {% for course in lecturer_courses %}
-                        <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
-                            <input type="checkbox" name="courses" value="{{ course.id }}" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                            <span>{{ course.course_code }} — {{ course.course_title }}</span>
+                        <label class="flex items-center gap-3 rounded-2xl purple-chip px-4 py-3 text-sm font-bold cursor-pointer hover:shadow-md transition-all">
+                            <input type="checkbox" name="courses" value="{{ course.id }}"
+                                class="h-4.5 w-4.5 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                                {% if edit_mode and selected_course_ids and course.id in selected_course_ids %}checked{% endif %} />
+                            <span class="flex-1">
+                                <span class="font-black text-purple-900">{{ course.course_code }}</span>
+                                <span class="text-purple-700 opacity-80"> — {{ course.course_title }}</span>
+                            </span>
                         </label>
                         {% empty %}
-                        <p class="text-sm text-red-600 font-semibold">You need at least one taught course before creating an assessment.</p>
+                        <div class="md:col-span-2 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-bold text-amber-800">
+                            <i class="fas fa-triangle-exclamation mr-2"></i>
+                            You need at least one assigned course before creating assessments. Visit Courses to add courses first.
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
-                        <input type="checkbox" name="randomize_question_order" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                        <span>Randomize question order</span>
+                    <label class="flex items-center gap-3 rounded-2xl purple-chip px-4 py-3 text-sm font-bold cursor-pointer hover:shadow-md transition-all">
+                        <input type="checkbox" name="randomize_question_order"
+                            class="h-4.5 w-4.5 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                            {% if edit_mode and assessment and assessment.randomize_question_order %}checked{% endif %} />
+                        <i class="fas fa-shuffle text-purple-500"></i>
+                        <span>Randomize question order per attempt</span>
                     </label>
-                    <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">
-                        <input type="checkbox" name="randomize_answer_options" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                        <span>Randomize answer options</span>
+                    <label class="flex items-center gap-3 rounded-2xl purple-chip px-4 py-3 text-sm font-bold cursor-pointer hover:shadow-md transition-all">
+                        <input type="checkbox" name="randomize_answer_options"
+                            class="h-4.5 w-4.5 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                            {% if edit_mode and assessment and assessment.randomize_answer_options %}checked{% endif %} />
+                        <i class="fas fa-arrow-right-arrow-left text-purple-500"></i>
+                        <span>Randomize MCQ answer options</span>
                     </label>
                 </div>
             </div>
 
-            <div class="rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm h-fit">
-                <h2 class="text-lg font-black text-amber-900">Question builder rules</h2>
-                <ul class="mt-4 space-y-3 text-sm font-medium text-amber-900">
-                    <li>• MCQ requires four options and one correct answer.</li>
-                    <li>• True/False is auto-marked from the correct answer selector.</li>
-                    <li>• Fill in the blank accepts multiple correct answers separated by new lines.</li>
-                    <li>• Short answer is manually graded.</li>
-                    <li>• Essay is visible for future use, but grading is intentionally deferred for now.</li>
-                </ul>
+            <div class="space-y-6">
+                <div class="rounded-3xl purple-card p-6 shadow-sm h-fit">
+                    <h3 class="text-lg font-black text-purple-900 flex items-center gap-2 mb-4">
+                        <i class="fas fa-lightbulb text-amber-500"></i>Quick tips
+                    </h3>
+                    <ul class="space-y-3 text-sm font-semibold text-gray-700">
+                        <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i><span>MCQ: Add 2+ options and tick the radio next to the correct one.</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i><span>True/False: pick the correct choice from the dropdown.</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i><span>Fill blank: list accepted answers, one per line (case-insensitive).</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i><span>Short answer &amp; Essay: auto-flagged as Pending for manual grading with feedback.</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i><span>Set points per question. Total is the sum of all questions.</span></li>
+                    </ul>
+                </div>
+                <div class="rounded-3xl purple-gradient-bg border border-purple-200 p-6 h-fit">
+                    <h3 class="text-lg font-black text-purple-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-list-check text-purple-600"></i>Question types
+                    </h3>
+                    <div class="space-y-2 text-xs font-bold">
+                        <div class="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2 border border-purple-100"><span class="text-emerald-600"><i class="fas fa-bolt"></i></span><span class="text-gray-800">Multiple Choice — Auto graded</span></div>
+                        <div class="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2 border border-purple-100"><span class="text-indigo-600"><i class="fas fa-check-double"></i></span><span class="text-gray-800">True / False — Auto graded</span></div>
+                        <div class="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2 border border-purple-100"><span class="text-blue-600"><i class="fas fa-pen-line"></i></span><span class="text-gray-800">Fill in Blank — Auto graded</span></div>
+                        <div class="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2 border border-purple-100"><span class="text-amber-600"><i class="fas fa-memo-circle-info"></i></span><span class="text-gray-800">Short Answer — Manual grading</span></div>
+                        <div class="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2 border border-purple-100"><span class="text-purple-600"><i class="fas fa-feather-pointed"></i></span><span class="text-gray-800">Essay — Manual grading</span></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <input type="hidden" name="question_total" value="5" />
         <div class="space-y-4">
-            <h2 class="text-2xl font-black text-gray-900">Questions</h2>
-
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 1</h3><span class="text-xs font-black uppercase tracking-wide text-emerald-600">MCQ</span></div>
-                <input type="hidden" name="question_type_1" value="mcq" />
-                <input type="text" name="question_text_1" value="What is Python?" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium focus:border-indigo-400 outline-none" />
-                <input type="hidden" name="points_1" value="1" />
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" name="option_1_1" value="Database" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                    <input type="text" name="option_1_2" value="Programming Language" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                    <input type="text" name="option_1_3" value="Browser" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                    <input type="text" name="option_1_4" value="Operating System" class="rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                </div>
+            <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <label class="block text-sm font-black text-gray-900 mb-2">Correct option</label>
-                    <select name="correct_option_1" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium">
-                        <option value="2" selected>Option 2 — Programming Language</option>
-                        <option value="1">Option 1</option>
-                        <option value="3">Option 3</option>
-                        <option value="4">Option 4</option>
-                    </select>
+                    <h2 class="text-2xl font-black text-purple-900 flex items-center gap-2">
+                        <i class="fas fa-clipboard-question text-purple-600"></i>Questions
+                    </h2>
+                    <p class="mt-1 text-sm font-semibold text-gray-600">
+                        <span id="questionCount">0</span> question<span id="questionCountPlural">s</span> added so far. Each question type is fully custom — you control every part.
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="addQuestion('mcq')" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-2.5 text-xs font-black">
+                        <i class="fas fa-list"></i>+ MCQ
+                    </button>
+                    <button type="button" onclick="addQuestion('true_false')" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-2.5 text-xs font-black">
+                        <i class="fas fa-check-double"></i>+ True/False
+                    </button>
+                    <button type="button" onclick="addQuestion('fill_blank')" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-2.5 text-xs font-black">
+                        <i class="fas fa-pen-line"></i>+ Fill Blank
+                    </button>
+                    <button type="button" onclick="addQuestion('short_answer')" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-2.5 text-xs font-black">
+                        <i class="fas fa-memo-circle-info"></i>+ Short Answer
+                    </button>
+                    <button type="button" onclick="addQuestion('essay')" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-2.5 text-xs font-black">
+                        <i class="fas fa-feather-pointed"></i>+ Essay
+                    </button>
                 </div>
             </div>
 
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 2</h3><span class="text-xs font-black uppercase tracking-wide text-indigo-600">True / False</span></div>
-                <input type="hidden" name="question_type_2" value="true_false" />
-                <input type="text" name="question_text_2" value="Python is compiled." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                <input type="hidden" name="points_2" value="1" />
-                <select name="correct_tf_2" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium">
-                    <option value="false" selected>False</option>
-                    <option value="true">True</option>
-                </select>
-            </div>
+            <div id="questionsContainer" class="space-y-5"></div>
 
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 3</h3><span class="text-xs font-black uppercase tracking-wide text-blue-600">Fill in the blank</span></div>
-                <input type="hidden" name="question_type_3" value="fill_blank" />
-                <input type="text" name="question_text_3" value="The capital of France is ______." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                <input type="hidden" name="points_3" value="1" />
-                <textarea name="accepted_answers_3" rows="3" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium">Paris
-paris</textarea>
-            </div>
-
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 4</h3><span class="text-xs font-black uppercase tracking-wide text-amber-600">Short answer</span></div>
-                <input type="hidden" name="question_type_4" value="short_answer" />
-                <input type="text" name="question_text_4" value="Explain polymorphism." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                <input type="hidden" name="points_4" value="5" />
-                <p class="text-sm text-amber-700 font-semibold">This will require manual grading by the lecturer.</p>
-            </div>
-
-            <div class="rounded-3xl border border-dashed border-gray-300 bg-white p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between"><h3 class="text-lg font-black text-gray-900">Question 5</h3><span class="text-xs font-black uppercase tracking-wide text-rose-600">Essay</span></div>
-                <input type="hidden" name="question_type_5" value="essay" />
-                <input type="text" name="question_text_5" value="Discuss the importance of cloud computing." class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium" />
-                <input type="hidden" name="points_5" value="10" />
-                <p class="text-sm text-rose-700 font-semibold">Essay grading is intentionally deferred for now. Keep this as a reminder for your later implementation pass.</p>
-            </div>
+            <button type="button" onclick="addQuestion('mcq')" class="w-full add-question-btn rounded-3xl py-6 text-sm font-black flex items-center justify-center gap-3">
+                <i class="fas fa-plus-circle text-2xl"></i>
+                Add a new question (or choose a type using the buttons above)
+            </button>
         </div>
 
-        <div class="flex flex-wrap gap-3">
-            <button type="submit" name="action" value="draft" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"><i class="fas fa-floppy-disk"></i>Save Draft</button>
-            <button type="submit" name="action" value="publish" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition-all"><i class="fas fa-rocket"></i>Publish Assessment</button>
+        <div class="flex flex-wrap gap-3 pt-4 sticky bottom-4 z-20">
+            <button type="submit" name="action" value="draft" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-6 py-3.5 text-sm font-black">
+                <i class="fas fa-floppy-disk"></i>Save Draft
+            </button>
+            <button type="submit" name="action" value="publish" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3.5 text-sm font-black text-white">
+                <i class="fas fa-rocket"></i>{% if edit_mode %}Save &amp; Update{% else %}Publish Assessment{% endif %}
+            </button>
+            <a href="{% url 'millialms_lecturer_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-6 py-3.5 text-sm font-black text-gray-600 hover:bg-gray-50 transition-all">
+                <i class="fas fa-xmark"></i>Cancel
+            </a>
         </div>
     </form>
 </div>
+
+<script>
+    const TYPE_LABELS = {
+        mcq: { label: "Multiple Choice", color: "emerald", icon: "fa-list" },
+        true_false: { label: "True / False", color: "indigo", icon: "fa-check-double" },
+        fill_blank: { label: "Fill in Blank", color: "blue", icon: "fa-pen-line" },
+        short_answer: { label: "Short Answer", color: "amber", icon: "fa-memo-circle-info" },
+        essay: { label: "Essay", color: "purple", icon: "fa-feather-pointed" },
+    };
+    const TYPE_COLOR_CLASSES = {
+        emerald: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        indigo: "bg-indigo-50 text-indigo-700 border-indigo-200",
+        blue: "bg-blue-50 text-blue-700 border-blue-200",
+        amber: "bg-amber-50 text-amber-700 border-amber-200",
+        purple: "bg-purple-50 text-purple-700 border-purple-200",
+    };
+    let questionCounter = 0;
+    const questionSlots = [];
+
+    function updateQuestionCount() {
+        const total = questionSlots.length;
+        document.getElementById("questionCount").textContent = total;
+        document.getElementById("questionCountPlural").textContent = total === 1 ? "" : "s";
+    }
+
+    function renumberQuestions() {
+        questionSlots.forEach((slot, i) => {
+            const displayNum = i + 1;
+            const titleEl = slot.element.querySelector(".question-number");
+            if (titleEl) titleEl.textContent = displayNum;
+        });
+        updateQuestionCount();
+    }
+
+    function makeIdAttrSafe(str) { return String(str).replace(/[^a-zA-Z0-9_]/g, "_"); }
+
+    function addQuestion(type, preset) {
+        questionCounter += 1;
+        const qIdx = questionCounter;
+        const info = TYPE_LABELS[type] || TYPE_LABELS.mcq;
+        const colorClass = TYPE_COLOR_CLASSES[info.color];
+        const wrapper = document.createElement("div");
+        wrapper.className = "question-card rounded-3xl p-5 md:p-6 space-y-4 relative";
+        wrapper.dataset.type = type;
+        wrapper.dataset.idx = qIdx;
+
+        const header = document.createElement("div");
+        header.className = "flex flex-wrap items-start justify-between gap-3";
+        header.innerHTML = `
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-black shadow-md">
+                    <span class="question-number">${questionSlots.length + 1}</span>
+                </div>
+                <span class="question-type-label inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-black uppercase tracking-wider border ${colorClass}">
+                    <i class="fas ${info.icon}"></i>${info.label}
+                </span>
+                <input type="hidden" name="q_idx_${qIdx}" value="${qIdx}" />
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 rounded-2xl purple-chip px-3 py-2">
+                    <i class="fas fa-coins text-amber-500"></i>
+                    <label class="text-[10px] font-black uppercase tracking-wider text-purple-800">Points</label>
+                    <input type="number" step="0.5" min="0" name="q_points_${qIdx}" value="${preset?.points ?? 1}"
+                        class="w-20 rounded-xl border-0 bg-white/80 px-2 py-1 text-sm font-black text-purple-900 text-center focus:ring-2 focus:ring-purple-300 outline-none" />
+                </div>
+                <button type="button" onclick="removeQuestion(${qIdx})" title="Delete this question"
+                    class="flex h-10 w-10 items-center justify-center rounded-2xl text-red-500 hover:bg-red-50 hover:text-red-600 border border-red-100 transition-all">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        wrapper.appendChild(header);
+
+        const textArea = document.createElement("div");
+        textArea.innerHTML = `
+            <label class="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">Question text</label>
+            <textarea name="q_text_${qIdx}" rows="2" required
+                class="w-full rounded-2xl purple-input px-4 py-3 text-sm font-semibold text-gray-900 resize-y"
+                placeholder="Type your question here...">${preset?.text ?? ""}</textarea>
+            <input type="hidden" name="q_type_${qIdx}" value="${type}" />
+        `;
+        wrapper.appendChild(textArea);
+
+        if (type === "mcq") {
+            const optWrap = document.createElement("div");
+            optWrap.className = "space-y-3 pt-2";
+            optWrap.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-black uppercase tracking-wider text-gray-700 flex items-center gap-1.5"><i class="fas fa-list-ul text-purple-500"></i>Answer options</label>
+                    <button type="button" onclick="addOption(${qIdx}, this)" class="inline-flex items-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50 px-3 py-1.5 text-[11px] font-black text-purple-700 hover:bg-purple-100 transition-all">
+                        <i class="fas fa-plus"></i>Add option
+                    </button>
+                </div>
+                <div class="options-list space-y-2" data-qidx="${qIdx}"></div>
+                <p class="text-[11px] font-bold text-amber-700 flex items-center gap-1"><i class="fas fa-info-circle"></i>Select the radio button next to the correct answer.</p>
+            `;
+            wrapper.appendChild(optWrap);
+            const opts = preset?.options?.length ? preset.options : [{text: "", correct: false}, {text: "", correct: false}, {text: "", correct: false}, {text: "", correct: false}];
+            opts.forEach((opt, i) => { addOption(qIdx, null, opt); });
+        } else if (type === "true_false") {
+            const tf = document.createElement("div");
+            tf.className = "pt-2";
+            const correct = preset?.tf_correct ?? "true";
+            tf.innerHTML = `
+                <label class="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2 flex items-center gap-1.5"><i class="fas fa-check-double text-indigo-500"></i>Correct answer</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-black cursor-pointer transition-all ${correct === 'true' ? 'bg-emerald-50 border-2 border-emerald-300 text-emerald-800' : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-200'}">
+                        <input type="radio" name="q_tf_correct_${qIdx}_radio" value="true" ${correct === 'true' ? 'checked' : ''} onchange="syncTFCorrect(${qIdx}, 'true')" class="h-4 w-4 text-emerald-600" />
+                        <i class="fas fa-circle-check text-emerald-500"></i>True
+                    </label>
+                    <label class="flex items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-black cursor-pointer transition-all ${correct === 'false' ? 'bg-rose-50 border-2 border-rose-300 text-rose-800' : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-200'}">
+                        <input type="radio" name="q_tf_correct_${qIdx}_radio" value="false" ${correct === 'false' ? 'checked' : ''} onchange="syncTFCorrect(${qIdx}, 'false')" class="h-4 w-4 text-rose-600" />
+                        <i class="fas fa-circle-xmark text-rose-500"></i>False
+                    </label>
+                </div>
+                <input type="hidden" name="q_tf_correct_${qIdx}" id="q_tf_correct_${qIdx}" value="${correct}" />
+            `;
+            wrapper.appendChild(tf);
+        } else if (type === "fill_blank") {
+            const fb = document.createElement("div");
+            fb.className = "pt-2";
+            fb.innerHTML = `
+                <label class="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2 flex items-center gap-1.5"><i class="fas fa-spell-check text-blue-500"></i>Accepted answers (one per line, case-insensitive)</label>
+                <textarea name="q_answers_${qIdx}" rows="3"
+                    class="w-full rounded-2xl purple-input px-4 py-3 text-sm font-semibold text-gray-900"
+                    placeholder="Enter each accepted answer on its own line&#10;Example:&#10;Paris&#10;paris">${preset?.accepted_answers ?? ""}</textarea>
+            `;
+            wrapper.appendChild(fb);
+        } else if (type === "short_answer") {
+            const sa = document.createElement("div");
+            sa.className = "pt-2";
+            sa.innerHTML = `
+                <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3">
+                    <i class="fas fa-memo-circle-info text-amber-600 mt-0.5"></i>
+                    <div class="text-sm font-bold text-amber-800">
+                        Short answer questions are flagged as <strong>Pending</strong> and will require manual grading by you after students submit.
+                    </div>
+                </div>
+            `;
+            wrapper.appendChild(sa);
+        } else if (type === "essay") {
+            const es = document.createElement("div");
+            es.className = "pt-2";
+            es.innerHTML = `
+                <div class="rounded-2xl border border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-3 flex items-start gap-3">
+                    <i class="fas fa-feather-pointed text-purple-600 mt-0.5"></i>
+                    <div class="text-sm font-bold text-purple-800">
+                        Essay responses appear in the <strong>Manual grading queue</strong> with student name, their full answer, a score box, and a field for personalised feedback. Status remains Pending until graded.
+                    </div>
+                </div>
+            `;
+            wrapper.appendChild(es);
+        }
+
+        document.getElementById("questionsContainer").appendChild(wrapper);
+        questionSlots.push({ element: wrapper, idx: qIdx });
+        renumberQuestions();
+    }
+
+    function removeQuestion(idx) {
+        const pos = questionSlots.findIndex(s => s.idx === idx);
+        if (pos === -1) return;
+        if (questionSlots.length <= 1) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Keep at least one question',
+                text: 'An assessment needs at least one question. If you want no questions, delete the assessment from the dashboard.',
+                confirmButtonColor: '#764ba2',
+            });
+            return;
+        }
+        const slot = questionSlots[pos];
+        slot.element.style.transition = "all 0.2s ease";
+        slot.element.style.opacity = "0";
+        slot.element.style.transform = "translateY(-10px)";
+        setTimeout(() => {
+            slot.element.remove();
+            questionSlots.splice(pos, 1);
+            renumberQuestions();
+        }, 180);
+    }
+
+    function addOption(qIdx, btnEl, preset) {
+        const container = btnEl
+            ? btnEl.closest(".question-card").querySelector(`.options-list[data-qidx="${qIdx}"]`)
+            : document.querySelector(`.options-list[data-qidx="${qIdx}"]`);
+        if (!container) return;
+        const currentCount = container.querySelectorAll(".option-item").length;
+        const optIdx = currentCount + 1;
+        const presetText = preset?.text ?? "";
+        const presetCorrect = !!preset?.correct;
+
+        const optRow = document.createElement("div");
+        optRow.className = "option-item flex items-stretch gap-2 rounded-2xl bg-white border border-purple-100 p-2 hover:border-purple-200 transition-all";
+        optRow.dataset.oidx = optIdx;
+        optRow.innerHTML = `
+            <label class="flex items-center justify-center px-3 cursor-pointer border-r border-purple-100" title="Mark as correct">
+                <input type="radio" name="q_correct_radio_${qIdx}" ${presetCorrect ? 'checked' : ''} onchange="syncMCCorrect(${qIdx})" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500" />
+            </label>
+            <input type="hidden" name="q_opt_${qIdx}_${optIdx}_correct" id="q_opt_${qIdx}_${optIdx}_correct" value="${presetCorrect ? '1' : '0'}" />
+            <div class="flex-1 flex items-center gap-2">
+                <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-purple-50 text-xs font-black text-purple-700 border border-purple-100 opt-label">${String.fromCharCode(64 + optIdx)}</span>
+                <input type="text" name="q_opt_${qIdx}_${optIdx}" value="${presetText}"
+                    class="flex-1 rounded-xl border-0 px-2 py-2 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-purple-200 outline-none bg-transparent"
+                    placeholder="Option ${optIdx} text..." />
+            </div>
+            <button type="button" onclick="removeOption(this, ${qIdx})"
+                class="flex items-center justify-center px-3 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all" title="Remove option">
+                <i class="fas fa-minus-circle"></i>
+            </button>
+        `;
+        container.appendChild(optRow);
+        relabelOptions(container);
+        syncMCCorrect(qIdx);
+    }
+
+    function removeOption(btn, qIdx) {
+        const row = btn.closest(".option-item");
+        const container = row.parentElement;
+        if (container.querySelectorAll(".option-item").length <= 2) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Keep at least 2 options',
+                text: 'A multiple-choice question needs at least 2 options.',
+                confirmButtonColor: '#764ba2',
+            });
+            return;
+        }
+        row.remove();
+        relabelOptions(container);
+        syncMCCorrect(qIdx);
+    }
+
+    function relabelOptions(container) {
+        container.querySelectorAll(".option-item").forEach((row, i) => {
+            row.dataset.oidx = i + 1;
+            const label = row.querySelector(".opt-label");
+            if (label) label.textContent = String.fromCharCode(64 + (i + 1));
+        });
+        // Rename inputs to match backend expectation (consecutive index)
+        const qIdx = container.dataset.qidx;
+        let i = 0;
+        container.querySelectorAll(".option-item").forEach(row => {
+            i += 1;
+            const textInput = row.querySelector(`input[name^="q_opt_${qIdx}_"][name$="_correct"]`);
+            // Find text and hidden inputs by pattern
+            const allInputs = row.querySelectorAll("input");
+            allInputs.forEach(inp => {
+                if (inp.name && inp.name.startsWith(`q_opt_${qIdx}_`)) {
+                    if (inp.name.endsWith("_correct")) {
+                        inp.name = `q_opt_${qIdx}_${i}_correct`;
+                        inp.id = `q_opt_${qIdx}_${i}_correct`;
+                    } else if (inp.type === "text") {
+                        inp.name = `q_opt_${qIdx}_${i}`;
+                    }
+                }
+            });
+        });
+    }
+
+    function syncMCCorrect(qIdx) {
+        const container = document.querySelector(`.options-list[data-qidx="${qIdx}"]`);
+        if (!container) return;
+        const radio = container.querySelector('input[type="radio"]:checked');
+        container.querySelectorAll('.option-item').forEach(row => row.classList.remove("ring-2", "ring-emerald-300", "bg-emerald-50/50"));
+        container.querySelectorAll("input[name^='q_opt_" + qIdx + "_'][name$='_correct']").forEach(h => { h.value = "0"; });
+        if (radio) {
+            const row = radio.closest(".option-item");
+            if (row) row.classList.add("ring-2", "ring-emerald-300", "bg-emerald-50/50");
+            const i = row.dataset.oidx;
+            const hidden = document.getElementById(`q_opt_${qIdx}_${i}_correct`);
+            if (hidden) hidden.value = "1";
+        } else {
+            const firstHidden = container.querySelector("input[name^='q_opt_" + qIdx + "_'][name$='_correct']");
+            if (firstHidden) firstHidden.value = "1";
+        }
+    }
+
+    function syncTFCorrect(qIdx, value) {
+        const hidden = document.getElementById(`q_tf_correct_${qIdx}`);
+        if (hidden) hidden.value = value;
+        const labels = document.querySelectorAll(`input[name="q_tf_correct_${qIdx}_radio"]`);
+        labels.forEach(r => {
+            const lbl = r.closest("label");
+            const isTrue = r.value === "true";
+            if (r.checked) {
+                lbl.className = `flex items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-black cursor-pointer transition-all ${isTrue ? 'bg-emerald-50 border-2 border-emerald-300 text-emerald-800' : 'bg-rose-50 border-2 border-rose-300 text-rose-800'}`;
+            } else {
+                lbl.className = "flex items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-black cursor-pointer transition-all bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-200";
+            }
+        });
+    }
+
+    function validateForm() {
+        const title = document.getElementById("id_title");
+        if (!title.value.trim()) {
+            Swal.fire({ icon: 'error', title: 'Title required', text: 'Please give this assessment a title before saving.', confirmButtonColor: '#764ba2' });
+            title.focus();
+            return false;
+        }
+        if (questionSlots.length === 0) {
+            Swal.fire({ icon: 'error', title: 'Add at least one question', text: 'You need at least one question to create an assessment.', confirmButtonColor: '#764ba2' });
+            return false;
+        }
+        let ok = true;
+        questionSlots.forEach(slot => {
+            const type = slot.element.dataset.type;
+            const textInput = slot.element.querySelector(`textarea[name^="q_text_"]`);
+            if (textInput && !textInput.value.trim()) {
+                textInput.classList.add("border-red-400", "bg-red-50");
+                ok = false;
+            }
+            if (type === "mcq") {
+                const opts = slot.element.querySelectorAll(`.option-item input[type="text"]`);
+                let filled = 0;
+                opts.forEach(i => { if (i.value.trim()) filled++; });
+                if (filled < 2) {
+                    slot.element.querySelector(".options-list").classList.add("border-2", "border-red-300", "rounded-2xl", "p-2", "bg-red-50/40");
+                    ok = false;
+                }
+            }
+        });
+        if (!ok) {
+            Swal.fire({ icon: 'warning', title: 'Some fields need attention', text: 'Make sure every question has text and MCQ questions have at least 2 filled options.', confirmButtonColor: '#764ba2' });
+            return false;
+        }
+        return true;
+    }
+
+    {% if edit_mode and existing_questions_json %}
+    (function hydrateFromEdit() {
+        const data = {{ existing_questions_json|safe }};
+        if (!Array.isArray(data) || data.length === 0) { addQuestion("mcq"); return; }
+        data.forEach(q => addQuestion(q.type, q));
+    })();
+    {% else %}
+    addQuestion("mcq");
+    {% endif %}
+</script>
 {% endblock content %}

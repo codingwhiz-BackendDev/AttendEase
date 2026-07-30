@@ -1,69 +1,226 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="p-6 md:p-8 max-w-6xl mx-auto space-y-8">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
+<style>
+    .purple-card { background:#ffffff; border:1px solid rgba(118,75,162,0.15); box-shadow:0 4px 20px rgba(102,126,234,0.08); }
+    .stat-card { background:linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.03) 100%); border:1px solid rgba(118,75,162,0.15); box-shadow:0 2px 12px rgba(102,126,234,0.06); transition:all 0.25s ease; }
+    .stat-card:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(102,126,234,0.15); border-color:rgba(139,92,246,0.35); }
+    .btn-purple { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); box-shadow:0 8px 24px rgba(102,126,234,0.25); transition:all 0.25s ease; }
+    .btn-purple:hover { transform:translateY(-1px); box-shadow:0 12px 32px rgba(102,126,234,0.35); }
+    .btn-emerald { background:linear-gradient(135deg,#10b981 0%,#0d9488 100%); box-shadow:0 8px 24px rgba(16,185,129,0.25); transition:all 0.25s ease; }
+    .btn-emerald:hover { transform:translateY(-1px); box-shadow:0 12px 32px rgba(16,185,129,0.35); }
+    .btn-outline-purple { border:1.5px solid rgba(118,75,162,0.3); background:white; color:#6d28d9; transition:all 0.2s ease; }
+    .btn-outline-purple:hover { background:rgba(139,92,246,0.06); border-color:#8b5cf6; }
+    .status-live { background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.15)); color:#047857; border-color:rgba(16,185,129,0.3); }
+    .status-upcoming { background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(124,58,237,0.15)); color:#6d28d9; border-color:rgba(139,92,246,0.3); }
+    .status-closed { background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(220,38,38,0.15)); color:#b91c1c; border-color:rgba(239,68,68,0.3); }
+    .status-draft { background:linear-gradient(135deg,rgba(107,114,128,0.12),rgba(75,85,99,0.15)); color:#374151; border-color:rgba(107,114,128,0.3); }
+    .type-badge { background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(192,132,252,0.15)); color:#7e22ce; border-color:rgba(168,85,247,0.3); }
+    .course-chip { background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(167,139,250,0.15)); color:#6d28d9; border-color:rgba(139,92,246,0.3); }
+    .attempt-row { transition:all 0.2s ease; }
+    .attempt-row:hover { background:rgba(139,92,246,0.04); }
+    .status-graded { background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(5,150,105,0.15)); color:#047857; border-color:rgba(16,185,129,0.3); }
+    .status-submitted { background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(245,158,11,0.15)); color:#92400e; border-color:rgba(251,191,36,0.3); }
+    .status-inprogress { background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(124,58,237,0.15)); color:#6d28d9; border-color:rgba(139,92,246,0.3); }
+    .bar-track { background:rgba(139,92,246,0.1); border-radius:999px; overflow:hidden; }
+    .bar-fill { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 0.6s ease; }
+    .empty-state-icon { background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(167,139,250,0.2)); color:#7c3aed; }
+    .notice-banner { background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(245,158,11,0.15)); border-color:rgba(251,191,36,0.35); color:#92400e; }
+</style>
+
+<div class="p-4 md:p-8 max-w-6xl mx-auto space-y-8">
+    <div class="flex flex-wrap items-start justify-between gap-5">
+        <div class="flex-1 min-w-0">
             <div class="flex flex-wrap items-center gap-2 mb-3">
-                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black {% if assessment.status_label == 'Live' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif assessment.status_label == 'Upcoming' %}bg-indigo-50 text-indigo-700 border border-indigo-200{% elif assessment.status_label == 'Closed' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-gray-100 text-gray-700 border border-gray-200{% endif %}">{{ assessment.status_label }}</span>
-                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black bg-purple-50 text-purple-700 border border-purple-200">{{ assessment.type_label }}</span>
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black border {% if assessment.status_label == 'Live' %}status-live{% elif assessment.status_label == 'Upcoming' %}status-upcoming{% elif assessment.status_label == 'Closed' %}status-closed{% else %}status-draft{% endif %}">
+                    {% if assessment.status_label == 'Live' %}<i class="fas fa-circle text-[6px] mr-1.5 animate-pulse"></i>{% endif %}
+                    {{ assessment.status_label }}
+                </span>
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black border type-badge">
+                    <i class="fas fa-list-check mr-1.5"></i>{{ assessment.type_label }}
+                </span>
             </div>
-            <h1 class="text-3xl md:text-4xl font-black text-gray-900">{{ assessment.title }}</h1>
-            <p class="mt-2 max-w-3xl text-gray-600">{{ assessment.instructions|default:'No instructions supplied yet.' }}</p>
+            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words">
+                {{ assessment.title }}
+            </h1>
+            <p class="mt-3 max-w-4xl text-gray-700 font-medium leading-relaxed">
+                {{ assessment.instructions|default:'No instructions supplied yet.' }}
+            </p>
         </div>
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap gap-2.5">
             {% if can_take %}
-            <a href="{% url 'millialms_take_assessment' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-emerald-200 hover:-translate-y-0.5 transition-all"><i class="fas fa-play"></i>Start assessment</a>
+            <a href="{% url 'millialms_take_assessment' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-emerald px-5 py-3 text-sm font-black text-white">
+                <i class="fas fa-play"></i>Start Assessment
+            </a>
             {% endif %}
-            <a href="{% url 'millialms_student_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"><i class="fas fa-arrow-left"></i>Back</a>
+            <a href="{% url 'millialms_student_dashboard' %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-3 text-sm font-black">
+                <i class="fas fa-arrow-left"></i>Back to List
+            </a>
         </div>
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Questions</p><p class="mt-3 text-3xl font-black text-gray-900">{{ assessment.total_questions }}</p></div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempt limit</p><p class="mt-3 text-3xl font-black text-indigo-700">{{ assessment.max_attempts }}</p></div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Time limit</p><p class="mt-3 text-3xl font-black text-emerald-700">{% if assessment.time_limit_minutes %}{{ assessment.time_limit_minutes }}{% else %}∞{% endif %}</p></div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">My attempts</p><p class="mt-3 text-3xl font-black text-purple-700">{{ attempts|length }}</p></div>
+    {% if messages %}
+    <div class="space-y-3">
+        {% for message in messages %}
+        <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
+        </div>
+        {% endfor %}
     </div>
+    {% endif %}
 
-    <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 class="text-xl font-black text-gray-900 mb-4">Courses</h2>
-        <div class="flex flex-wrap gap-2">
-            {% for course in assessment.courses.all %}
-            <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-black text-indigo-700">{{ course.course_code }} — {{ course.course_title }}</span>
-            {% endfor %}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Questions</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-gray-700 to-gray-900 bg-clip-text text-transparent">{{ assessment.total_questions }}</p>
+            <div class="mt-3 h-1.5 bar-track"><div class="bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempt Limit</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-purple-600 to-indigo-700 bg-clip-text text-transparent">{{ assessment.max_attempts }}</p>
+            <p class="mt-3 text-xs font-bold text-gray-500">{{ remaining_attempts }} remaining</p>
+        </div>
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Time Limit</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-blue-600 to-cyan-700 bg-clip-text text-transparent">{% if assessment.time_limit_minutes %}{{ assessment.time_limit_minutes }}{% else %}∞{% endif %}</p>
+            <p class="mt-3 text-xs font-bold text-gray-500">{% if assessment.time_limit_minutes %}minutes{% else %}No limit{% endif %}</p>
+        </div>
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">My Attempts</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-emerald-600 to-teal-700 bg-clip-text text-transparent">{{ attempts|length }}</p>
+            <p class="mt-3 text-xs font-bold text-gray-500">of {{ assessment.max_attempts }} max</p>
         </div>
     </div>
 
-    <div class="rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <div class="border-b border-gray-100 px-6 py-4"><h2 class="text-lg font-black text-gray-900">My attempt history</h2></div>
-        {% if attempts %}
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-gray-50 text-gray-600 uppercase text-[11px] tracking-wider">
-                    <tr>
-                        <th class="p-4 text-left font-black">Attempt</th>
-                        <th class="p-4 text-left font-black">Status</th>
-                        <th class="p-4 text-left font-black">Submitted</th>
-                        <th class="p-4 text-left font-black">Score</th>
-                        <th class="p-4 text-left font-black">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    {% for attempt in attempts %}
-                    <tr>
-                        <td class="p-4 font-bold text-gray-900">Attempt {{ attempt.attempt_number }}</td>
-                        <td class="p-4 text-gray-700">{{ attempt.get_status_display }}</td>
-                        <td class="p-4 text-gray-700">{% if attempt.submitted_at %}{{ attempt.submitted_at }}{% else %}—{% endif %}</td>
-                        <td class="p-4 font-black text-indigo-700">{{ attempt.total_score }}/{{ attempt.total_possible_score }}</td>
-                        <td class="p-4"><a href="{% url 'millialms_student_result' attempt.id %}" class="inline-flex items-center gap-2 rounded-xl border border-indigo-100 bg-white px-3 py-2 text-xs font-black text-indigo-700 hover:bg-indigo-50 transition-all">View result</a></td>
-                    </tr>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="xl:col-span-2 purple-card rounded-3xl shadow-sm overflow-hidden">
+            <div class="border-b border-purple-100/60 px-6 py-5">
+                <h2 class="text-xl font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent">
+                    <i class="fas fa-clock-rotate-left text-purple-600 mr-2"></i>My Attempt History
+                </h2>
+                <p class="text-sm text-gray-500 mt-0.5 font-medium">Track your progress, scores, and feedback for every submission.</p>
+            </div>
+            {% if attempts %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-900 uppercase text-[11px] tracking-wider">
+                        <tr>
+                            <th class="p-4 text-left font-black">Attempt</th>
+                            <th class="p-4 text-left font-black">Status</th>
+                            <th class="p-4 text-left font-black">Submitted</th>
+                            <th class="p-4 text-left font-black">Score</th>
+                            <th class="p-4 text-left font-black">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-purple-100/60">
+                        {% for attempt in attempts %}
+                        <tr class="attempt-row">
+                            <td class="p-4">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-black text-xs shadow-sm">
+                                        #{{ attempt.attempt_number }}
+                                    </div>
+                                    <span class="font-bold text-gray-900">Attempt {{ attempt.attempt_number }}</span>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-black border
+                                    {% if attempt.status == 'graded' %}status-graded
+                                    {% elif attempt.status == 'submitted' %}status-submitted
+                                    {% else %}status-inprogress{% endif %}">
+                                    {% if attempt.status == 'graded' %}<i class="fas fa-check-double mr-1"></i>
+                                    {% elif attempt.status == 'submitted' %}<i class="fas fa-hourglass-half mr-1 animate-pulse"></i>
+                                    {% else %}<i class="fas fa-pen mr-1"></i>{% endif %}
+                                    {{ attempt.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="p-4 text-gray-700 font-semibold">{% if attempt.submitted_at %}{{ attempt.submitted_at }}{% else %}<span class="text-gray-400">—</span>{% endif %}</td>
+                            <td class="p-4">
+                                <span class="font-black text-base bg-gradient-to-r from-purple-700 to-indigo-700 bg-clip-text text-transparent">{{ attempt.total_score }}</span>
+                                <span class="text-sm text-gray-500 font-bold"> / {{ attempt.total_possible_score }}</span>
+                                {% if attempt.status == 'graded' and attempt.total_possible_score > 0 %}
+                                    {% with ratio=attempt.total_score|add:0 %}
+                                    {% widthratio ratio attempt.total_possible_score 100 as pct %}
+                                    <div class="mt-1.5 h-1.5 bar-track">
+                                        <div class="bar-fill" style="width:{{ pct }}%; {% if pct < 50 %}background:linear-gradient(90deg,#ef4444,#f87171);{% elif pct < 70 %}background:linear-gradient(90deg,#f59e0b,#fb923c);{% endif %}"></div>
+                                    </div>
+                                    {% endwith %}
+                                {% endif %}
+                            </td>
+                            <td class="p-4">
+                                <a href="{% url 'millialms_student_result' attempt.id %}" class="inline-flex items-center gap-2 rounded-xl btn-outline-purple px-3 py-2 text-xs font-black">
+                                    <i class="fas fa-chart-line"></i>View Result
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-14 md:p-16 text-center">
+                <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl empty-state-icon shadow-lg">
+                    <i class="fas fa-clipboard-list text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900">No attempts yet</h3>
+                <p class="mt-2 text-gray-600 font-medium max-w-md mx-auto">
+                    You have not submitted this assessment yet. Start your first attempt when you're ready!
+                </p>
+                {% if can_take %}
+                <div class="mt-6">
+                    <a href="{% url 'millialms_take_assessment' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3.5 text-sm font-black text-white">
+                        <i class="fas fa-play"></i>Start First Attempt
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="space-y-6">
+            <div class="purple-card rounded-3xl p-6 shadow-sm">
+                <h3 class="text-lg font-black text-purple-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-book text-purple-600"></i>Assigned Courses
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                    {% for course in assessment.courses.all %}
+                    <span class="rounded-full border course-chip px-4 py-2 text-xs font-black shadow-sm">
+                        <i class="fas fa-book mr-1.5"></i>{{ course.course_code }}
+                    </span>
+                    {% empty %}
+                    <p class="text-sm text-gray-500 font-semibold italic">No courses assigned.</p>
                     {% endfor %}
-                </tbody>
-            </table>
+                </div>
+                <div class="mt-5 pt-5 border-t border-purple-100 space-y-2.5 text-xs font-bold text-gray-700">
+                    <div class="flex items-center justify-between">
+                        <span><i class="fas fa-user-tie text-gray-400 mr-1.5"></i>Lecturer</span>
+                        <span class="text-gray-900">{{ assessment.lecturer.user.get_full_name|default:assessment.lecturer.user.username }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><i class="fas fa-calendar-play text-gray-400 mr-1.5"></i>Starts</span>
+                        <span class="text-gray-900">{% if assessment.start_time %}{{ assessment.start_time }}{% else %}Anytime{% endif %}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><i class="fas fa-calendar-xmark text-gray-400 mr-1.5"></i>Closes</span>
+                        <span class="text-gray-900">{% if assessment.end_time %}{{ assessment.end_time }}{% else %}No end{% endif %}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><i class="fas fa-shuffle text-gray-400 mr-1.5"></i>Randomized</span>
+                        <span class="text-gray-900">{% if assessment.randomize_question_order or assessment.randomize_answer_options %}Yes{% else %}No{% endif %}</span>
+                    </div>
+                    {% if assessment.total_points %}
+                    <div class="flex items-center justify-between">
+                        <span><i class="fas fa-coins text-gray-400 mr-1.5"></i>Total Points</span>
+                        <span class="text-gray-900">{{ assessment.total_points }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="rounded-3xl notice-banner border px-5 py-5 text-sm shadow-sm flex items-start gap-3">
+                <i class="fas fa-memo-circle-check text-2xl mt-0.5 flex-shrink-0"></i>
+                <div class="font-bold leading-relaxed">{{ essay_reminder }}</div>
+            </div>
         </div>
-        {% else %}
-        <div class="p-12 text-center text-gray-500">You have not submitted this assessment yet.</div>
-        {% endif %}
     </div>
 </div>
 {% endblock content %}

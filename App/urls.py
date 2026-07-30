@@ -81,6 +81,21 @@ urlpatterns = [
         name="millialms_lecturer_assessment_detail",
     ),
     path(
+        "millialms/lecturer/assessment/<int:pk>/edit/",
+        views.millialms_edit_assessment,
+        name="millialms_edit_assessment",
+    ),
+    path(
+        "millialms/lecturer/assessment/<int:pk>/duplicate/",
+        views.millialms_duplicate_assessment,
+        name="millialms_duplicate_assessment",
+    ),
+    path(
+        "millialms/lecturer/assessment/<int:pk>/delete/",
+        views.millialms_delete_assessment,
+        name="millialms_delete_assessment",
+    ),
+    path(
         "millialms/lecturer/assessment/<int:pk>/toggle/",
         views.millialms_toggle_assessment_publish,
         name="millialms_toggle_assessment_publish",

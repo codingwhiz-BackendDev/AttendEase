@@ -1,6 +1,7 @@
 import base64
 import csv
 import io
+import json
 import logging
 import math
 import os
@@ -1951,7 +1952,10 @@ def millialms_lecturer_dashboard(request):
         assessment.attempt_count = assessment.attempts.count()
         assessment.pending_manual_count = AssessmentResponse.objects.filter(
             attempt__assessment=assessment,
-            question__question_type=AssessmentQuestion.TYPE_SHORT_ANSWER,
+            question__question_type__in={
+                AssessmentQuestion.TYPE_SHORT_ANSWER,
+                AssessmentQuestion.TYPE_ESSAY,
+            },
             graded_manually=False,
         ).count()
 
@@ -1968,7 +1972,6 @@ def millialms_lecturer_dashboard(request):
         "attempt_count": sum(a.attempt_count for a in assessments),
         "pending_manual_count": sum(a.pending_manual_count for a in assessments),
         "server_now_lagos": format_lagos_time(current_time),
-        "essay_reminder": "Essay grading is intentionally deferred for now — remind yourself to add it later.",
     }
     return render(request, "millialms_lecturer_dashboard.html", context)
 
@@ -2000,7 +2003,7 @@ def millialms_create_assessment(request):
             return render(
                 request,
                 "millialms_create_assessment.html",
-                {"user_role": "lecturer", "lecturer_courses": lecturer_courses},
+                {"user_role": "lecturer", "lecturer_courses": lecturer_courses, "edit_mode": False},
             )
 
         if assessment_type not in dict(Assessment.TYPE_CHOICES):
@@ -2008,7 +2011,7 @@ def millialms_create_assessment(request):
             return render(
                 request,
                 "millialms_create_assessment.html",
-                {"user_role": "lecturer", "lecturer_courses": lecturer_courses},
+                {"user_role": "lecturer", "lecturer_courses": lecturer_courses, "edit_mode": False},
             )
 
         try:
@@ -2018,7 +2021,7 @@ def millialms_create_assessment(request):
             return render(
                 request,
                 "millialms_create_assessment.html",
-                {"user_role": "lecturer", "lecturer_courses": lecturer_courses},
+                {"user_role": "lecturer", "lecturer_courses": lecturer_courses, "edit_mode": False},
             )
 
         time_limit_minutes = None
@@ -2030,7 +2033,7 @@ def millialms_create_assessment(request):
                 return render(
                     request,
                     "millialms_create_assessment.html",
-                    {"user_role": "lecturer", "lecturer_courses": lecturer_courses},
+                    {"user_role": "lecturer", "lecturer_courses": lecturer_courses, "edit_mode": False},
                 )
 
         start_time = get_aware_datetime(start_time_raw) if start_time_raw else None
@@ -2040,7 +2043,7 @@ def millialms_create_assessment(request):
             return render(
                 request,
                 "millialms_create_assessment.html",
-                {"user_role": "lecturer", "lecturer_courses": lecturer_courses},
+                {"user_role": "lecturer", "lecturer_courses": lecturer_courses, "edit_mode": False},
             )
 
         assessment = Assessment.objects.create(
@@ -2062,18 +2065,31 @@ def millialms_create_assessment(request):
         if selected_course_ids:
             assessment.courses.set(lecturer_courses.filter(id__in=selected_course_ids))
 
-        question_total = int(request.POST.get("question_total") or 0)
+        # --- DYNAMIC QUESTION PARSER ---
+        # Accepts arbitrary number of questions + arbitrary MCQ options.
+        # Frontend sends consecutive question indices (gaps allowed -> skip empty).
+        question_ids = []
+        for key in request.POST.keys():
+            if key.startswith("q_idx_"):
+                try:
+                    question_ids.append(int(key.split("_", 2)[2]))
+                except (ValueError, IndexError):
+                    continue
+        question_ids = sorted(set(question_ids))
+
         created_questions = 0
-        for index in range(1, question_total + 1):
-            q_text = (request.POST.get(f"question_text_{index}") or "").strip()
-            q_type = (request.POST.get(f"question_type_{index}") or "").strip()
-            points_raw = (request.POST.get(f"points_{index}") or "1").strip()
+        for idx in question_ids:
+            q_text = (request.POST.get(f"q_text_{idx}") or "").strip()
+            q_type = (request.POST.get(f"q_type_{idx}") or "").strip()
+            points_raw = (request.POST.get(f"q_points_{idx}") or "1").strip()
             if not q_text or q_type not in MILLIALMS_SUPPORTED_TYPES:
                 continue
             try:
                 points = float(points_raw or "1")
             except ValueError:
                 points = 1
+            if points < 0:
+                points = 0
 
             manual_required = q_type in {
                 AssessmentQuestion.TYPE_SHORT_ANSWER,
@@ -2082,7 +2098,7 @@ def millialms_create_assessment(request):
             accepted_answers = ""
             if q_type == AssessmentQuestion.TYPE_FILL_BLANK:
                 accepted_answers = (
-                    request.POST.get(f"accepted_answers_{index}") or ""
+                    request.POST.get(f"q_answers_{idx}") or ""
                 ).strip()
 
             question = AssessmentQuestion.objects.create(
@@ -2098,7 +2114,7 @@ def millialms_create_assessment(request):
 
             if q_type == AssessmentQuestion.TYPE_TRUE_FALSE:
                 correct_answer = (
-                    (request.POST.get(f"correct_tf_{index}") or "true").strip().lower()
+                    (request.POST.get(f"q_tf_correct_{idx}") or "true").strip().lower()
                 )
                 AssessmentOption.objects.create(
                     question=question,
@@ -2113,20 +2129,47 @@ def millialms_create_assessment(request):
                     order=2,
                 )
             elif q_type == AssessmentQuestion.TYPE_MCQ:
-                correct_option_key = (
-                    request.POST.get(f"correct_option_{index}") or ""
-                ).strip()
-                for option_index in range(1, 5):
-                    option_text = (
-                        request.POST.get(f"option_{index}_{option_index}") or ""
+                # Arbitrary number of MCQ options via consecutive q_opt_N_IDX keys.
+                option_keys = []
+                for key in request.POST.keys():
+                    prefix = f"q_opt_{idx}_"
+                    if key.startswith(prefix):
+                        tail = key[len(prefix):]
+                        # Accepted keys: q_opt_<qidx>_<oidx> (text), q_opt_<qidx>_<oidx>_correct (hidden flag, 1 or 0)
+                        if "_correct" not in tail:
+                            try:
+                                option_keys.append(int(tail))
+                            except ValueError:
+                                continue
+                option_keys = sorted(set(option_keys))
+                any_correct_selected = False
+                option_objs = []
+                oidx_actual = 1
+                for oidx in option_keys:
+                    opt_text = (
+                        request.POST.get(f"q_opt_{idx}_{oidx}") or ""
                     ).strip()
-                    if option_text:
-                        AssessmentOption.objects.create(
+                    if not opt_text:
+                        continue
+                    is_correct_raw = (
+                        request.POST.get(f"q_opt_{idx}_{oidx}_correct") or ""
+                    ).strip().lower()
+                    is_correct = is_correct_raw in {"1", "on", "yes", "true"}
+                    if is_correct:
+                        any_correct_selected = True
+                    option_objs.append(
+                        AssessmentOption(
                             question=question,
-                            option_text=option_text,
-                            is_correct=(correct_option_key == str(option_index)),
-                            order=option_index,
+                            option_text=opt_text,
+                            is_correct=is_correct,
+                            order=oidx_actual,
                         )
+                    )
+                    oidx_actual += 1
+                if option_objs:
+                    if not any_correct_selected:
+                        option_objs[0].is_correct = True
+                    AssessmentOption.objects.bulk_create(option_objs)
 
         if created_questions == 0:
             assessment.delete()
@@ -2137,7 +2180,7 @@ def millialms_create_assessment(request):
             return render(
                 request,
                 "millialms_create_assessment.html",
-                {"user_role": "lecturer", "lecturer_courses": lecturer_courses},
+                {"user_role": "lecturer", "lecturer_courses": lecturer_courses, "edit_mode": False},
             )
 
         messages.success(
@@ -2148,8 +2191,307 @@ def millialms_create_assessment(request):
     return render(
         request,
         "millialms_create_assessment.html",
-        {"user_role": "lecturer", "lecturer_courses": lecturer_courses},
+        {"user_role": "lecturer", "lecturer_courses": lecturer_courses, "edit_mode": False},
     )
+
+
+# ------- NEW: EDIT Assessment (dynamic question rebuild) -------
+@lecturer_required
+@transaction.atomic
+def millialms_edit_assessment(request, pk):
+    user_obj = User.objects.get(username=request.user)
+    lecturer = get_object_or_404(LecturerProfile, user=user_obj)
+    assessment = get_object_or_404(
+        Assessment.objects.prefetch_related("courses", "questions__options"),
+        id=pk,
+        lecturer=lecturer,
+    )
+    lecturer_courses = lecturer.courses_taught.all().order_by("course_code")
+
+    if request.method == "POST":
+        # --- Same parsing as create, but DELETE old questions/options first ---
+        title = (request.POST.get("title") or "").strip()
+        instructions = (request.POST.get("instructions") or "").strip()
+        assessment_type = (
+            request.POST.get("assessment_type") or Assessment.TYPE_QUIZ
+        ).strip()
+        action = (request.POST.get("action") or "draft").strip()
+        selected_course_ids = request.POST.getlist("courses")
+        start_time_raw = (request.POST.get("start_time") or "").strip()
+        end_time_raw = (request.POST.get("end_time") or "").strip()
+        time_limit_raw = (request.POST.get("time_limit_minutes") or "").strip()
+        max_attempts_raw = (request.POST.get("max_attempts") or "1").strip()
+        randomize_question_order = bool(request.POST.get("randomize_question_order"))
+        randomize_answer_options = bool(request.POST.get("randomize_answer_options"))
+
+        if not title:
+            messages.error(request, "Assessment title is required.")
+            return redirect("millialms_edit_assessment", pk=assessment.id)
+        if assessment_type not in dict(Assessment.TYPE_CHOICES):
+            messages.error(request, "Invalid assessment type selected.")
+            return redirect("millialms_edit_assessment", pk=assessment.id)
+        try:
+            max_attempts = max(1, int(max_attempts_raw or "1"))
+        except ValueError:
+            messages.error(request, "Attempt limit must be a valid number.")
+            return redirect("millialms_edit_assessment", pk=assessment.id)
+
+        time_limit_minutes = None
+        if time_limit_raw:
+            try:
+                time_limit_minutes = max(1, int(time_limit_raw))
+            except ValueError:
+                messages.error(request, "Time limit must be a valid number of minutes.")
+                return redirect("millialms_edit_assessment", pk=assessment.id)
+
+        start_time = get_aware_datetime(start_time_raw) if start_time_raw else None
+        end_time = get_aware_datetime(end_time_raw) if end_time_raw else None
+        if start_time and end_time and start_time >= end_time:
+            messages.error(request, "Start time must be before end time.")
+            return redirect("millialms_edit_assessment", pk=assessment.id)
+
+        assessment.title = title
+        assessment.instructions = instructions
+        assessment.assessment_type = assessment_type
+        assessment.status = (
+            Assessment.STATUS_PUBLISHED if action == "publish" else Assessment.STATUS_DRAFT
+        )
+        assessment.start_time = start_time
+        assessment.end_time = end_time
+        assessment.time_limit_minutes = time_limit_minutes
+        assessment.max_attempts = max_attempts
+        assessment.randomize_question_order = randomize_question_order
+        assessment.randomize_answer_options = randomize_answer_options
+        assessment.is_auto_publish = (action == "publish")
+        assessment.save()
+
+        if selected_course_ids:
+            assessment.courses.set(lecturer_courses.filter(id__in=selected_course_ids))
+        else:
+            assessment.courses.clear()
+
+        # Drop old questions/options — they're re-created from POST.
+        # (Note: Historical attempts still reference the QUESTIONS they were
+        # created with. To preserve them fully, this would need a more complex
+        # "update vs replace" diff. For MVP, we keep it simple: editing only
+        # allowed BEFORE any attempt has been made.)
+        has_attempts = assessment.attempts.exists()
+        if not has_attempts:
+            AssessmentOption.objects.filter(question__assessment=assessment).delete()
+            assessment.questions.all().delete()
+        else:
+            messages.warning(
+                request,
+                "Questions were NOT replaced because attempts already exist for this assessment. If you need to change questions, please duplicate the assessment.",
+            )
+            return redirect("millialms_lecturer_assessment_detail", pk=assessment.id)
+
+        # --- Parse dynamic questions identically to create_assessment ---
+        question_ids = []
+        for key in request.POST.keys():
+            if key.startswith("q_idx_"):
+                try:
+                    question_ids.append(int(key.split("_", 2)[2]))
+                except (ValueError, IndexError):
+                    continue
+        question_ids = sorted(set(question_ids))
+
+        created_questions = 0
+        for idx in question_ids:
+            q_text = (request.POST.get(f"q_text_{idx}") or "").strip()
+            q_type = (request.POST.get(f"q_type_{idx}") or "").strip()
+            points_raw = (request.POST.get(f"q_points_{idx}") or "1").strip()
+            if not q_text or q_type not in MILLIALMS_SUPPORTED_TYPES:
+                continue
+            try:
+                points = float(points_raw or "1")
+            except ValueError:
+                points = 1
+            if points < 0:
+                points = 0
+
+            manual_required = q_type in {
+                AssessmentQuestion.TYPE_SHORT_ANSWER,
+                AssessmentQuestion.TYPE_ESSAY,
+            }
+            accepted_answers = ""
+            if q_type == AssessmentQuestion.TYPE_FILL_BLANK:
+                accepted_answers = (request.POST.get(f"q_answers_{idx}") or "").strip()
+
+            question = AssessmentQuestion.objects.create(
+                assessment=assessment,
+                question_text=q_text,
+                question_type=q_type,
+                points=points,
+                order=created_questions + 1,
+                accepted_answers=accepted_answers,
+                manual_grading_required=manual_required,
+            )
+            created_questions += 1
+
+            if q_type == AssessmentQuestion.TYPE_TRUE_FALSE:
+                correct_answer = (
+                    (request.POST.get(f"q_tf_correct_{idx}") or "true").strip().lower()
+                )
+                AssessmentOption.objects.bulk_create([
+                    AssessmentOption(question=question, option_text="True",
+                                     is_correct=(correct_answer == "true"), order=1),
+                    AssessmentOption(question=question, option_text="False",
+                                     is_correct=(correct_answer == "false"), order=2),
+                ])
+            elif q_type == AssessmentQuestion.TYPE_MCQ:
+                option_keys = []
+                for key in request.POST.keys():
+                    prefix = f"q_opt_{idx}_"
+                    if key.startswith(prefix) and "_correct" not in key[len(prefix):]:
+                        tail = key[len(prefix):]
+                        try:
+                            option_keys.append(int(tail))
+                        except ValueError:
+                            continue
+                option_keys = sorted(set(option_keys))
+                any_correct_selected = False
+                option_objs = []
+                oidx_actual = 1
+                for oidx in option_keys:
+                    opt_text = (request.POST.get(f"q_opt_{idx}_{oidx}") or "").strip()
+                    if not opt_text:
+                        continue
+                    is_correct_raw = (
+                        request.POST.get(f"q_opt_{idx}_{oidx}_correct") or ""
+                    ).strip().lower()
+                    is_correct = is_correct_raw in {"1", "on", "yes", "true"}
+                    if is_correct:
+                        any_correct_selected = True
+                    option_objs.append(AssessmentOption(
+                        question=question,
+                        option_text=opt_text,
+                        is_correct=is_correct,
+                        order=oidx_actual,
+                    ))
+                    oidx_actual += 1
+                if option_objs:
+                    if not any_correct_selected:
+                        option_objs[0].is_correct = True
+                    AssessmentOption.objects.bulk_create(option_objs)
+
+        if created_questions == 0:
+            # Recreate with a default question so the assessment isn't empty.
+            AssessmentQuestion.objects.create(
+                assessment=assessment, question_text=assessment.title,
+                question_type=AssessmentQuestion.TYPE_MCQ, points=1, order=1,
+                manual_grading_required=False,
+            )
+            messages.warning(
+                request, "Saved but no valid questions were detected.",
+            )
+
+        messages.success(request, f'Updated "{assessment.title}" successfully.')
+        return redirect("millialms_lecturer_assessment_detail", pk=assessment.id)
+
+    # GET: serialize existing questions for the JS editor
+    q_serialized = []
+    for q in assessment.questions.all():
+        payload = {
+            "index": q.order,
+            "type": q.question_type,
+            "text": q.question_text,
+            "points": str(q.points),
+            "accepted_answers": q.accepted_answers or "",
+        }
+        if q.question_type == AssessmentQuestion.TYPE_TRUE_FALSE:
+            correct_opt = q.options.filter(is_correct=True).first()
+            payload["tf_correct"] = (
+                correct_opt.option_text.lower() if correct_opt else "true"
+            )
+        elif q.question_type == AssessmentQuestion.TYPE_MCQ:
+            opts = []
+            for idx, o in enumerate(q.options.all(), start=1):
+                opts.append({
+                    "slot": idx,
+                    "text": o.option_text,
+                    "correct": "1" if o.is_correct else "0",
+                })
+            payload["options"] = opts
+        q_serialized.append(payload)
+
+    return render(
+        request,
+        "millialms_create_assessment.html",
+        {
+            "user_role": "lecturer",
+            "lecturer_courses": lecturer_courses,
+            "edit_mode": True,
+            "assessment": assessment,
+            "existing_questions_json": json.dumps(q_serialized),
+            "selected_course_ids": [c.id for c in assessment.courses.all()],
+        },
+    )
+
+
+# ------- NEW: DUPLICATE Assessment (clone questions + options + settings) -------
+@lecturer_required
+@transaction.atomic
+def millialms_duplicate_assessment(request, pk):
+    user_obj = User.objects.get(username=request.user)
+    lecturer = get_object_or_404(LecturerProfile, user=user_obj)
+    original = get_object_or_404(
+        Assessment.objects.prefetch_related("courses", "questions__options"),
+        id=pk,
+        lecturer=lecturer,
+    )
+    course_ids = list(original.courses.values_list("id", flat=True))
+    orig_questions = list(original.questions.prefetch_related("options").all())
+
+    dup = Assessment(
+        title=f"{original.title} (Copy)",
+        instructions=original.instructions,
+        assessment_type=original.assessment_type,
+        status=Assessment.STATUS_DRAFT,
+        lecturer=lecturer,
+        start_time=original.start_time,
+        end_time=original.end_time,
+        time_limit_minutes=original.time_limit_minutes,
+        max_attempts=original.max_attempts,
+        randomize_question_order=original.randomize_question_order,
+        randomize_answer_options=original.randomize_answer_options,
+        is_auto_publish=False,
+    )
+    dup.save()
+    if course_ids:
+        dup.courses.set(Course.objects.filter(id__in=course_ids))
+
+    for q in orig_questions:
+        opts = list(q.options.all())
+        q.pk = None
+        q.id = None
+        q.assessment = dup
+        q.save()
+        for o in opts:
+            o.pk = None
+            o.id = None
+            o.question = q
+        if opts:
+            AssessmentOption.objects.bulk_create(opts)
+
+    messages.success(request, f'Created a copy of "{dup.title}". Edit what you need.')
+    return redirect("millialms_edit_assessment", pk=dup.id)
+
+
+# ------- NEW: DELETE Assessment (cascades to questions/attempts/responses) -------
+@lecturer_required
+@transaction.atomic
+def millialms_delete_assessment(request, pk):
+    if request.method != "POST":
+        messages.error(request, "Please confirm deletion from the assessment detail page.")
+        return redirect("millialms_lecturer_dashboard")
+    user_obj = User.objects.get(username=request.user)
+    lecturer = get_object_or_404(LecturerProfile, user=user_obj)
+    assessment = get_object_or_404(Assessment, id=pk, lecturer=lecturer)
+    title = assessment.title
+    assessment.delete()
+    messages.success(request, f'Deleted "{title}" permanently.')
+    return redirect("millialms_lecturer_dashboard")
 
 
 @lecturer_required
@@ -2168,19 +2510,94 @@ def millialms_lecturer_assessment_detail(request, pk):
     assessment.type_label = get_assessment_type_label(assessment.assessment_type)
 
     attempts = assessment.attempts.select_related("student").order_by("-started_at")
+    # Include BOTH short answer AND essay responses in pending review.
     pending_manual = AssessmentResponse.objects.filter(
         attempt__assessment=assessment,
-        question__question_type=AssessmentQuestion.TYPE_SHORT_ANSWER,
+        question__question_type__in={
+            AssessmentQuestion.TYPE_SHORT_ANSWER,
+            AssessmentQuestion.TYPE_ESSAY,
+        },
         graded_manually=False,
     ).select_related("attempt", "attempt__student", "question")
+
+    # Aggregate stats for overview cards
+    total_possible = sum(
+        float(q.points) for q in assessment.questions.all()
+    )
+    graded_attempts = [a for a in attempts if a.status == AssessmentAttempt.STATUS_GRADED]
+    if graded_attempts:
+        avg_score = round(
+            sum(float(a.total_score) for a in graded_attempts) / len(graded_attempts), 2
+        )
+        if total_possible > 0:
+            avg_pct = round((avg_score / total_possible) * 100, 1)
+        else:
+            avg_pct = 0
+        highest = max(float(a.total_score) for a in graded_attempts)
+        lowest = min(float(a.total_score) for a in graded_attempts)
+    else:
+        avg_score = 0
+        avg_pct = 0
+        highest = 0
+        lowest = 0
+    submission_rate = 0
+    enrolled = StudentProfile.objects.filter(
+        courses_enrolled__in=assessment.courses.all()
+    ).distinct().count()
+    if enrolled:
+        unique_subs = {a.student_id for a in attempts}
+        submission_rate = round(len(unique_subs) / enrolled * 100, 1)
+
+    # Per-question breakdown
+    per_question = []
+    for q in assessment.questions.all():
+        q_responses = q.responses.filter(attempt__assessment=assessment).all()
+        q_total = len(q_responses)
+        q_correct = sum(
+            1 for r in q_responses
+            if r.is_correct and r.question.question_type in {
+                AssessmentQuestion.TYPE_MCQ,
+                AssessmentQuestion.TYPE_TRUE_FALSE,
+                AssessmentQuestion.TYPE_FILL_BLANK,
+            }
+        )
+        q_avg_score = 0
+        if q_total:
+            scored = sum(
+                (float(r.auto_score) + float(r.manual_score or 0))
+                for r in q_responses
+            )
+            q_avg_score = round(scored / q_total, 2)
+        per_question.append({
+            "question": q,
+            "answered_count": q_total,
+            "correct_count": q_correct,
+            "avg_score": q_avg_score,
+            "correct_pct": round(q_correct / q_total * 100, 1) if q_total else 0,
+        })
 
     context = {
         "user_role": "lecturer",
         "assessment": assessment,
         "attempts": attempts,
         "pending_manual": pending_manual,
+        "pending_manual_count": pending_manual.count(),
         "server_now_lagos": format_lagos_time(current_time),
-        "essay_reminder": "Essay question grading is not enabled yet. Add it later when you are ready.",
+        "essay_reminder": "Essay and short-answer submissions appear as Pending until you grade them manually below.",
+        "stats": {
+            "enrolled": enrolled,
+            "submission_count": len({a.student_id for a in attempts}),
+            "submission_rate": submission_rate,
+            "avg_score": avg_score,
+            "avg_pct": avg_pct,
+            "highest": highest,
+            "lowest": lowest,
+            "total_possible": total_possible,
+            "attempt_count": len(attempts),
+            "graded_count": len(graded_attempts),
+            "pending_grading_count": sum(1 for a in attempts if a.status == AssessmentAttempt.STATUS_SUBMITTED),
+        },
+        "per_question": per_question,
     }
     return render(request, "millialms_lecturer_assessment_detail.html", context)
 
@@ -2214,7 +2631,10 @@ def millialms_grade_attempt(request, attempt_id):
 
     if request.method == "POST":
         for response in attempt.responses.select_related("question"):
-            if response.question.question_type == AssessmentQuestion.TYPE_SHORT_ANSWER:
+            if response.question.question_type in {
+                AssessmentQuestion.TYPE_SHORT_ANSWER,
+                AssessmentQuestion.TYPE_ESSAY,
+            }:
                 score_raw = (request.POST.get(f"score_{response.id}") or "0").strip()
                 feedback = (request.POST.get(f"feedback_{response.id}") or "").strip()
                 try:
@@ -2335,7 +2755,7 @@ def millialms_student_dashboard(request):
         ),
         "submitted_count": AssessmentAttempt.objects.filter(student=user_obj).count(),
         "server_now_lagos": format_lagos_time(current_time),
-        "essay_reminder": "Essay submissions are shown but full essay grading is intentionally left for later.",
+        "essay_reminder": "Essay and short-answer questions are graded manually by your lecturer. Your final score updates once they review.",
     }
     return render(request, "millialms_student_dashboard.html", context)
 
@@ -2441,7 +2861,7 @@ def millialms_take_assessment(request, pk):
         "assessment": assessment,
         "questions": serialized_questions,
         "server_now_lagos": format_lagos_time(current_time),
-        "essay_reminder": "Essay question entry is visible for now, but essay grading will be completed later.",
+        "essay_reminder": "Essay and short-answer responses will be reviewed and graded by your lecturer after submission.",
     }
     return render(request, "millialms_take_assessment.html", context)
 

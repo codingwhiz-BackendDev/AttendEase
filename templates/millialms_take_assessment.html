@@ -1,47 +1,265 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="p-6 md:p-8 max-w-5xl mx-auto space-y-8">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
-            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2">MilliaLMS</p>
-            <h1 class="text-3xl md:text-4xl font-black text-gray-900">{{ assessment.title }}</h1>
-            <p class="mt-2 max-w-3xl text-gray-600">{{ assessment.instructions|default:'Answer all required questions and submit when you are done.' }}</p>
+<style>
+    .purple-card { background:#ffffff; border:1px solid rgba(118,75,162,0.15); box-shadow:0 4px 20px rgba(102,126,234,0.08); }
+    .question-card {
+        background: linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.02) 100%);
+        border:1px solid rgba(118,75,162,0.15);
+        box-shadow:0 2px 12px rgba(102,126,234,0.06);
+        transition:all 0.25s ease;
+    }
+    .question-card:hover {
+        border-color:rgba(139,92,246,0.35);
+        box-shadow:0 10px 30px rgba(102,126,234,0.12);
+    }
+    .btn-purple { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); box-shadow:0 8px 24px rgba(102,126,234,0.25); transition:all 0.25s ease; }
+    .btn-purple:hover { transform:translateY(-1px); box-shadow:0 12px 32px rgba(102,126,234,0.35); }
+    .btn-outline-purple { border:1.5px solid rgba(118,75,162,0.3); background:white; color:#6d28d9; transition:all 0.2s ease; }
+    .btn-outline-purple:hover { background:rgba(139,92,246,0.06); border-color:#8b5cf6; }
+    .q-type-chip-mcq { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
+    .q-type-chip-tf { background:rgba(99,102,241,0.1); color:#4338ca; border-color:rgba(99,102,241,0.3); }
+    .q-type-chip-fb { background:rgba(59,130,246,0.1); color:#1d4ed8; border-color:rgba(59,130,246,0.3); }
+    .q-type-chip-sa { background:rgba(245,158,11,0.1); color:#92400e; border-color:rgba(245,158,11,0.3); }
+    .q-type-chip-essay { background:rgba(168,85,247,0.12); color:#7e22ce; border-color:rgba(168,85,247,0.35); }
+    .q-num-badge { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; box-shadow:0 4px 12px rgba(102,126,234,0.3); }
+    .points-chip { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
+    .option-label {
+        border:1.5px solid rgba(118,75,162,0.12);
+        background:rgba(139,92,246,0.02);
+        transition:all 0.2s ease;
+    }
+    .option-label:hover {
+        border-color:rgba(139,92,246,0.4);
+        background:rgba(139,92,246,0.06);
+        transform:translateX(3px);
+    }
+    .option-label:has(input:checked) {
+        border-color:#8b5cf6;
+        background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(167,139,250,0.12));
+        box-shadow:0 4px 16px rgba(139,92,246,0.15);
+    }
+    .answer-input {
+        border:2px solid rgba(118,75,162,0.15);
+        transition:all 0.2s ease;
+        background:rgba(139,92,246,0.01);
+    }
+    .answer-input:focus {
+        border-color:#8b5cf6;
+        box-shadow:0 0 0 4px rgba(139,92,246,0.1);
+        outline:none;
+        background:white;
+    }
+    .notice-banner {
+        background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(245,158,11,0.15));
+        border-color:rgba(251,191,36,0.35);
+        color:#92400e;
+    }
+    .progress-bar-track { background:rgba(139,92,246,0.1); border-radius:999px; overflow:hidden; }
+    .progress-bar-fill { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 0.6s ease; }
+</style>
+
+<div class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
+    <div class="flex flex-wrap items-start justify-between gap-5">
+        <div class="flex-1 min-w-0">
+            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-purple-600 mb-2">
+                <i class="fas fa-pen-to-square mr-1.5"></i>MilliaLMS — Assessment in Progress
+            </p>
+            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words">
+                {{ assessment.title }}
+            </h1>
+            <p class="mt-3 max-w-4xl text-gray-700 font-medium leading-relaxed">
+                {{ assessment.instructions|default:'Answer all required questions and submit when you are done. You cannot resume after submitting.' }}
+            </p>
         </div>
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">{{ essay_reminder }}</div>
+        <div class="flex flex-wrap gap-3">
+            {% if assessment.time_limit_minutes %}
+            <div class="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3 shadow-sm text-sm font-black text-amber-900 flex items-center gap-2">
+                <i class="fas fa-stopwatch text-lg"></i>{{ assessment.time_limit_minutes }} min limit
+            </div>
+            {% endif %}
+            <div class="rounded-2xl border border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-3 shadow-sm text-sm font-bold text-purple-800 flex items-center gap-2">
+                <i class="fas fa-question"></i>{{ questions|length }} question{{ questions|pluralize }}
+            </div>
+        </div>
     </div>
 
-    <form method="post" class="space-y-6">
+    {% if messages %}
+    <div class="space-y-3">
+        {% for message in messages %}
+        <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="rounded-3xl notice-banner border px-5 py-4 text-sm shadow-sm flex items-start gap-3">
+        <i class="fas fa-memo-circle-check text-xl mt-0.5 flex-shrink-0"></i>
+        <div class="font-bold leading-relaxed">
+            {{ essay_reminder }}
+            &nbsp;Objective questions (MCQ, True/False, Fill-in-blank) auto-grade immediately on submit.
+        </div>
+    </div>
+
+    <div class="rounded-3xl purple-card shadow-sm p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <span class="text-xs font-black uppercase tracking-wider text-gray-500">Your Progress</span>
+            <span class="text-xs font-black text-purple-700">{{ questions|length }} questions total</span>
+        </div>
+        <div class="h-2 progress-bar-track">
+            <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-xs font-bold text-gray-500" id="progressText">Answer each question below. Your progress updates as you fill in answers.</p>
+    </div>
+
+    <form method="post" class="space-y-5 md:space-y-6" id="assessmentForm">
         {% csrf_token %}
         {% for item in questions %}
-        <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div class="flex flex-wrap items-center gap-2 mb-3">
-                <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-black text-gray-700">Question {{ forloop.counter }}</span>
-                <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-black text-indigo-700 border border-indigo-200">{{ item.question.get_question_type_display }}</span>
-                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700 border border-emerald-200">{{ item.question.points }} pts</span>
+        <div class="question-card rounded-3xl p-5 md:p-6 shadow-sm" data-question>
+            <div class="flex flex-wrap items-start gap-3 mb-4 md:mb-5">
+                <div class="flex h-10 w-10 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-2xl q-num-badge font-black text-sm">
+                    {{ forloop.counter }}
+                </div>
+                <div class="min-w-0 flex-1 pt-0.5">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        {% with qt=item.question.question_type %}
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border
+                            {% if qt == 'mcq' %}q-type-chip-mcq
+                            {% elif qt == 'true_false' %}q-type-chip-tf
+                            {% elif qt == 'fill_blank' %}q-type-chip-fb
+                            {% elif qt == 'short_answer' %}q-type-chip-sa
+                            {% elif qt == 'essay' %}q-type-chip-essay{% endif %}">
+                            <i class="fas {% if qt == 'mcq' %}fa-list{% elif qt == 'true_false' %}fa-check-double{% elif qt == 'fill_blank' %}fa-pen-line{% elif qt == 'short_answer' %}fa-memo-circle-info{% elif qt == 'essay' %}fa-feather-pointed{% endif %} mr-1.5"></i>
+                            {{ item.question.get_question_type_display }}
+                        </span>
+                        {% endwith %}
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border points-chip">
+                            <i class="fas fa-coins mr-1.5"></i>{{ item.question.points }} point{{ item.question.points|pluralize }}
+                        </span>
+                        {% if item.question.question_type == 'essay' or item.question.question_type == 'short_answer' %}
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border border-amber-300 bg-amber-50 text-amber-800">
+                            <i class="fas fa-memo-circle-check mr-1.5"></i>Manual grading
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h2 class="text-lg md:text-xl font-black text-gray-900 leading-relaxed break-words">
+                        {{ item.question.question_text }}
+                    </h2>
+                </div>
             </div>
-            <h2 class="text-lg font-black text-gray-900">{{ item.question.question_text }}</h2>
 
-            <div class="mt-4">
+            <div class="md:ml-14">
                 {% if item.question.question_type == 'mcq' or item.question.question_type == 'true_false' %}
-                    <div class="space-y-3">
+                    <div class="space-y-2.5 md:space-y-3">
                         {% for option in item.options %}
-                        <label class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 hover:border-indigo-200 hover:bg-indigo-50/40 transition-all">
-                            <input type="radio" name="question_{{ item.question.id }}" value="{{ option.id }}" class="mt-0.5 h-4 w-4 text-indigo-600 focus:ring-indigo-500" />
-                            <span>{{ option.option_text }}</span>
+                        <label class="option-label flex items-start gap-3 md:gap-4 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 cursor-pointer group">
+                            <div class="flex h-6 w-6 shrink-0 items-center justify-center mt-0.5">
+                                <div class="relative">
+                                    <input type="radio" name="question_{{ item.question.id }}" value="{{ option.id }}" class="peer sr-only" data-input />
+                                    <div class="h-6 w-6 rounded-full border-2 border-purple-200 bg-white transition-all peer-checked:border-purple-600 peer-checked:bg-purple-50 flex items-center justify-center">
+                                        <div class="h-2.5 w-2.5 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0 pt-0.5">
+                                <div class="flex gap-2.5 items-start">
+                                    <span class="font-black text-[13px] text-purple-600 pt-0.5 shrink-0 w-6">{{ forloop.counter|stringformat:"02d" }}.</span>
+                                    <span class="font-semibold text-gray-800 leading-relaxed">{{ option.option_text }}</span>
+                                </div>
+                            </div>
                         </label>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <textarea name="question_{{ item.question.id }}" rows="{% if item.question.question_type == 'essay' %}6{% else %}4{% endif %}" class="w-full rounded-2xl border-2 border-gray-100 px-4 py-3 text-sm font-medium outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="Type your answer here..."></textarea>
+                    <div class="space-y-2">
+                        {% if item.question.question_type == 'fill_blank' and item.accepted_answers %}
+                        <p class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 inline-block">
+                            <i class="fas fa-spell-check mr-1.5"></i>Tip: Enter a single concise answer (spelling matters — case-insensitive match).
+                        </p>
+                        {% elif item.question.question_type == 'short_answer' %}
+                        <p class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 inline-block">
+                            <i class="fas fa-info-circle mr-1.5"></i>Write 1-3 sentences. Your lecturer reviews this manually.
+                        </p>
+                        {% elif item.question.question_type == 'essay' %}
+                        <p class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2 inline-block">
+                            <i class="fas fa-feather-pointed mr-1.5"></i>Essay question — write a full answer. Your lecturer marks this with feedback.
+                        </p>
+                        {% endif %}
+                        <textarea name="question_{{ item.question.id }}"
+                            rows="{% if item.question.question_type == 'essay' %}7{% elif item.question.question_type == 'short_answer' %}4{% else %}2{% endif %}"
+                            class="answer-input w-full rounded-2xl px-4 md:px-5 py-3.5 md:py-4 text-sm md:text-base font-semibold text-gray-800 placeholder:text-gray-400 resize-y"
+                            placeholder="{% if item.question.question_type == 'essay' %}Write your essay answer here...{% elif item.question.question_type == 'short_answer' %}Write your short answer here...{% elif item.question.question_type == 'fill_blank' %}Type the missing word or phrase...{% else %}Type your answer here...{% endif %}"
+                            data-input></textarea>
+                    </div>
                 {% endif %}
             </div>
         </div>
         {% endfor %}
 
-        <div class="flex flex-wrap gap-3">
-            <a href="{% url 'millialms_student_assessment_detail' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm font-black text-gray-700 shadow-sm hover:bg-gray-50 transition-all"><i class="fas fa-arrow-left"></i>Cancel</a>
-            <button type="submit" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition-all"><i class="fas fa-paper-plane"></i>Submit assessment</button>
+        <div class="sticky bottom-4 z-10">
+            <div class="purple-card rounded-3xl shadow-2xl p-4 md:p-5 border-purple-200">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="text-xs md:text-sm font-bold text-gray-600 flex items-center gap-2">
+                        <i class="fas fa-shield-halved text-purple-600 text-base"></i>
+                        <span>Once submitted, this attempt cannot be edited or retracted. Make sure every question is answered.</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2.5 md:justify-end">
+                        <a href="{% url 'millialms_student_assessment_detail' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-5 py-3 text-sm font-black">
+                            <i class="fas fa-arrow-left"></i>Cancel
+                        </a>
+                        <button type="submit" onclick="return confirmSubmit();" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3 text-sm font-black text-white">
+                            <i class="fas fa-paper-plane"></i>Submit Assessment
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
+
+<script>
+function confirmSubmit() {
+    const total = document.querySelectorAll('[data-question]').length;
+    let answered = 0;
+    document.querySelectorAll('[data-question]').forEach(q => {
+        const radios = q.querySelectorAll('input[type="radio"]');
+        const textareas = q.querySelectorAll('textarea[data-input]');
+        let done = false;
+        if (radios.length) {
+            q.querySelectorAll('input[type="radio"]:checked').forEach(() => { done = true; });
+        }
+        textareas.forEach(t => { if (t.value.trim().length > 0) done = true; });
+        if (done) answered++;
+    });
+    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+    let msg = `You've answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nSubmit this attempt now? You cannot change answers after submitting.`;
+    if (answered < total) {
+        msg = `⚠ You've only answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nUnanswered questions earn 0 points. Are you sure you want to submit anyway?`;
+    }
+    return confirm(msg);
+}
+
+function updateProgress() {
+    const cards = document.querySelectorAll('[data-question]');
+    const total = cards.length;
+    let answered = 0;
+    cards.forEach(q => {
+        const radio = q.querySelector('input[type="radio"]:checked');
+        const text = q.querySelector('textarea[data-input]');
+        let ok = false;
+        if (radio) ok = true;
+        if (text && text.value.trim().length > 0) ok = true;
+        if (ok) answered++;
+    });
+    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+    const bar = document.getElementById('progressBar');
+    const txt = document.getElementById('progressText');
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = `Answered ${answered}/${total} · ${pct}% complete — keep going!`;
+}
+
+document.getElementById('assessmentForm').addEventListener('change', updateProgress);
+document.getElementById('assessmentForm').addEventListener('input', updateProgress);
+updateProgress();
+</script>
 {% endblock content %}

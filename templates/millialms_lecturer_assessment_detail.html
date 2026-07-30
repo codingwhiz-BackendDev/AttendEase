@@ -1,122 +1,417 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
+<style>
+    .purple-card { background:#ffffff; border:1px solid rgba(118,75,162,0.15); box-shadow:0 4px 20px rgba(102,126,234,0.08); }
+    .stat-card { background:linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.03) 100%); border:1px solid rgba(118,75,162,0.15); box-shadow:0 2px 12px rgba(102,126,234,0.06); transition:all 0.25s ease; }
+    .stat-card:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(102,126,234,0.15); border-color:rgba(139,92,246,0.35); }
+    .btn-purple { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); box-shadow:0 8px 24px rgba(102,126,234,0.25); transition:all 0.25s ease; }
+    .btn-purple:hover { transform:translateY(-1px); box-shadow:0 12px 32px rgba(102,126,234,0.35); }
+    .btn-outline-purple { border:1.5px solid rgba(118,75,162,0.3); background:white; color:#6d28d9; transition:all 0.2s ease; }
+    .btn-outline-purple:hover { background:rgba(139,92,246,0.06); border-color:#8b5cf6; }
+    .btn-danger { border:1.5px solid rgba(239,68,68,0.3); background:white; color:#dc2626; transition:all 0.2s ease; }
+    .btn-danger:hover { background:rgba(239,68,68,0.06); border-color:#ef4444; }
+    .status-live { background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.15)); color:#047857; border-color:rgba(16,185,129,0.3); }
+    .status-upcoming { background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(124,58,237,0.15)); color:#6d28d9; border-color:rgba(139,92,246,0.3); }
+    .status-closed { background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(220,38,38,0.15)); color:#b91c1c; border-color:rgba(239,68,68,0.3); }
+    .status-draft { background:linear-gradient(135deg,rgba(107,114,128,0.12),rgba(75,85,99,0.15)); color:#374151; border-color:rgba(107,114,128,0.3); }
+    .type-badge { background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(192,132,252,0.15)); color:#7e22ce; border-color:rgba(168,85,247,0.3); }
+    .q-type-chip-mcq { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
+    .q-type-chip-tf { background:rgba(99,102,241,0.1); color:#4338ca; border-color:rgba(99,102,241,0.3); }
+    .q-type-chip-fb { background:rgba(59,130,246,0.1); color:#1d4ed8; border-color:rgba(59,130,246,0.3); }
+    .q-type-chip-sa { background:rgba(245,158,11,0.1); color:#92400e; border-color:rgba(245,158,11,0.3); }
+    .q-type-chip-essay { background:rgba(168,85,247,0.12); color:#7e22ce; border-color:rgba(168,85,247,0.35); }
+    .question-item { background:linear-gradient(180deg,rgba(139,92,246,0.02) 0%,#ffffff 100%); border:1px solid rgba(118,75,162,0.12); transition:all 0.2s ease; }
+    .question-item:hover { border-color:rgba(139,92,246,0.35); box-shadow:0 6px 20px rgba(102,126,234,0.1); }
+    .correct-opt { background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.35) !important; color:#047857; }
+    .grad-queue-item { background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(245,158,11,0.1)); border-color:rgba(251,191,36,0.4); }
+    .purple-input { border:2px solid rgba(118,75,162,0.15); transition:all 0.2s ease; }
+    .purple-input:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,0.1); outline:none; }
+    .bar-track { background:rgba(139,92,246,0.1); border-radius:999px; overflow:hidden; }
+    .bar-fill { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 0.6s ease; }
+    .score-good { color:#047857; }
+    .score-mid { color:#92400e; }
+    .score-bad { color:#b91c1c; }
+    .grade-btn { background:linear-gradient(135deg,#f59e0b 0%,#ea580c 100%); box-shadow:0 8px 20px rgba(245,158,11,0.25); transition:all 0.25s ease; }
+    .grade-btn:hover { transform:translateY(-1px); box-shadow:0 12px 28px rgba(245,158,11,0.35); }
+    .progress-ring { position:relative; display:flex; align-items:center; justify-content:center; }
+    .delete-confirm { background:linear-gradient(135deg,#fecaca 0%,#fecdd3 100%); border-color:#f87171; }
+</style>
+
+<div class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+    <div class="flex flex-wrap items-start justify-between gap-5">
+        <div class="flex-1 min-w-0">
             <div class="flex flex-wrap items-center gap-2 mb-3">
-                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black {% if assessment.status_label == 'Live' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif assessment.status_label == 'Upcoming' %}bg-indigo-50 text-indigo-700 border border-indigo-200{% elif assessment.status_label == 'Closed' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-gray-100 text-gray-700 border border-gray-200{% endif %}">{{ assessment.status_label }}</span>
-                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black bg-purple-50 text-purple-700 border border-purple-200">{{ assessment.type_label }}</span>
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black border {% if assessment.status_label == 'Live' %}status-live{% elif assessment.status_label == 'Upcoming' %}status-upcoming{% elif assessment.status_label == 'Closed' %}status-closed{% else %}status-draft{% endif %}">
+                    {% if assessment.status_label == 'Live' %}<i class="fas fa-circle text-[6px] mr-1.5 animate-pulse"></i>{% endif %}
+                    {{ assessment.status_label }}
+                </span>
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-black border type-badge">
+                    <i class="fas fa-list-check mr-1.5"></i>{{ assessment.type_label }}
+                </span>
             </div>
-            <h1 class="text-3xl md:text-4xl font-black text-gray-900">{{ assessment.title }}</h1>
-            <p class="mt-2 max-w-3xl text-gray-600">{{ assessment.instructions|default:'No instructions supplied yet.' }}</p>
+            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words">
+                {{ assessment.title }}
+            </h1>
+            <p class="mt-3 max-w-4xl text-gray-700 font-medium leading-relaxed">
+                {{ assessment.instructions|default:'No instructions supplied yet.' }}
+            </p>
         </div>
-        <div class="flex flex-wrap gap-3">
-            <a href="{% url 'millialms_export_results' assessment.id %}?format=csv" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm font-black text-emerald-700 shadow-sm hover:bg-emerald-50 transition-all"><i class="fas fa-file-csv"></i>Excel/CSV</a>
-            <a href="{% url 'millialms_export_results' assessment.id %}?format=pdf" class="inline-flex items-center gap-2 rounded-2xl border border-rose-100 bg-white px-4 py-3 text-sm font-black text-rose-700 shadow-sm hover:bg-rose-50 transition-all"><i class="fas fa-file-pdf"></i>PDF</a>
-            <a href="{% url 'millialms_toggle_assessment_publish' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition-all"><i class="fas fa-toggle-on"></i>{% if assessment.is_published %}Unpublish{% else %}Publish{% endif %}</a>
+        <div class="flex flex-wrap gap-2.5">
+            <a href="{% url 'millialms_export_results' assessment.id %}?format=csv" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-sm font-black text-emerald-800 hover:bg-emerald-100 transition-all">
+                <i class="fas fa-file-csv"></i>CSV
+            </a>
+            <a href="{% url 'millialms_export_results' assessment.id %}?format=pdf" class="inline-flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50/70 px-4 py-3 text-sm font-black text-rose-800 hover:bg-rose-100 transition-all">
+                <i class="fas fa-file-pdf"></i>PDF
+            </a>
+            <a href="{% url 'millialms_edit_assessment' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-3 text-sm font-black">
+                <i class="fas fa-pen"></i>Edit
+            </a>
+            <a href="{% url 'millialms_duplicate_assessment' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl border border-purple-200 bg-white px-4 py-3 text-sm font-black text-purple-700 hover:bg-purple-50 transition-all">
+                <i class="fas fa-copy"></i>Duplicate
+            </a>
+            <a href="{% url 'millialms_toggle_assessment_publish' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-4 py-3 text-sm font-black text-white">
+                <i class="fas {% if assessment.is_published %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>{% if assessment.is_published %}Unpublish{% else %}Publish{% endif %}
+            </a>
+            <form method="post" action="{% url 'millialms_delete_assessment' assessment.id %}" onsubmit="return confirmDelete();" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="inline-flex items-center gap-2 rounded-2xl btn-danger px-4 py-3 text-sm font-black">
+                    <i class="fas fa-trash"></i>Delete
+                </button>
+            </form>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Questions</p><p class="mt-3 text-3xl font-black text-gray-900">{{ assessment.total_questions }}</p></div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempts</p><p class="mt-3 text-3xl font-black text-indigo-700">{{ attempts|length }}</p></div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Attempt Limit</p><p class="mt-3 text-3xl font-black text-emerald-700">{{ assessment.max_attempts }}</p></div>
-        <div class="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm"><p class="text-[11px] font-black uppercase tracking-wider text-amber-700">Essay note</p><p class="mt-3 text-sm font-bold text-amber-900">{{ essay_reminder }}</p></div>
+    {% if messages %}
+    <div class="space-y-3">
+        {% for message in messages %}
+        <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5">
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Questions</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-gray-700 to-gray-900 bg-clip-text text-transparent">{{ assessment.total_questions }}</p>
+            <div class="mt-3 h-1.5 bar-track"><div class="bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Enrolled</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-blue-600 to-indigo-700 bg-clip-text text-transparent">{{ stats.enrolled }}</p>
+            <p class="mt-3 text-xs font-bold text-gray-500">across assigned courses</p>
+        </div>
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Submissions</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-purple-600 to-fuchsia-700 bg-clip-text text-transparent">{{ stats.submission_count }}</p>
+            <p class="mt-3 text-xs font-bold text-gray-500">{{ stats.submission_rate }}% submission rate</p>
+        </div>
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Avg Score</p>
+            <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-emerald-600 to-teal-700 bg-clip-text text-transparent">{{ stats.avg_score }}</p>
+            <p class="mt-3 text-xs font-bold text-gray-500">
+                {% if stats.avg_pct >= 70 %}<span class="score-good"><i class="fas fa-arrow-trend-up"></i> {{ stats.avg_pct }}% strong</span>
+                {% elif stats.avg_pct >= 50 %}<span class="score-mid"><i class="fas fa-minus"></i> {{ stats.avg_pct }}%</span>
+                {% else %}<span class="score-bad"><i class="fas fa-arrow-trend-down"></i> {{ stats.avg_pct }}%</span>{% endif %}
+            </p>
+        </div>
+        <div class="stat-card rounded-3xl p-5">
+            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Grading</p>
+            <div class="flex items-baseline gap-2 mt-3">
+                <p class="text-3xl md:text-4xl font-black bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">{{ stats.pending_grading_count }}</p>
+                <span class="text-xs font-bold text-gray-500">/ {{ stats.attempt_count }}</span>
+            </div>
+            <div class="mt-3 h-1.5 bar-track"><div class="bar-fill" style="width:{% if stats.attempt_count > 0 %}{{ stats.graded_count|add:0 }}{% else %}0{% endif %}{% if stats.attempt_count > 0 %}{% widthratio stats.graded_count stats.attempt_count 100 %}{% else %}0{% endif %}%; background:linear-gradient(90deg,#f59e0b 0%,#ea580c 100%);"></div></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+        <div class="stat-card rounded-3xl p-5 flex items-center gap-4">
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-md">
+                <i class="fas fa-arrow-up text-xl"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Highest</p>
+                <p class="mt-1 text-2xl font-black text-gray-900">{{ stats.highest }} <span class="text-sm text-gray-500">/ {{ stats.total_possible }}</span></p>
+            </div>
+        </div>
+        <div class="stat-card rounded-3xl p-5 flex items-center gap-4">
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-400 to-red-500 text-white shadow-md">
+                <i class="fas fa-arrow-down text-xl"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Lowest</p>
+                <p class="mt-1 text-2xl font-black text-gray-900">{{ stats.lowest }} <span class="text-sm text-gray-500">/ {{ stats.total_possible }}</span></p>
+            </div>
+        </div>
+        <div class="stat-card rounded-3xl p-5 flex items-center gap-4">
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md">
+                <i class="fas fa-hourglass-half text-xl"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Pending Review</p>
+                <p class="mt-1 text-2xl font-black text-gray-900">{{ pending_manual_count }} <span class="text-sm text-gray-500">response{{ pending_manual_count|pluralize }}</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50/60 px-5 py-4 text-sm shadow-sm flex items-start gap-3">
+        <i class="fas fa-info-circle text-xl text-amber-600 mt-0.5 flex-shrink-0"></i>
+        <div class="font-bold text-amber-900">{{ essay_reminder }}</div>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div class="xl:col-span-2 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="text-xl font-black text-gray-900 mb-4">Questions</h2>
+        <div class="xl:col-span-2 purple-card rounded-3xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent flex items-center gap-2">
+                    <i class="fas fa-list-ol text-purple-600"></i>Questions <span class="text-sm text-gray-500">({{ assessment.total_questions }})</span>
+                </h2>
+                <a href="{% url 'millialms_edit_assessment' assessment.id %}" class="inline-flex items-center gap-1.5 rounded-xl btn-outline-purple px-3 py-1.5 text-xs font-black">
+                    <i class="fas fa-pen"></i>Edit questions
+                </a>
+            </div>
             <div class="space-y-4">
-                {% for question in assessment.questions.all %}
-                <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                        <span class="rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-gray-700 border border-gray-200">Q{{ forloop.counter }}</span>
-                        <span class="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-black text-indigo-700 border border-indigo-200">{{ question.get_question_type_display }}</span>
-                        <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black text-emerald-700 border border-emerald-200">{{ question.points }} pts</span>
+                {% for q in assessment.questions.all %}
+                <div class="question-item rounded-2xl p-4 md:p-5">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span class="rounded-full bg-white px-3 py-1 text-[11px] font-black text-gray-800 border border-purple-100 shadow-sm">Q{{ forloop.counter }}</span>
+                        {% with qt=q.question_type %}
+                        <span class="rounded-full px-3 py-1 text-[11px] font-black border
+                            {% if qt == 'mcq' %}q-type-chip-mcq
+                            {% elif qt == 'true_false' %}q-type-chip-tf
+                            {% elif qt == 'fill_blank' %}q-type-chip-fb
+                            {% elif qt == 'short_answer' %}q-type-chip-sa
+                            {% elif qt == 'essay' %}q-type-chip-essay{% endif %}">
+                            <i class="fas {% if qt == 'mcq' %}fa-list{% elif qt == 'true_false' %}fa-check-double{% elif qt == 'fill_blank' %}fa-pen-line{% elif qt == 'short_answer' %}fa-memo-circle-info{% elif qt == 'essay' %}fa-feather-pointed{% endif %} mr-1"></i>
+                            {{ q.get_question_type_display }}
+                        </span>
+                        {% endwith %}
+                        <span class="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-700 border border-emerald-200">
+                            <i class="fas fa-coins mr-1"></i>{{ q.points }} pt{{ q.points|pluralize }}
+                        </span>
+                        {% if q.manual_grading_required %}
+                        <span class="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700 border border-amber-200">
+                            <i class="fas fa-memo-circle-check mr-1"></i>Manual
+                        </span>
+                        {% endif %}
                     </div>
-                    <p class="font-bold text-gray-900">{{ question.question_text }}</p>
-                    {% if question.options.all %}
-                    <div class="mt-3 space-y-2">
-                        {% for option in question.options.all %}
-                        <div class="rounded-xl bg-white px-3 py-2 text-sm border {% if option.is_correct %}border-emerald-200 text-emerald-800{% else %}border-gray-200 text-gray-600{% endif %}">{{ option.option_text }} {% if option.is_correct %}<span class="font-black">✓</span>{% endif %}</div>
+                    <p class="font-bold text-gray-900 leading-relaxed text-base md:text-lg">{{ q.question_text }}</p>
+
+                    {% if q.options.all %}
+                    <div class="mt-4 space-y-2">
+                        {% for opt in q.options.all %}
+                        <div class="rounded-xl px-4 py-2.5 text-sm border {% if opt.is_correct %}correct-opt font-bold{% else %}border-gray-200 text-gray-700{% endif %}">
+                            <span class="font-black mr-2">{{ forloop.counter|stringformat:"02d" }}.</span>
+                            {{ opt.option_text }}
+                            {% if opt.is_correct %}<i class="fas fa-check-circle ml-2"></i>{% endif %}
+                        </div>
                         {% endfor %}
                     </div>
-                    {% elif question.accepted_answers %}
-                    <div class="mt-3 rounded-xl bg-white px-3 py-3 text-sm border border-gray-200 text-gray-700 whitespace-pre-line">{{ question.accepted_answers }}</div>
+                    {% elif q.accepted_answers %}
+                    <div class="mt-4 rounded-xl bg-white p-4 text-sm border border-blue-200 text-blue-900">
+                        <p class="font-black mb-2 text-[11px] uppercase tracking-wider text-blue-700"><i class="fas fa-spell-check mr-1.5"></i>Accepted answers</p>
+                        <div class="whitespace-pre-line font-semibold">{{ q.accepted_answers }}</div>
+                    </div>
                     {% endif %}
+
+                    {% with pq=per_question|dictsortreversed:"question.order"|first %}{% endwith %}
                 </div>
                 {% endfor %}
             </div>
-        </div>
 
-        <div class="space-y-6">
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-black text-gray-900 mb-4">Assigned courses</h2>
-                <div class="flex flex-wrap gap-2">
-                    {% for course in assessment.courses.all %}
-                    <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-black text-indigo-700">{{ course.course_code }}</span>
-                    {% empty %}
-                    <p class="text-sm text-gray-500">No courses assigned.</p>
+            {% if per_question %}
+            <div class="mt-8">
+                <h3 class="text-lg font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-simple text-purple-600"></i>Per-question performance
+                </h3>
+                <div class="space-y-3">
+                    {% for pq in per_question %}
+                    <div class="rounded-2xl bg-gradient-to-r from-purple-50/40 to-white border border-purple-100 p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+                            <div class="font-bold text-gray-900">
+                                <span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white border border-purple-200 text-xs font-black text-purple-700 mr-2">Q{{ forloop.counter }}</span>
+                                {{ pq.question.question_text|truncatechars:70 }}
+                            </div>
+                            <div class="flex flex-wrap gap-2 text-xs font-bold">
+                                <span class="rounded-lg bg-blue-50 px-2.5 py-1 border border-blue-200 text-blue-800">{{ pq.answered_count }} answered</span>
+                                <span class="rounded-lg bg-emerald-50 px-2.5 py-1 border border-emerald-200 text-emerald-800">{{ pq.correct_count }} correct</span>
+                                <span class="rounded-lg {% if pq.correct_pct >= 70 %}bg-emerald-100 border-emerald-200 text-emerald-800{% elif pq.correct_pct >= 40 %}bg-amber-100 border-amber-200 text-amber-800{% else %}bg-red-100 border-red-200 text-red-800{% endif %} px-2.5 py-1 border">{{ pq.correct_pct }}%</span>
+                                <span class="rounded-lg bg-purple-50 px-2.5 py-1 border border-purple-200 text-purple-800">avg {{ pq.avg_score }}/{{ pq.question.points }}</span>
+                            </div>
+                        </div>
+                        <div class="h-2.5 bar-track"><div class="bar-fill" style="width:{{ pq.correct_pct }}%;"></div></div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
+            {% endif %}
+        </div>
 
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-black text-gray-900 mb-4">Manual grading queue</h2>
+        <div class="space-y-6">
+            <div class="purple-card rounded-3xl p-6 shadow-sm">
+                <h3 class="text-lg font-black text-purple-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-book text-purple-600"></i>Assigned courses
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                    {% for course in assessment.courses.all %}
+                    <span class="rounded-full border border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-2 text-xs font-black text-purple-800 shadow-sm">
+                        <i class="fas fa-book mr-1.5 text-purple-500"></i>{{ course.course_code }} — {{ course.course_title }}
+                    </span>
+                    {% empty %}
+                    <p class="text-sm text-gray-500 font-semibold italic">No courses assigned yet. Edit the assessment to link it to your courses.</p>
+                    {% endfor %}
+                </div>
+                <div class="mt-5 pt-5 border-t border-purple-100 space-y-2.5 text-xs font-bold text-gray-700">
+                    <div class="flex items-center justify-between"><span><i class="fas fa-clock text-gray-400 mr-1.5"></i>Start</span><span class="text-gray-900">{% if assessment.start_time %}{{ assessment.start_time }}{% else %}—{% endif %}</span></div>
+                    <div class="flex items-center justify-between"><span><i class="fas fa-clock text-gray-400 mr-1.5"></i>End</span><span class="text-gray-900">{% if assessment.end_time %}{{ assessment.end_time }}{% else %}—{% endif %}</span></div>
+                    <div class="flex items-center justify-between"><span><i class="fas fa-hourglass text-gray-400 mr-1.5"></i>Time limit</span><span class="text-gray-900">{% if assessment.time_limit_minutes %}{{ assessment.time_limit_minutes }} min{% else %}No limit{% endif %}</span></div>
+                    <div class="flex items-center justify-between"><span><i class="fas fa-repeat text-gray-400 mr-1.5"></i>Attempts</span><span class="text-gray-900">Max {{ assessment.max_attempts }}</span></div>
+                    <div class="flex items-center justify-between"><span><i class="fas fa-shuffle text-gray-400 mr-1.5"></i>Randomize</span><span class="text-gray-900">{% if assessment.randomize_question_order or assessment.randomize_answer_options %}Yes{% else %}No{% endif %}</span></div>
+                </div>
+            </div>
+
+            <div class="purple-card rounded-3xl p-6 shadow-sm">
+                <h3 class="text-lg font-black text-purple-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-memo-circle-check text-amber-500"></i>Manual grading queue
+                    <span class="ml-auto rounded-full bg-amber-100 text-amber-800 px-3 py-1 text-xs font-black border border-amber-200">{{ pending_manual_count }}</span>
+                </h3>
                 {% if pending_manual %}
                 <form method="post" action="{% url 'millialms_grade_attempt' pending_manual.0.attempt.id %}" class="space-y-4">
                     {% csrf_token %}
                     {% for item in pending_manual %}
-                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                        <p class="text-sm font-black text-amber-900">{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}</p>
-                        <p class="mt-1 text-sm text-amber-800">{{ item.question.question_text }}</p>
-                        <div class="mt-3 rounded-xl bg-white p-3 border border-amber-100 text-sm text-gray-700">{{ item.text_answer|default:'No response submitted.' }}</div>
-                        <div class="mt-3 grid grid-cols-1 gap-3">
-                            <input name="score_{{ item.id }}" type="number" step="0.01" min="0" max="{{ item.question.points }}" class="rounded-2xl border-2 border-white px-4 py-3 text-sm font-medium" placeholder="Score / {{ item.question.points }}" />
-                            <textarea name="feedback_{{ item.id }}" rows="2" class="rounded-2xl border-2 border-white px-4 py-3 text-sm font-medium" placeholder="Feedback for student"></textarea>
+                    <div class="grad-queue-item rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs font-black uppercase tracking-wider text-amber-700">
+                                <i class="fas fa-user-graduate mr-1"></i>{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}
+                            </p>
+                            <span class="rounded-full bg-white/80 border border-amber-200 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-amber-800">
+                                {{ item.question.get_question_type_display }}
+                            </span>
+                        </div>
+                        <p class="text-sm font-bold text-gray-900 mb-3">{{ item.question.question_text }}</p>
+                        <div class="rounded-xl bg-white p-3.5 border border-amber-200/80 text-sm text-gray-800 max-h-48 overflow-y-auto whitespace-pre-wrap font-semibold">
+                            {{ item.text_answer|default:'<span class="text-gray-400 italic">No response submitted.</span>' }}
+                        </div>
+                        <div class="mt-3 grid grid-cols-1 gap-2.5">
+                            <div class="flex items-center gap-2">
+                                <label class="text-[11px] font-black uppercase tracking-wider text-gray-600 whitespace-nowrap">Score</label>
+                                <div class="flex-1 flex items-center gap-2">
+                                    <input name="score_{{ item.id }}" type="number" step="0.01" min="0" max="{{ item.question.points }}"
+                                        class="flex-1 rounded-xl purple-input px-3 py-2 text-sm font-black" placeholder="0.00" />
+                                    <span class="text-xs font-bold text-gray-500">/ {{ item.question.points }}</span>
+                                </div>
+                            </div>
+                            <textarea name="feedback_{{ item.id }}" rows="2"
+                                class="rounded-xl purple-input px-3 py-2 text-sm font-semibold"
+                                placeholder="Optional personalised feedback for the student..."></textarea>
                         </div>
                     </div>
                     {% endfor %}
-                    <button type="submit" class="w-full rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-sm font-black text-white shadow-lg hover:-translate-y-0.5 transition-all">Save grading</button>
+                    <button type="submit" class="w-full rounded-2xl grade-btn px-4 py-3.5 text-sm font-black text-white">
+                        <i class="fas fa-check-double mr-2"></i>Save grading for {{ pending_manual|length }} response{{ pending_manual|pluralize }}
+                    </button>
                 </form>
                 {% else %}
-                <p class="text-sm text-gray-500">No short-answer responses are waiting for manual grading.</p>
+                <div class="text-center py-8">
+                    <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+                        <i class="fas fa-sparkles text-xl"></i>
+                    </div>
+                    <p class="text-sm text-gray-600 font-bold">All caught up!</p>
+                    <p class="text-xs text-gray-500 mt-1 font-semibold">No essay or short-answer responses waiting.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <div class="border-b border-gray-100 px-6 py-4"><h2 class="text-lg font-black text-gray-900">Student attempts</h2></div>
+    <div class="purple-card rounded-3xl shadow-sm overflow-hidden">
+        <div class="border-b border-purple-100/60 px-6 py-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="text-xl font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent">
+                    <i class="fas fa-users-line text-purple-600 mr-2"></i>Student attempts
+                </h2>
+                <p class="text-sm text-gray-500 mt-0.5 font-medium">{{ stats.attempt_count }} total · {{ stats.graded_count }} graded · {{ stats.pending_grading_count }} pending</p>
+            </div>
+        </div>
         {% if attempts %}
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 text-gray-600 uppercase text-[11px] tracking-wider">
+                <thead class="bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-900 uppercase text-[11px] tracking-wider">
                     <tr>
                         <th class="p-4 text-left font-black">Student</th>
                         <th class="p-4 text-left font-black">Attempt</th>
                         <th class="p-4 text-left font-black">Status</th>
-                        <th class="p-4 text-left font-black">Submitted</th>
-                        <th class="p-4 text-left font-black">Score</th>
+                        <th class="p-4 text-left font-black">Submitted (Lagos)</th>
+                        <th class="p-4 text-left font-black">Auto</th>
+                        <th class="p-4 text-left font-black">Manual</th>
+                        <th class="p-4 text-left font-black">Total</th>
+                        <th class="p-4 text-left font-black">%</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
-                    {% for attempt in attempts %}
-                    <tr>
-                        <td class="p-4 font-bold text-gray-900">{{ attempt.student.get_full_name|default:attempt.student.username }}</td>
-                        <td class="p-4 text-gray-700">{{ attempt.attempt_number }}</td>
-                        <td class="p-4 text-gray-700">{{ attempt.get_status_display }}</td>
-                        <td class="p-4 text-gray-700">{% if attempt.submitted_at %}{{ attempt.submitted_at }}{% else %}—{% endif %}</td>
-                        <td class="p-4 font-black text-indigo-700">{{ attempt.total_score }}/{{ attempt.total_possible_score }}</td>
+                <tbody class="divide-y divide-purple-100/60">
+                    {% for a in attempts %}
+                    {% with pct=0 %}
+                    <tr class="hover:bg-purple-50/40 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-black text-xs shadow-sm">
+                                    {{ a.student.username|first|upper }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-gray-900 truncate">{{ a.student.get_full_name|default:a.student.username }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ a.student.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 font-bold text-gray-700">#{{ a.attempt_number }}</td>
+                        <td class="p-4">
+                            <span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-black border
+                                {% if a.status == 'graded' %}border-emerald-200 bg-emerald-50 text-emerald-800
+                                {% elif a.status == 'submitted' %}border-amber-200 bg-amber-50 text-amber-800
+                                {% else %}border-indigo-200 bg-indigo-50 text-indigo-800{% endif %}">
+                                {% if a.status == 'graded' %}<i class="fas fa-check-double mr-1"></i>{% elif a.status == 'submitted' %}<i class="fas fa-hourglass-half mr-1 animate-pulse"></i>{% endif %}
+                                {{ a.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-gray-700 font-semibold">{% if a.submitted_at %}{{ a.submitted_at }}{% else %}<span class="text-gray-400">—</span>{% endif %}</td>
+                        <td class="p-4 font-black text-gray-800">{{ a.auto_score }}</td>
+                        <td class="p-4 font-black {% if a.manual_score > 0 %}text-amber-700{% else %}text-gray-400{% endif %}">{{ a.manual_score }}</td>
+                        <td class="p-4 font-black text-purple-700 text-base">{{ a.total_score }}<span class="text-xs text-gray-500"> / {{ a.total_possible_score }}</span></td>
+                        <td class="p-4 font-black">
+                            {% if a.total_possible_score > 0 %}
+                                {% with ratio=a.total_score|add:0 %}
+                                {% widthratio ratio a.total_possible_score 100 as pct_val %}
+                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs
+                                    {% if pct_val >= 70 %}bg-emerald-50 border border-emerald-200 text-emerald-800
+                                    {% elif pct_val >= 50 %}bg-amber-50 border border-amber-200 text-amber-800
+                                    {% else %}bg-red-50 border border-red-200 text-red-800{% endif %}">{{ pct_val }}%</span>
+                                {% endwith %}
+                            {% else %}
+                                <span class="text-gray-400">—</span>
+                            {% endif %}
+                        </td>
                     </tr>
+                    {% endwith %}
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="p-12 text-center text-gray-500">No student attempts yet.</div>
+        <div class="p-14 text-center">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-600 border border-purple-200">
+                <i class="fas fa-inbox text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-black text-gray-900">No submissions yet</h3>
+            <p class="mt-2 text-gray-500 font-medium max-w-md mx-auto">Once students start this assessment, their attempts appear here with auto-graded scores and a queue for manual review.</p>
+        </div>
         {% endif %}
     </div>
 </div>
+
+<script>
+function confirmDelete() {
+    return confirm("Delete this assessment permanently? This removes all questions, attempts, and results and can't be undone.");
+}
+</script>
 {% endblock content %}

@@ -1,15 +1,84 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+<style>
+    .purple-card {
+        background: #ffffff;
+        border: 1px solid rgba(118, 75, 162, 0.15);
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08);
+    }
+    .stat-card {
+        background: linear-gradient(180deg, #ffffff 0%, rgba(139, 92, 246, 0.03) 100%);
+        border: 1px solid rgba(118, 75, 162, 0.15);
+        box-shadow: 0 2px 12px rgba(102, 126, 234, 0.06);
+        transition: all 0.25s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        border-color: rgba(139, 92, 246, 0.35);
+    }
+    .assessment-card {
+        background: #ffffff;
+        border: 1px solid rgba(118, 75, 162, 0.12);
+        transition: all 0.25s ease;
+    }
+    .assessment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 36px rgba(102, 126, 234, 0.15);
+        border-color: rgba(139, 92, 246, 0.3);
+    }
+    .btn-purple {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+        transition: all 0.25s ease;
+    }
+    .btn-purple:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.35);
+    }
+    .btn-outline-purple {
+        border: 1.5px solid rgba(118, 75, 162, 0.3);
+        background: white;
+        color: #6d28d9;
+        transition: all 0.2s ease;
+    }
+    .btn-outline-purple:hover {
+        background: rgba(139, 92, 246, 0.06);
+        border-color: #8b5cf6;
+    }
+    .status-live { background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.15)); color: #047857; border-color: rgba(16, 185, 129, 0.3); }
+    .status-upcoming { background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(124, 58, 237, 0.15)); color: #6d28d9; border-color: rgba(139, 92, 246, 0.3); }
+    .status-closed { background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.15)); color: #b91c1c; border-color: rgba(239, 68, 68, 0.3); }
+    .status-draft { background: linear-gradient(135deg, rgba(107, 114, 128, 0.12), rgba(75, 85, 99, 0.15)); color: #374151; border-color: rgba(107, 114, 128, 0.3); }
+    .type-badge { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(192, 132, 252, 0.15)); color: #7e22ce; border-color: rgba(168, 85, 247, 0.3); }
+    .meta-chip { background: rgba(139, 92, 246, 0.06); border: 1px solid rgba(139, 92, 246, 0.15); color: #5b21b6; }
+    .empty-state-icon {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(167, 139, 250, 0.2));
+        color: #7c3aed;
+    }
+    .notice-banner {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.15));
+        border-color: rgba(251, 191, 36, 0.35);
+        color: #92400e;
+    }
+</style>
+
+<div class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 mb-2">MilliaLMS</p>
-            <h1 class="text-3xl md:text-4xl font-black text-gray-900">Assessment Studio</h1>
-            <p class="mt-2 max-w-3xl text-gray-600">Create quizzes, timed tests, and practice assessments for one or more classes. Objective questions are auto-graded immediately, while short answers can be reviewed manually.</p>
+            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-purple-600 mb-2">
+                <i class="fas fa-sparkles mr-1.5"></i>MilliaLMS — Assessment Studio
+            </p>
+            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight">
+                Assessment Studio
+            </h1>
+            <p class="mt-2 max-w-3xl text-gray-600 font-medium">
+                Build custom quizzes, timed tests, and practice assessments. Objective questions auto-grade instantly while essay and short answer flow into your manual grading queue.
+            </p>
         </div>
         <div class="flex flex-wrap gap-3">
-            <a href="{% url 'millialms_create_assessment' %}" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-indigo-200 hover:-translate-y-0.5 transition-all">
-                <i class="fas fa-plus-circle"></i>Create Assessment
+            <a href="{% url 'millialms_create_assessment' %}" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-5 py-3.5 text-sm font-black text-white">
+                <i class="fas fa-plus-circle"></i>Create New Assessment
             </a>
         </div>
     </div>
@@ -17,73 +86,162 @@
     {% if messages %}
     <div class="space-y-3">
         {% for message in messages %}
-        <div class="rounded-2xl border px-4 py-3 text-sm font-semibold {% if message.tags == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800{% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-800{% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800{% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">{{ message }}</div>
+        <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
+        </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Drafts</p>
-            <p class="mt-3 text-3xl font-black text-gray-900">{{ draft_count }}</p>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <div class="stat-card rounded-3xl p-5 md:p-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Drafts</p>
+                    <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-gray-700 to-gray-900 bg-clip-text text-transparent">{{ draft_count }}</p>
+                </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-100 text-gray-600">
+                    <i class="fas fa-file-pen text-lg"></i>
+                </div>
+            </div>
+            <p class="mt-3 text-xs font-semibold text-gray-500">Not yet published</p>
         </div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Published</p>
-            <p class="mt-3 text-3xl font-black text-indigo-700">{{ published_count }}</p>
+        <div class="stat-card rounded-3xl p-5 md:p-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Published</p>
+                    <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-purple-600 to-indigo-700 bg-clip-text text-transparent">{{ published_count }}</p>
+                </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md">
+                    <i class="fas fa-rocket text-lg"></i>
+                </div>
+            </div>
+            <p class="mt-3 text-xs font-semibold text-gray-500">Live, upcoming, or closed</p>
         </div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Total Attempts</p>
-            <p class="mt-3 text-3xl font-black text-emerald-700">{{ attempt_count }}</p>
+        <div class="stat-card rounded-3xl p-5 md:p-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Total Attempts</p>
+                    <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-emerald-600 to-teal-700 bg-clip-text text-transparent">{{ attempt_count }}</p>
+                </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md">
+                    <i class="fas fa-users-line text-lg"></i>
+                </div>
+            </div>
+            <p class="mt-3 text-xs font-semibold text-gray-500">Student submissions received</p>
         </div>
-        <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Needs Manual Review</p>
-            <p class="mt-3 text-3xl font-black text-amber-600">{{ pending_manual_count }}</p>
+        <div class="stat-card rounded-3xl p-5 md:p-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Awaiting Review</p>
+                    <p class="mt-3 text-3xl md:text-4xl font-black bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">{{ pending_manual_count }}</p>
+                </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md">
+                    <i class="fas fa-memo-circle-check text-lg"></i>
+                </div>
+            </div>
+            <p class="mt-3 text-xs font-semibold text-gray-500">Essay &amp; short answer to grade</p>
         </div>
     </div>
 
-    <div class="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900 shadow-sm">
-        <span class="font-black">Reminder:</span> {{ essay_reminder }}
+    <div class="rounded-3xl notice-banner border px-5 py-4 text-sm shadow-sm flex items-start gap-3">
+        <i class="fas fa-bell text-xl mt-0.5 flex-shrink-0"></i>
+        <div class="font-bold">
+            <strong>Server time (Lagos/WAT):</strong> {{ server_now_lagos }}
+            &nbsp;•&nbsp; Assessments auto-hide from students outside of the Start / End window. Drafts are never visible.
+        </div>
     </div>
 
-    <div class="rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <div class="border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+    <div class="purple-card rounded-3xl shadow-sm overflow-hidden">
+        <div class="border-b border-purple-100/60 px-6 py-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h2 class="text-lg font-black text-gray-900">All assessments</h2>
-                <p class="text-sm text-gray-500">Server time: {{ server_now_lagos }}</p>
+                <h2 class="text-xl font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent">All assessments</h2>
+                <p class="text-sm text-gray-500 mt-0.5 font-medium">Fully custom — no generic templates. Every question is written by you.</p>
+            </div>
+            <div class="text-xs font-bold text-gray-500">
+                {{ assessments|length }} assessment{{ assessments|pluralize }} total
             </div>
         </div>
+
         {% if assessments %}
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-purple-100/60">
             {% for assessment in assessments %}
-            <div class="p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div class="min-w-0 flex-1">
-                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-black {% if assessment.status_label == 'Live' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif assessment.status_label == 'Upcoming' %}bg-indigo-50 text-indigo-700 border border-indigo-200{% elif assessment.status_label == 'Closed' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-gray-100 text-gray-700 border border-gray-200{% endif %}">{{ assessment.status_label }}</span>
-                        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-black bg-purple-50 text-purple-700 border border-purple-200">{{ assessment.type_label }}</span>
-                        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-black bg-slate-100 text-slate-700 border border-slate-200">{{ assessment.total_questions }} questions</span>
+            <div class="p-5 md:p-6 assessment-card border-0 rounded-none">
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border {% if assessment.status_label == 'Live' %}status-live{% elif assessment.status_label == 'Upcoming' %}status-upcoming{% elif assessment.status_label == 'Closed' %}status-closed{% else %}status-draft{% endif %}">
+                                {% if assessment.status_label == 'Live' %}<i class="fas fa-circle text-[6px] mr-1.5 animate-pulse"></i>{% endif %}
+                                {{ assessment.status_label }}
+                            </span>
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border type-badge">
+                                <i class="fas fa-list-check mr-1.5"></i>{{ assessment.type_label }}
+                            </span>
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black bg-slate-100 text-slate-700 border border-slate-200">
+                                <i class="fas fa-circle-question mr-1.5 text-slate-500"></i>{{ assessment.total_questions }} question{{ assessment.total_questions|pluralize }}
+                            </span>
+                            {% if assessment.pending_manual_count > 0 %}
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black bg-amber-100 text-amber-800 border border-amber-200 animate-pulse">
+                                <i class="fas fa-hourglass-half mr-1.5"></i>{{ assessment.pending_manual_count }} pending
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="text-xl md:text-2xl font-black text-gray-900">{{ assessment.title }}</h3>
+                        <p class="mt-1.5 text-sm text-gray-600 font-medium leading-relaxed">
+                            {{ assessment.instructions|default:'No instructions added yet.'|truncatechars:220 }}
+                        </p>
+
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="rounded-xl meta-chip px-3.5 py-1.5 text-xs font-black flex items-center gap-1.5">
+                                <i class="fas fa-book"></i>{{ assessment.course_count }} course{{ assessment.course_count|pluralize }}
+                            </span>
+                            <span class="rounded-xl meta-chip px-3.5 py-1.5 text-xs font-black flex items-center gap-1.5">
+                                <i class="fas fa-pen-to-square"></i>{{ assessment.attempt_count }} attempt{{ assessment.attempt_count|pluralize }}
+                            </span>
+                            <span class="rounded-xl meta-chip px-3.5 py-1.5 text-xs font-black flex items-center gap-1.5">
+                                <i class="fas fa-repeat"></i>Max {{ assessment.max_attempts }} attempt{{ assessment.max_attempts|pluralize }}
+                            </span>
+                            {% if assessment.time_limit_minutes %}
+                            <span class="rounded-xl meta-chip px-3.5 py-1.5 text-xs font-black flex items-center gap-1.5">
+                                <i class="fas fa-clock"></i>{{ assessment.time_limit_minutes }} min
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
-                    <h3 class="text-xl font-black text-gray-900">{{ assessment.title }}</h3>
-                    <p class="mt-1 text-sm text-gray-600">{{ assessment.instructions|default:'No instructions added yet.'|truncatechars:180 }}</p>
-                    <div class="mt-3 flex flex-wrap gap-2 text-xs font-bold text-gray-500">
-                        <span class="rounded-xl bg-gray-50 px-3 py-1.5 border border-gray-100">{{ assessment.course_count }} course{{ assessment.course_count|pluralize }}</span>
-                        <span class="rounded-xl bg-gray-50 px-3 py-1.5 border border-gray-100">{{ assessment.attempt_count }} attempt{{ assessment.attempt_count|pluralize }}</span>
-                        <span class="rounded-xl bg-gray-50 px-3 py-1.5 border border-gray-100">{{ assessment.max_attempts }} max attempt{{ assessment.max_attempts|pluralize }}</span>
-                        {% if assessment.time_limit_minutes %}<span class="rounded-xl bg-gray-50 px-3 py-1.5 border border-gray-100">{{ assessment.time_limit_minutes }} mins</span>{% endif %}
+
+                    <div class="flex flex-wrap gap-2.5 lg:justify-end">
+                        <a href="{% url 'millialms_lecturer_assessment_detail' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-4 py-2.5 text-sm font-black">
+                            <i class="fas fa-eye"></i>Open
+                        </a>
+                        <a href="{% url 'millialms_edit_assessment' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl border border-indigo-100 bg-white px-4 py-2.5 text-sm font-black text-indigo-700 hover:bg-indigo-50 transition-all">
+                            <i class="fas fa-pen"></i>Edit
+                        </a>
+                        <a href="{% url 'millialms_duplicate_assessment' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl border border-purple-100 bg-white px-4 py-2.5 text-sm font-black text-purple-700 hover:bg-purple-50 transition-all">
+                            <i class="fas fa-copy"></i>Duplicate
+                        </a>
+                        <a href="{% url 'millialms_export_results' assessment.id %}?format=csv" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-100 bg-white px-4 py-2.5 text-sm font-black text-emerald-700 hover:bg-emerald-50 transition-all">
+                            <i class="fas fa-file-csv"></i>CSV
+                        </a>
                     </div>
-                </div>
-                <div class="flex flex-wrap gap-2 lg:justify-end">
-                    <a href="{% url 'millialms_lecturer_assessment_detail' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl border border-indigo-100 bg-white px-4 py-2.5 text-sm font-black text-indigo-700 hover:bg-indigo-50 transition-all"><i class="fas fa-eye"></i>Open</a>
-                    <a href="{% url 'millialms_export_results' assessment.id %}?format=csv" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-100 bg-white px-4 py-2.5 text-sm font-black text-emerald-700 hover:bg-emerald-50 transition-all"><i class="fas fa-file-csv"></i>Excel/CSV</a>
-                    <a href="{% url 'millialms_export_results' assessment.id %}?format=pdf" class="inline-flex items-center gap-2 rounded-2xl border border-rose-100 bg-white px-4 py-2.5 text-sm font-black text-rose-700 hover:bg-rose-50 transition-all"><i class="fas fa-file-pdf"></i>PDF</a>
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="p-14 text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-600"><i class="fas fa-clipboard-list text-2xl"></i></div>
-            <h3 class="text-xl font-black text-gray-900">No assessments yet</h3>
-            <p class="mt-2 text-gray-500">Create your first MilliaLMS quiz, timed test, or practice assessment.</p>
+        <div class="p-14 md:p-20 text-center">
+            <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl empty-state-icon shadow-lg">
+                <i class="fas fa-clipboard-list text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-900">No assessments yet</h3>
+            <p class="mt-2 text-gray-600 font-medium max-w-md mx-auto">
+                Build your first quiz, timed test, or practice assessment. Add fully custom questions of any type and assign to your courses.
+            </p>
+            <div class="mt-6">
+                <a href="{% url 'millialms_create_assessment' %}" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3.5 text-sm font-black text-white">
+                    <i class="fas fa-plus-circle"></i>Create Your First Assessment
+                </a>
+            </div>
         </div>
         {% endif %}
     </div>
