@@ -175,9 +175,9 @@
                         <label for="report-course" class="mb-2 block text-[11px] font-black uppercase tracking-[0.18em] text-gray-500">Course filter</label>
                         <select id="report-course" name="course" onchange="this.form.submit()"
                             class="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white shadow-sm outline-none transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20">
-                            <option value="">All courses</option>
+                            <option value="" class="text-gray-900 bg-white">All courses</option>
                             {% for c in courses_with_sessions %}
-                            <option value="{{ c.id }}" {% if selected_course == c.id|stringformat:"i" %}selected{% endif %}>{{ c.course_code }} · {{ c.course_title|truncatechars:30 }}</option>
+                            <option value="{{ c.id }}" {% if selected_course == c.id|stringformat:"i" %}selected{% endif %} class="text-gray-900 bg-white">{{ c.course_code }} · {{ c.course_title|truncatechars:30 }}</option>
                             {% endfor %}
                         </select>
                     </div>

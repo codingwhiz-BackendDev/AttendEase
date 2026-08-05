@@ -1441,38 +1441,53 @@
                             class="relative rounded-3xl overflow-hidden shadow-2xl"
                         >
                             <img
-                                src="{% static 'images/interractive map.jpg' %}"
-                                alt="Interactive map"
+                                src="{% static 'images/university at sunset.jpg' %}"
+                                alt="Campus at sunset"
                                 class="w-full h-auto object-cover"
                             />
                             <div
-                                class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"
+                                class="absolute inset-0 bg-gradient-to-t from-gray-900/85 via-gray-900/30 to-transparent"
                             ></div>
                             <div
                                 class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6"
                             >
                                 <div class="glass-card rounded-2xl p-3 sm:p-4">
                                     <div
-                                        class="flex items-center justify-between"
+                                        class="flex items-center justify-between gap-3 flex-wrap"
                                     >
-                                        <div>
+                                        <div class="min-w-0 flex-1">
                                             <p
-                                                class="text-sm sm:text-base font-bold"
+                                                class="text-sm sm:text-base font-bold text-white flex items-center gap-2"
                                             >
-                                                Live Geofence Map
+                                                <i class="fas fa-location-crosshairs text-indigo-400"></i>
+                                                Smart Geofencing
                                             </p>
                                             <p
-                                                class="text-xs sm:text-sm text-gray-400"
+                                                class="text-xs sm:text-sm text-gray-300 mt-0.5"
                                             >
-                                                3 active sessions • 127 students
-                                                nearby
+                                                Per-hall zones • GPS accuracy lock •
+                                                eligibility in real time
                                             </p>
+                                            <div class="flex flex-wrap items-center gap-2 mt-2">
+                                                <span
+                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30"
+                                                >
+                                                    <i class="fas fa-circle text-[5px] animate-pulse"></i>
+                                                    3 Active Sessions
+                                                </span>
+                                                <span
+                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-black border border-indigo-500/30"
+                                                >
+                                                    <i class="fas fa-users"></i>
+                                                    127 Check-ins Today
+                                                </span>
+                                            </div>
                                         </div>
                                         <div
-                                            class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500 flex items-center justify-center animate-pulse"
+                                            class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shrink-0"
                                         >
                                             <i
-                                                class="fas fa-signal text-white text-sm"
+                                                class="fas fa-shield-halved text-white text-base sm:text-lg"
                                             ></i>
                                         </div>
                                     </div>

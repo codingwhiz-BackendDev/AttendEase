@@ -2,9 +2,6 @@
 {% load static %}
 
 {% block content %}
-<!-- Leaflet.js map assets -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
     .glass-card {
         background: rgba(255, 255, 255, 0.05);
@@ -46,15 +43,7 @@
         50% { transform: translateY(-10px); }
     }
 
-    .mini-map { border-radius: 1rem; overflow: hidden; background: #1f2937; border: 1px solid rgba(255,255,255,0.1); position: relative; }
-    .leaflet-container { z-index: 1; }
     .countdown-cell { font-variant-numeric: tabular-nums; }
-    .leaflet-control-attribution { font-size: 8px !important; }
-    .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 6px 20px rgba(0,0,0,.15) !important; }
-    /* Map overlay nav buttons */
-    .map-nav-overlay { position:absolute; bottom:6px; left:6px; z-index:400; display:flex; gap:4px; }
-    .map-nav-btn { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:4px 8px; font-size:10px; font-weight:800; color:#a5b4fc; box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer; text-decoration:none; display:flex; align-items:center; gap:4px; }
-    .map-nav-btn:hover { background:rgba(255,255,255,0.2); }
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -285,18 +274,41 @@
                 </div>
             </div>
 
-            <!-- Mini map (if we have coords) -->
+            <!-- GPS / Location banner (no map) -->
             {% if att.latitude and att.longitude %}
-            <div
-                id="mini-map-{{ att.session_id }}"
-                class="mini-map w-full h-40 border-b border-gray-100"
-            ></div>
+            <div class="w-full bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-blue-500/15 border-b border-white/10 px-5 py-3.5 flex items-center justify-between gap-3 flex-wrap">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 shrink-0 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
+                        <i class="fas fa-location-dot text-indigo-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] font-black uppercase tracking-wide text-indigo-300 mb-0.5">Hall GPS · Geofence {{ att.radius|default:100 }}m</p>
+                        <p class="text-[11px] text-gray-300 font-mono truncate">{{ att.latitude|floatformat:6 }}, {{ att.longitude|floatformat:6 }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button
+                        title="Google Maps directions"
+                        onclick="openCardDirections('google', {{ att.session_id }})"
+                        class="w-9 h-9 flex items-center justify-center bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 border border-blue-500/30 font-bold transition-all"
+                    >
+                        <i class="fab fa-google text-sm"></i>
+                    </button>
+                    <button
+                        title="Waze directions"
+                        onclick="openCardDirections('waze', {{ att.session_id }})"
+                        class="w-9 h-9 flex items-center justify-center bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 border border-cyan-500/30 font-bold transition-all"
+                    >
+                        <i class="fas fa-route text-sm"></i>
+                    </button>
+                </div>
+            </div>
             {% else %}
             <div
-                class="w-full h-40 bg-gradient-to-br from-gray-800 to-gray-900 border-b border-white/10 flex flex-col items-center justify-center text-gray-500"
+                class="w-full bg-gradient-to-br from-gray-800 to-gray-900 border-b border-white/10 px-5 py-3.5 flex items-center gap-3"
             >
-                <i class="fas fa-map-marker-slash text-4xl mb-2"></i>
-                <p class="text-xs font-bold">No GPS data from lecturer</p>
+                <i class="fas fa-map-marker-slash text-gray-500"></i>
+                <p class="text-xs font-bold text-gray-500">No GPS location set by lecturer</p>
             </div>
             {% endif %}
 
@@ -452,44 +464,31 @@
                     </span>
                     {% endif %}
 
-                    <!-- Directions (if coords) -->
+                    <!-- Directions / mark link (if coords) -->
                     {% if att.latitude and att.longitude %}
-                    <div class="flex gap-1.5">
+                    <div class="flex gap-1.5 shrink-0">
+                        {% if att.status_label == "Active" and not att.has_attended %}
                         <button
-                            title="Get Google Maps directions to hall"
+                            title="Mark attendance"
+                            onclick="location.href='/student/mark-attendance/{{ att.session_id }}'"
+                            class="w-10 flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:from-indigo-600 hover:to-purple-600 shadow-md transition-all"
+                        >
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        {% endif %}
+                        <button
+                            title="Google Maps directions"
                             onclick="openCardDirections('google', {{ att.session_id }})"
                             class="w-10 flex items-center justify-center bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 border border-blue-500/30 font-bold shadow-sm transition-all"
                         >
                             <i class="fab fa-google"></i>
                         </button>
                         <button
-                            title="Waze navigation"
+                            title="Waze directions"
                             onclick="openCardDirections('waze', {{ att.session_id }})"
                             class="w-10 flex items-center justify-center bg-cyan-500/20 text-cyan-300 rounded-xl hover:bg-cyan-500/30 border border-cyan-500/30 font-bold shadow-sm transition-all"
                         >
                             <i class="fas fa-route"></i>
-                        </button>
-                        <button
-                            title="Open mark page (map & details)"
-                            {%
-                            if
-                            att.status_label=""
-                            ="Active"
-                            %}
-                            onclick="location.href='/student/mark-attendance/{{ att.session_id }}'"
-                            {%
-                            elif
-                            att.latitude
-                            and
-                            att.longitude
-                            %}
-                            onclick="openCardMapInNewTab({{ att.session_id }})"
-                            {%
-                            endif
-                            %}
-                            class="w-10 flex items-center justify-center bg-indigo-500/20 text-indigo-300 rounded-xl hover:bg-indigo-500/30 border border-indigo-500/30 font-bold shadow-sm transition-all"
-                        >
-                            <i class="fas fa-expand"></i>
                         </button>
                     </div>
                     {% endif %}
@@ -564,85 +563,11 @@
         else url = `https://www.waze.com/ul?ll=${lat},${lon}&navigate=yes`;
         window.open(url, '_blank', 'noopener,noreferrer');
     }
-    function openCardMapInNewTab(sid) {
-        // Just open the mark-attendance page which has a FULL map + directions
-        window.open('/student/mark-attendance/' + sid, '_blank');
-    }
 
     // =========================================================
-    // Initialize mini maps per card that has coordinates
+    // Live countdowns per card
     // =========================================================
     document.addEventListener('DOMContentLoaded', function () {
-        {% for att in attendances %}
-            {% if att.latitude and att.longitude %}
-                (function () {
-                    const sid = {{ att.session_id }};
-                    const lat = {{ att.latitude }};
-                    const lon = {{ att.longitude }};
-                    const radius = {{ att.radius|default:100 }};
-                    const hall = "{{ att.hall|default:'Lecture Hall'|escapejs }}";
-                    const status = "{{ att.status_label }}";
-                    const statusColor = status === 'Active' ? '#10b981' : (status === 'Upcoming' ? '#6366f1' : '#ef4444');
-
-                    const containerId = 'mini-map-' + sid;
-                    const el = document.getElementById(containerId);
-                    if (!el) return;
-
-                    const mini = L.map(containerId, {
-                        zoomControl: false,
-                        attributionControl: true,
-                        scrollWheelZoom: false,
-                        dragging: true,
-                    }).setView([lat, lon], 17);
-
-                    /* CartoDB Voyager — high quality tiles */
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                        maxZoom: 22,
-                        attribution: '© OSM © CARTO'
-                    }).addTo(mini);
-
-                    /* Hall pin */
-                    const hallIcon = L.divIcon({
-                        className: '',
-                        html: `<div style="transform:translate(-50%,-100%)">
-                                 <div style="background:${statusColor};color:#fff;border:2.5px solid #fff;border-radius:50% 50% 50% 0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(0,0,0,0.25);">
-                                   <i class="fas fa-building" style="transform:rotate(45deg);font-size:11px;"></i>
-                                 </div>
-                                 <div style="width:2px;height:6px;background:${statusColor};margin:0 auto;"></div>
-                               </div>`,
-                        iconSize: [26, 38], iconAnchor: [13, 38]
-                    });
-                    L.marker([lat, lon], { icon: hallIcon }).addTo(mini)
-                        .bindPopup(`<div style="font-weight:800;color:${statusColor};margin-bottom:3px">🏫 ${hall}</div>
-                                    <div style="font-size:11px;color:#6b7280">Geofence: ${radius}m · ${status}</div>`);
-
-                    /* Geofence circle */
-                    const circle = L.circle([lat, lon], {
-                        color: statusColor, fillColor: statusColor, weight: 2,
-                        fillOpacity: 0.12, radius: radius, dashArray: '5 4'
-                    }).addTo(mini);
-
-                    mini.fitBounds(circle.getBounds(), { padding: [8, 8] });
-
-                    /* Navigation overlay buttons */
-                    const overlay = document.createElement('div');
-                    overlay.className = 'map-nav-overlay';
-                    overlay.style.cssText = 'position:absolute;bottom:8px;left:8px;z-index:1000;display:flex;gap:4px;';
-                    overlay.innerHTML = `
-                        <a class="map-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&dir_action=navigate&travelmode=walking" target="_blank" rel="noopener" style="background:white;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;box-shadow:0 1px 2px rgba(0,0,0,0.2)">
-                            <i class="fab fa-google" style="margin-right:2px"></i>Maps
-                        </a>
-                        <a class="map-nav-btn" href="https://www.waze.com/ul?ll=${lat},${lon}&navigate=yes" target="_blank" rel="noopener" style="background:white;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;box-shadow:0 1px 2px rgba(0,0,0,0.2)">
-                            <i class="fas fa-route" style="margin-right:2px"></i>Waze
-                        </a>`;
-                    el.appendChild(overlay);
-                })();
-            {% endif %}
-        {% endfor %}
-
-        // =========================================================
-        // Live countdowns per card
-        // =========================================================
         function fmt(ms) {
             const s = Math.max(0, Math.floor(ms / 1000));
             const h = String(Math.floor(s / 3600)).padStart(2, '0');

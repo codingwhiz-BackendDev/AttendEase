@@ -1,439 +1,254 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-
 <style>
     .glass-card {
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
     .gradient-text {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-    
-    .card-hover {
-        transition: all 0.3s ease;
-    }
-    
-    .card-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    }
-    
     .pulse-glow {
         animation: pulse-glow 2s ease-in-out infinite;
     }
-    
     @keyframes pulse-glow {
         0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
         50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
     }
-    
     .float-animation {
         animation: float 6s ease-in-out infinite;
     }
-    
     @keyframes float {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-10px); }
     }
-
-    /* ── Animated pulsing user dot ── */
-    .user-pulse-ring {
-        width: 22px; height: 22px;
-        border-radius: 50%;
-        background: rgba(99,102,241,0.25);
-        border: 3px solid #6366f1;
-        animation: userRing 2s ease-out infinite;
-        position: relative;
-    }
-    .user-pulse-ring::after {
-        content:'';
-        position: absolute;
-        inset: -6px;
-        border-radius: 50%;
-        border: 2px solid rgba(99,102,241,0.4);
-        animation: userRing 2s ease-out infinite 0.4s;
-    }
-    @keyframes userRing {
-        0%   { transform:scale(1);   opacity:1; }
-        100% { transform:scale(2.2); opacity:0; }
-    }
-    .user-dot-core {
-        width: 14px; height: 14px;
-        background: #6366f1;
-        border: 3px solid #fff;
-        border-radius: 50%;
-        box-shadow: 0 2px 10px rgba(99,102,241,0.5);
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%,-50%);
-    }
-
-    /* ── Hall pin ── */
-    .hall-pin {
-        width: 36px; height: 36px;
-        background: #ef4444;
-        border: 3px solid #fff;
-        border-radius: 50% 50% 50% 0;
-        transform: rotate(-45deg);
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 14px rgba(239,68,68,0.4);
-    }
-    .hall-pin i { transform: rotate(45deg); color:#fff; font-size: 13px; }
-
-    /* ── Route polyline dashes ── */
-    .leaflet-interactive.route-dashed { stroke-dasharray: 8 5; animation: dashAnim 1.5s linear infinite; }
-    @keyframes dashAnim { to { stroke-dashoffset: -26; } }
-
-    /* ── Distance progress bar ── */
-    #dist-bar-fill { transition: width 0.6s cubic-bezier(0.4,0,0.2,1), background-color 0.4s; }
-
-    /* ── Map container ── */
-    .leaflet-container { z-index: 10; border-radius: 1rem; }
-    .leaflet-control-attribution { font-size: 9px !important; }
-    .leaflet-popup-content-wrapper { border-radius: 14px !important; box-shadow: 0 8px 24px rgba(0,0,0,.15) !important; }
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-    <!-- Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
         <div class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
     </div>
 
-    <div class="relative p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto">
-    <!-- Top bar -->
-    <div class="mb-4 sm:mb-6 flex items-center justify-between flex-wrap gap-3">
-        <a href="/student/view-attendance/"
-           class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
-            <i class="fas fa-arrow-left"></i><span class="hidden sm:inline">Back to Attendance</span>
-        </a>
-        <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <div id="gps-accuracy-badge"
-                 class="text-[10px] sm:text-xs bg-white/10 text-gray-400 border border-white/20 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 font-bold">
-                <i class="fas fa-satellite-dish mr-1"></i>Acquiring GPS…
-            </div>
-            <div class="text-[10px] sm:text-xs text-gray-400 glass-card rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-sm border border-white/10">
-                <i class="fas fa-clock mr-1 text-gray-500"></i>
-                Server: <span class="font-mono text-white font-semibold">{{ server_now_lagos|default:"N/A" }}</span>
+    <div class="relative p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
+        <!-- Top bar -->
+        <div class="mb-4 sm:mb-6 flex items-center justify-between flex-wrap gap-3">
+            <a href="/student/view-attendance/"
+               class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
+                <i class="fas fa-arrow-left"></i><span class="hidden sm:inline">Back to Attendance</span>
+            </a>
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <div id="gps-accuracy-badge"
+                     class="text-[10px] sm:text-xs bg-white/10 text-gray-400 border border-white/20 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 font-bold">
+                    <i class="fas fa-satellite-dish mr-1"></i>Acquiring GPS…
+                </div>
             </div>
         </div>
-    </div>
 
-    {% if messages %}{% for message in messages %}
-    <div class="mb-6 px-4 py-3 rounded-2xl {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-300 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-300 border border-blue-500/30{% endif %}">
-        <div class="flex items-center gap-2">
-            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
-            <span>{{ message }}</span>
+        {% if messages %}{% for message in messages %}
+        <div class="mb-6 px-4 py-3 rounded-2xl {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-300 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-300 border border-blue-500/30{% endif %}">
+            <div class="flex items-center gap-2">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
         </div>
-    </div>
-    {% endfor %}{% endif %}
+        {% endfor %}{% endif %}
 
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <!-- ── LEFT PANEL: Session info ── -->
-        <div class="lg:col-span-2 glass-card rounded-3xl shadow-xl p-4 sm:p-6 border border-white/10 flex flex-col">
-            <div class="mb-3 sm:mb-4">
-                <div class="flex items-center justify-between mb-2 sm:mb-3 gap-2 flex-wrap">
-                    <span class="px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-black rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 animate-pulse">
-                        <i class="fas fa-bolt mr-1"></i>ACTIVE NOW
-                    </span>
-                    <span class="text-[10px] sm:text-xs font-bold text-gray-400">Session #{{ attendance_session.id }}</span>
+        <!-- ═══════ HERO: FACE CAPTURE + SESSION SUMMARY ═══════ -->
+        <div class="glass-card rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/10 mb-6 sm:mb-8">
+
+            <!-- Session quick summary (compact) -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8 pb-5 border-b border-white/10">
+                <div class="flex items-start gap-3 sm:gap-4 min-w-0">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-book-open text-white text-base sm:text-lg"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 animate-pulse">
+                                <i class="fas fa-bolt mr-1"></i>ACTIVE
+                            </span>
+                            <span class="text-[10px] sm:text-xs font-bold text-gray-400 truncate">{{ attendance_session.course.course_code }}</span>
+                        </div>
+                        <h1 class="text-lg sm:text-xl font-extrabold text-white truncate">{{ attendance_session.course.course_title }}</h1>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-[11px] sm:text-xs text-gray-400 font-semibold">
+                            <span><i class="fas fa-building mr-1 text-indigo-400"></i>{{ attendance_session.lecture_hall }}</span>
+                            <span><i class="fas fa-clock mr-1 text-indigo-400"></i><span id="countdown-timer-inline" class="text-white font-mono font-bold">--:--:--</span> left</span>
+                            <span id="live-distance-inline" class="text-gray-400"><i class="fas fa-location-dot mr-1 text-indigo-400"></i>Locating…</span>
+                            <span><i class="fas fa-compress-arrows-alt mr-1 text-indigo-400"></i>{{ attendance_session.radius }}m zone</span>
+                        </div>
+                    </div>
                 </div>
-                <h1 class="text-xl sm:text-2xl font-extrabold text-white mb-1">{{ attendance_session.course.course_title }}</h1>
-                <p class="text-xs sm:text-sm text-gray-400 font-bold">{{ attendance_session.course.course_code }}</p>
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <button onclick="openDirections('google')"
+                        class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-all"
+                        title="Navigate with Google Maps">
+                        <i class="fab fa-google text-blue-400 text-sm"></i>
+                        <span class="text-[11px] font-bold text-gray-200 hidden sm:inline">Directions</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm flex-1">
-                <div class="flex items-start gap-2 sm:gap-3">
-                    <i class="fas fa-building text-indigo-400 w-4 sm:w-5 mt-0.5"></i>
-                    <div>
-                        <p class="text-gray-400 font-semibold uppercase tracking-wide text-[10px] sm:text-xs">Lecture Hall</p>
-                        <p class="text-white font-bold text-sm sm:text-base">{{ attendance_session.lecture_hall }}</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-2 sm:gap-3">
-                    <i class="fas fa-clock text-indigo-400 w-4 sm:w-5 mt-0.5"></i>
-                    <div>
-                        <p class="text-gray-400 font-semibold uppercase tracking-wide text-[10px] sm:text-xs">Window (Lagos/WAT)</p>
-                        <p class="text-white font-bold text-xs sm:text-sm">{{ session_start_lagos|default:"N/A" }} → {{ session_end_lagos|default:"N/A" }}</p>
-                    </div>
-                </div>
+            <!-- Headline -->
+            <div class="text-center mb-5 sm:mb-7">
+                <h2 class="text-xl sm:text-2xl font-extrabold text-white mb-1">
+                    <i class="fas fa-camera text-indigo-400 mr-2"></i>Mark Your Attendance
+                </h2>
+                <p class="text-xs sm:text-sm text-gray-400">Align your face inside the circle and tap <strong class="text-white">Capture</strong>.</p>
+            </div>
 
-                <!-- Countdown -->
-                <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-2xl p-3 sm:p-4 border border-indigo-500/30">
-                    <p class="text-indigo-300 font-black text-[10px] sm:text-xs uppercase tracking-wide mb-2 flex items-center gap-2">
-                        <i class="fas fa-stopwatch"></i>Time Remaining
+            <!-- Camera + circle -->
+            <div class="relative w-full max-w-md mx-auto mb-4 sm:mb-6">
+                <video id="video" autoplay class="w-full aspect-square object-cover rounded-3xl bg-gray-900 shadow-2xl"></video>
+                <div id="video-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="w-[72%] aspect-square rounded-full border-[5px] border-emerald-400/90 border-dashed animate-pulse"></div>
+                </div>
+                <img id="captured-preview" class="w-full aspect-square object-cover rounded-3xl bg-gray-900 shadow-2xl hidden" alt="Captured preview" />
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+
+            <!-- Capture button -->
+            <div id="capture-section" class="flex justify-center mb-4 sm:mb-5">
+                <button id="capture-btn"
+                    class="inline-flex items-center justify-center gap-2 px-8 sm:px-10 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-black rounded-2xl hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base pulse-glow">
+                    <i class="fas fa-camera"></i>Capture My Face
+                </button>
+            </div>
+
+            <!-- Preview: retake + proceed -->
+            <div id="preview-section" class="hidden mb-4 sm:mb-5 max-w-xl mx-auto">
+                <div class="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-2xl p-4 border border-emerald-500/30">
+                    <div class="flex items-center mb-4 gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
+                            <i class="fas fa-check text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm sm:text-base">Face Captured</h3>
+                            <p class="text-xs text-gray-400">Retake if unclear, then proceed to submit.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 sm:gap-3 justify-center flex-wrap">
+                        <button id="retake-btn" class="px-5 py-3 bg-gray-500/20 text-white font-bold rounded-2xl hover:bg-gray-500/30 transition-all border border-gray-500/30 text-xs sm:text-sm">
+                            <i class="fas fa-redo mr-2"></i>Retake Photo
+                        </button>
+                        <button id="proceed-btn" class="px-5 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-2xl hover:from-indigo-600 hover:to-purple-700 transition-all shadow-md text-xs sm:text-sm">
+                            <i class="fas fa-arrow-right mr-2"></i>Proceed to Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final submit form -->
+            <form id="attendance-form" method="POST" enctype="multipart/form-data" class="hidden max-w-xl mx-auto">
+                {% csrf_token %}
+                <input type="file" name="captured_image" id="captured-image" class="hidden" />
+                <input type="text" id="latitude" readonly name="latitude" class="hidden" />
+                <input type="text" id="longitude" readonly name="longitude" class="hidden" />
+                <div class="bg-indigo-500/10 rounded-2xl p-3 border border-indigo-500/30 mb-4">
+                    <p class="text-xs sm:text-sm text-indigo-300 flex items-center gap-2">
+                        <i class="fas fa-shield-halved text-indigo-400"></i>
+                        <span><strong>Privacy:</strong> Photo is used only for this check-in; not stored permanently.</span>
                     </p>
-                    <div id="countdown-timer" class="flex items-center gap-1 text-indigo-200 font-black text-2xl sm:text-3xl font-mono tracking-tight">
-                        <span>--</span><span class="text-indigo-500">:</span><span>--</span><span class="text-indigo-500">:</span><span>--</span>
-                    </div>
-                    <p id="countdown-caption" class="text-[10px] sm:text-xs text-indigo-300 mt-1">Calculating…</p>
                 </div>
+                <button type="submit"
+                    class="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white font-black rounded-2xl hover:shadow-2xl focus:ring-4 focus:ring-emerald-500/30 transition-all shadow-lg text-base sm:text-lg transform hover:-translate-y-0.5">
+                    <i class="fas fa-circle-check mr-2"></i>Submit &amp; Mark My Attendance
+                </button>
+            </form>
+        </div>
 
-                <!-- Live distance progress bar -->
-                <div class="rounded-2xl border border-white/10 p-3 sm:p-4 bg-white/5">
+        <!-- ═══════ LOCATION STATUS (no map) ═══════ -->
+        <div class="glass-card rounded-3xl shadow-xl p-4 sm:p-6 border border-white/10">
+            <h3 class="text-sm sm:text-base font-extrabold text-white flex items-center gap-2 mb-4">
+                <i class="fas fa-location-crosshairs text-indigo-400"></i>
+                Location &amp; Zone Check
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <!-- Distance card -->
+                <div class="rounded-2xl border border-white/10 p-4 bg-white/5">
                     <div class="flex items-center justify-between mb-2">
-                        <p class="text-[10px] sm:text-xs font-black uppercase tracking-wide text-gray-400">Distance to Hall</p>
-                        <span id="dist-text" class="text-[10px] sm:text-xs font-black text-white">—</span>
+                        <p class="text-[10px] font-black uppercase tracking-wide text-gray-400">Distance to Hall</p>
+                        <span id="dist-text" class="text-[10px] font-black text-white">—</span>
                     </div>
-                    <div class="w-full h-2 sm:h-3 rounded-full bg-white/10 overflow-hidden">
+                    <div class="w-full h-3 rounded-full bg-white/10 overflow-hidden">
                         <div id="dist-bar-fill" class="h-full rounded-full bg-indigo-500" style="width:0%"></div>
                     </div>
-                    <div class="flex justify-between text-[8px] sm:text-[10px] text-gray-500 font-bold mt-1">
+                    <div class="flex justify-between text-[10px] text-gray-500 font-bold mt-2">
                         <span>Hall center</span>
                         <span id="dist-bar-label" class="font-black text-gray-400">—</span>
                         <span>{{ attendance_session.radius }}m fence</span>
                     </div>
-                </div>
-
-                <div class="flex items-start gap-2 sm:gap-3">
-                    <i class="fas fa-compress-arrows-alt text-indigo-400 w-4 sm:w-5 mt-0.5"></i>
-                    <div>
-                        <p class="text-gray-400 font-semibold uppercase tracking-wide text-[10px] sm:text-xs">Geofence Radius</p>
-                        <p class="text-white font-bold">{{ attendance_session.radius }} meters</p>
+                    <div class="mt-3 text-center">
+                        <span id="zone-status-pill"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-gray-400 border border-white/20">
+                            <span class="inline-block w-2 h-2 rounded-full bg-gray-500 animate-pulse"></span>
+                            Checking zone…
+                        </span>
                     </div>
                 </div>
-                <div class="flex items-start gap-2 sm:gap-3">
-                    <i class="fas fa-users text-indigo-400 w-4 sm:w-5 mt-0.5"></i>
-                    <div>
-                        <p class="text-gray-400 font-semibold uppercase tracking-wide text-[10px] sm:text-xs">Checked In So Far</p>
-                        <p class="text-white font-bold text-base sm:text-lg">{{ attendance_session.records.count }} student{{ attendance_session.records.count|pluralize }}</p>
-                    </div>
-                </div>
-                {% if attendance_session.notes %}
-                <div class="flex items-start gap-2 sm:gap-3">
-                    <i class="fas fa-sticky-note text-amber-400 w-4 sm:w-5 mt-0.5"></i>
-                    <div>
-                        <p class="text-gray-400 font-semibold uppercase tracking-wide text-[10px] sm:text-xs">Lecturer's Note</p>
-                        <p class="text-white italic text-xs sm:text-sm">"{{ attendance_session.notes }}"</p>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
 
-            <!-- Navigation buttons -->
-            <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
-                <p class="text-[10px] sm:text-xs text-gray-400 font-black uppercase tracking-wide mb-2 sm:mb-3">
-                    <i class="fas fa-diamond-turn-right mr-1 text-indigo-400"></i>Navigate to Hall
-                </p>
-                <div class="grid grid-cols-2 gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
-                    <button onclick="openDirections('google')"
-                        class="flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-500/20 border border-blue-500/30 hover:shadow-md transition-all">
-                        <i class="fab fa-google text-blue-400 text-base sm:text-lg"></i>
-                        <span class="text-[10px] sm:text-xs sm:text-sm font-bold text-blue-300">Google Maps</span>
-                    </button>
-                    <button onclick="openDirections('waze')"
-                        class="flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-teal-500/20 border border-cyan-500/30 hover:shadow-md transition-all">
-                        <i class="fas fa-route text-cyan-400 text-base sm:text-lg"></i>
-                        <span class="text-[10px] sm:text-xs sm:text-sm font-bold text-cyan-300">Waze</span>
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-1.5 sm:gap-2">
-                    <button onclick="openDirections('apple')"
-                        class="flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-gray-500/10 to-gray-500/20 border border-gray-500/30 hover:shadow-md transition-all">
-                        <i class="fab fa-apple text-gray-400 text-base sm:text-lg"></i>
-                        <span class="text-[10px] sm:text-xs sm:text-sm font-bold text-gray-300">Apple Maps</span>
-                    </button>
-                    <button onclick="shareLocation()"
-                        class="flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/20 border border-purple-500/30 hover:shadow-md transition-all">
-                        <i class="fas fa-share-nodes text-purple-400 text-base sm:text-lg"></i>
-                        <span class="text-[10px] sm:text-xs sm:text-sm font-bold text-purple-300">Share Hall</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── RIGHT PANEL: Live Map ── -->
-        <div class="lg:col-span-3 glass-card rounded-3xl shadow-xl p-4 sm:p-6 border border-white/10 flex flex-col">
-            <div class="flex items-center justify-between mb-2 sm:mb-3 flex-wrap gap-2">
-                <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
-                    <i class="fas fa-map-location-dot text-indigo-400"></i>
-                    Live Location &amp; Geofence
-                </h2>
-                <div id="live-distance" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/10 text-[10px] sm:text-xs font-bold text-gray-400 flex items-center gap-1.5">
-                    <span class="inline-block w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-gray-500 animate-pulse"></span>Locating…
-                </div>
-            </div>
-
-            <!-- Legend -->
-            <div class="flex flex-wrap gap-2 sm:gap-3 mb-2 sm:mb-3 text-[10px] sm:text-[11px] font-bold text-gray-400">
-                <span class="flex items-center gap-1 sm:gap-1.5">
-                    <span class="inline-block w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-indigo-500"></span>You (live)
-                </span>
-                <span class="flex items-center gap-1.5">
-                    <span class="inline-block w-3 h-3 rounded-full bg-red-500"></span>Lecture Hall
-                </span>
-                <span class="flex items-center gap-1.5">
-                    <span class="inline-block w-3 h-3 rounded-full border-2 border-dashed border-indigo-400 bg-indigo-500/20"></span>Geofence zone
-                </span>
-                <span class="flex items-center gap-1 sm:gap-1.5">
-                    <span class="inline-block w-4 sm:w-5 h-0.5 bg-indigo-400" style="border-top:2px dashed #818cf8"></span>Route to hall
-                </span>
-            </div>
-
-            <!-- Map -->
-            <div id="mark-attendance-map" class="w-full flex-1 min-h-[300px] sm:min-h-[400px] rounded-2xl bg-gray-800 border border-white/10 overflow-hidden shadow-inner"></div>
-
-            <!-- GPS Status bar -->
-            <div class="mt-3 sm:mt-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-2xl p-3 sm:p-4 border border-indigo-500/30">
-                <div class="flex items-center justify-between flex-wrap gap-2 sm:gap-3">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
-                            <i class="fas fa-location-crosshairs text-indigo-400 text-sm sm:text-base"></i>
+                <!-- GPS status card -->
+                <div class="rounded-2xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-4 border border-indigo-500/30">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
+                            <i class="fas fa-satellite-dish text-indigo-400 text-base"></i>
                         </div>
-                        <div>
-                            <p class="text-xs sm:text-sm font-black text-white">GPS Status</p>
-                            <p id="location-status" class="text-[10px] sm:text-xs text-gray-400">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-black text-white truncate">GPS Status</p>
+                            <p id="location-status" class="text-[11px] text-gray-400 truncate">
                                 <i class="fas fa-circle-notch fa-spin mr-1"></i>Fetching high-accuracy location…
                             </p>
                         </div>
                     </div>
-                    <div class="text-right text-[10px] sm:text-xs font-mono text-gray-400 space-y-0.5">
-                        <p>Lat: <span id="lat-display" class="font-black text-white">—</span></p>
-                        <p>Lng: <span id="lng-display" class="font-black text-white">—</span></p>
-                        <p class="text-gray-500">Accuracy: <span id="acc-display">—</span></p>
+                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-bold">
+                        <div class="rounded-xl bg-white/5 border border-white/10 p-2">
+                            <p class="text-gray-500 uppercase tracking-wide text-[9px] mb-0.5">Lat</p>
+                            <p id="lat-display" class="text-white font-mono">—</p>
+                        </div>
+                        <div class="rounded-xl bg-white/5 border border-white/10 p-2">
+                            <p class="text-gray-500 uppercase tracking-wide text-[9px] mb-0.5">Lng</p>
+                            <p id="lng-display" class="text-white font-mono">—</p>
+                        </div>
+                        <div class="rounded-xl bg-white/5 border border-white/10 p-2">
+                            <p class="text-gray-500 uppercase tracking-wide text-[9px] mb-0.5">Acc</p>
+                            <p id="acc-display" class="text-white font-mono">—</p>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── FACE VERIFICATION SECTION ── -->
-    <div class="glass-card rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/10 max-w-5xl mx-auto">
-        <div class="mb-4 sm:mb-6 sm:mb-8 text-center">
-            <h2 class="text-xl sm:text-2xl font-extrabold text-white mb-2">
-                <i class="fas fa-camera text-indigo-400 mr-2"></i>Face Verification Check-in
-            </h2>
-            <p class="text-xs sm:text-sm text-gray-400">Align your face inside the guide and capture a clear image. We compare it against your saved profile photo before marking attendance.</p>
-        </div>
-
-        <div class="relative w-full max-w-lg mx-auto mb-4 sm:mb-6">
-            <video id="video" autoplay class="w-full rounded-3xl bg-gray-900 shadow-xl"></video>
-            <div id="video-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-emerald-400 border-dashed animate-pulse"></div>
-            </div>
-            <img id="captured-preview" class="w-full rounded-3xl bg-gray-900 shadow-xl hidden" alt="Captured preview" />
-        </div>
-
-        <canvas id="canvas" class="hidden"></canvas>
-
-        <div id="capture-section" class="flex gap-3 sm:gap-4 justify-center mb-4 sm:mb-6">
-            <button id="capture-btn"
-                class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black rounded-2xl hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base">
-                <i class="fas fa-camera"></i>Capture My Face
-            </button>
-        </div>
-
-        <div id="preview-section" class="hidden mb-4 sm:mb-6 max-w-2xl mx-auto">
-            <div class="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-2xl p-4 sm:p-6 border border-emerald-500/30 shadow-inner">
-                <div class="flex items-center mb-3 sm:mb-4 gap-3 sm:gap-4">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
-                        <i class="fas fa-check text-white text-base sm:text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-white text-sm sm:text-base">Face Captured</h3>
-                        <p class="text-xs sm:text-sm text-gray-400">Review the preview. Retake if your face is blurry or not fully visible.</p>
-                    </div>
-                </div>
-                <div class="flex gap-2 sm:gap-3 justify-center flex-wrap">
-                    <button id="retake-btn" class="px-4 sm:px-5 py-2 sm:py-3 bg-gray-500/20 text-white font-bold rounded-2xl hover:bg-gray-500/30 transition-all border border-gray-500/30 text-xs sm:text-sm">
-                        <i class="fas fa-redo mr-1 sm:mr-2"></i>Retake Photo
-                    </button>
-                    <button id="proceed-btn" class="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-2xl hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md text-xs sm:text-sm">
-                        <i class="fas fa-arrow-right mr-1 sm:mr-2"></i>Proceed to Submit
+                    <button onclick="openDirections('google')"
+                        class="mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 hover:from-blue-500/30 hover:to-indigo-500/30 transition-all">
+                        <i class="fab fa-google text-blue-400"></i>
+                        <span class="text-[11px] font-bold text-blue-200">Navigate with Google Maps</span>
                     </button>
                 </div>
             </div>
+
+            <!-- Lecturer's note (if any) -->
+            {% if attendance_session.notes %}
+            <div class="mt-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 p-4 flex items-start gap-3">
+                <i class="fas fa-sticky-note text-amber-400 mt-0.5"></i>
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-wide text-amber-300 mb-1">Lecturer's Note</p>
+                    <p class="text-xs sm:text-sm text-amber-100 italic">"{{ attendance_session.notes }}"</p>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
-        <form id="attendance-form" method="POST" enctype="multipart/form-data" class="hidden max-w-2xl mx-auto">
-            {% csrf_token %}
-            <input type="file" name="captured_image" id="captured-image" class="hidden" />
-            <input type="text" id="latitude" readonly name="latitude" class="hidden" />
-            <input type="text" id="longitude" readonly name="longitude" class="hidden" />
-            <div class="bg-indigo-500/10 rounded-2xl p-3 sm:p-4 border border-indigo-500/30 mb-3 sm:mb-4">
-                <p class="text-xs sm:text-sm text-indigo-300 flex items-center gap-2">
-                    <i class="fas fa-shield-halved text-indigo-400 text-base sm:text-lg"></i>
-                    <span><strong>Privacy Notice:</strong> Your photo is only used for face comparison during this check-in and is not stored permanently.</span>
-                </p>
-            </div>
-            <button type="submit"
-                class="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black rounded-2xl hover:shadow-2xl focus:ring-4 focus:ring-indigo-500/30 transition-all shadow-lg text-base sm:text-lg transform hover:-translate-y-0.5">
-                <i class="fas fa-circle-check mr-2"></i>Submit &amp; Mark My Attendance
-            </button>
-        </form>
     </div>
 </div>
 
 <script>
-    /* ── Constants from Django context ── */
     const HALL_LAT       = {{ attendance_session.latitude|default:0|safe }};
     const HALL_LON       = {{ attendance_session.longitude|default:0|safe }};
     const ALLOWED_RADIUS = {{ attendance_session.radius|default:100|safe }};
     const SESSION_END_ISO   = "{{ attendance_session.end_time.isoformat|default:''|escapejs }}";
-    const SESSION_START_ISO = "{{ attendance_session.start_time.isoformat|default:''|escapejs }}";
-    const HALL_NAME = "{{ attendance_session.lecture_hall|default:'Lecture Hall'|escapejs }}";
 
-    /* ── Map state ── */
-    let map, hallMarker, geofenceCircle, studentMarker, accuracyCircle, routeLine;
     let studentLat = null, studentLon = null;
-    let mapReady = false;
 
-    /* ────────────────────────────────────────────────────
-       MAP INIT
-    ──────────────────────────────────────────────────── */
-    function initMap() {
-        if (!HALL_LAT || !HALL_LON) return;
-
-        map = L.map('mark-attendance-map', {
-            zoomControl: true,
-            attributionControl: true
-        }).setView([HALL_LAT, HALL_LON], 18);
-
-        /* High-quality CartoDB Voyager tiles */
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            maxZoom: 22,
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>'
-        }).addTo(map);
-
-        /* ── Hall pin ── */
-        const hallIcon = L.divIcon({
-            className: '',
-            html: `<div style="transform:translate(-50%,-100%)">
-                     <div class="hall-pin"><i class="fas fa-building"></i></div>
-                     <div style="width:2px;height:8px;background:#ef4444;margin:0 auto;"></div>
-                   </div>`,
-            iconSize: [36, 48], iconAnchor: [18, 48]
-        });
-        hallMarker = L.marker([HALL_LAT, HALL_LON], { icon: hallIcon }).addTo(map)
-            .bindPopup(`<div style="font-weight:800;color:#ef4444;margin-bottom:4px">📍 ${HALL_NAME}</div>
-                        <div style="font-size:11px;color:#6b7280">Geofence radius: ${ALLOWED_RADIUS}m</div>`);
-
-        /* ── Geofence circle ── */
-        geofenceCircle = L.circle([HALL_LAT, HALL_LON], {
-            color: '#6366f1',
-            fillColor: '#818cf8',
-            fillOpacity: 0.10,
-            radius: ALLOWED_RADIUS,
-            dashArray: '7 5',
-            weight: 2.5
-        }).addTo(map);
-
-        /* Fit to geofence */
-        map.fitBounds(geofenceCircle.getBounds(), { padding: [20, 20] });
-        mapReady = true;
-    }
-
-    /* ────────────────────────────────────────────────────
-       DISTANCE CALC (Haversine)
-    ──────────────────────────────────────────────────── */
     function haversine(lat1, lon1, lat2, lon2) {
         const R = 6371000, rad = Math.PI / 180;
         const dLat = (lat2 - lat1) * rad, dLon = (lon2 - lon1) * rad;
@@ -441,79 +256,23 @@
         return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    /* ────────────────────────────────────────────────────
-       UPDATE STUDENT MARKER + ROUTE + UI
-    ──────────────────────────────────────────────────── */
-    function updateStudentOnMap(lat, lon, accuracy) {
-        if (!mapReady) return;
-
-        /* ── Animated user dot ── */
-        const userIcon = L.divIcon({
-            className: '',
-            html: `<div style="position:relative;width:34px;height:34px;transform:translate(-50%,-50%)">
-                     <div class="user-pulse-ring" style="position:absolute;inset:0"></div>
-                     <div class="user-dot-core"></div>
-                   </div>`,
-            iconSize: [34, 34], iconAnchor: [17, 17]
-        });
-
-        if (studentMarker) {
-            studentMarker.setLatLng([lat, lon]);
-        } else {
-            studentMarker = L.marker([lat, lon], { icon: userIcon, zIndexOffset: 1000 }).addTo(map)
-                .bindPopup('<b style="color:#6366f1">📍 Your Location</b><br><span style="font-size:11px;color:#6b7280">Updated live every second</span>');
-        }
-
-        /* ── GPS accuracy circle ── */
-        if (accuracyCircle) {
-            accuracyCircle.setLatLng([lat, lon]).setRadius(accuracy);
-        } else {
-            accuracyCircle = L.circle([lat, lon], {
-                radius: accuracy,
-                color: '#818cf8',
-                fillColor: '#c7d2fe',
-                fillOpacity: 0.15,
-                weight: 1,
-                dashArray: '3 4'
-            }).addTo(map);
-        }
-
-        /* ── Dashed route line from student → hall ── */
-        const routeCoords = [[lat, lon], [HALL_LAT, HALL_LON]];
-        if (routeLine) {
-            routeLine.setLatLngs(routeCoords);
-        } else {
-            routeLine = L.polyline(routeCoords, {
-                color: '#6366f1',
-                weight: 3,
-                dashArray: '8 6',
-                opacity: 0.7,
-                className: 'route-dashed'
-            }).addTo(map);
-        }
-
-        /* ── Pan/zoom to show both markers ── */
-        const bounds = L.latLngBounds([[lat, lon], [HALL_LAT, HALL_LON]]);
-        map.fitBounds(bounds.pad(0.35));
-
-        /* ── Distance calculation ── */
+    function updateDistanceUI(lat, lon, accuracy) {
         const dist = haversine(lat, lon, HALL_LAT, HALL_LON);
         const inside = dist <= ALLOWED_RADIUS;
-        const pct = Math.min(1, dist / (ALLOWED_RADIUS * 2));
 
-        /* Update live distance badge */
-        const badge = document.getElementById('live-distance');
+        const inline = document.getElementById('live-distance-inline');
+        const pill = document.getElementById('zone-status-pill');
+
         if (inside) {
-            badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ${dist.toFixed(0)}m · ✅ Inside fence`;
-            badge.className = 'px-3 py-1.5 rounded-full bg-emerald-100 text-xs font-bold text-emerald-700 border border-emerald-300 flex items-center gap-1.5';
-            geofenceCircle.setStyle({ color:'#10b981', fillColor:'#34d399', fillOpacity: 0.14 });
+            inline.innerHTML = `<i class="fas fa-circle-check mr-1 text-emerald-400"></i><span class="text-emerald-300 font-bold">${dist.toFixed(0)}m · Inside zone</span>`;
+            pill.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-300';
+            pill.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>✅ Inside geofence — ready to mark attendance`;
         } else {
-            badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> ${dist.toFixed(0)}m · ⚠ Outside fence`;
-            badge.className = 'px-3 py-1.5 rounded-full bg-red-100 text-xs font-bold text-red-700 border border-red-300 flex items-center gap-1.5';
-            geofenceCircle.setStyle({ color:'#ef4444', fillColor:'#fca5a5', fillOpacity: 0.12 });
+            inline.innerHTML = `<i class="fas fa-triangle-exclamation mr-1 text-red-400"></i><span class="text-red-300 font-bold">${dist.toFixed(0)}m · Move to hall</span>`;
+            pill.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300';
+            pill.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>⚠ Outside zone — move to ${attendance_session.lecture_hall|default:'the lecture hall'|escapejs}`;
         }
 
-        /* Update distance bar */
         const barFill = document.getElementById('dist-bar-fill');
         const distText = document.getElementById('dist-text');
         const barLabel = document.getElementById('dist-bar-label');
@@ -521,16 +280,13 @@
         barFill.style.width = barPct + '%';
         barFill.style.backgroundColor = inside ? '#10b981' : (dist < ALLOWED_RADIUS * 1.5 ? '#f59e0b' : '#ef4444');
         distText.textContent = dist.toFixed(1) + 'm';
-        barLabel.textContent = dist.toFixed(0) + 'm from hall';
+        barLabel.textContent = dist.toFixed(0) + 'm away';
     }
 
-    /* ────────────────────────────────────────────────────
-       GPS WATCH
-    ──────────────────────────────────────────────────── */
     function watchLocation() {
         if (!navigator.geolocation) {
             document.getElementById('location-status').innerHTML =
-                '<i class="fas fa-circle-xmark mr-1 text-red-500"></i>Geolocation not supported on this device.';
+                '<i class="fas fa-circle-xmark mr-1 text-red-500"></i>Not supported.';
             return;
         }
         navigator.geolocation.watchPosition(
@@ -541,8 +297,8 @@
 
                 document.getElementById('latitude').value  = studentLat;
                 document.getElementById('longitude').value = studentLon;
-                document.getElementById('lat-display').textContent = studentLat.toFixed(6);
-                document.getElementById('lng-display').textContent = studentLon.toFixed(6);
+                document.getElementById('lat-display').textContent = studentLat.toFixed(4);
+                document.getElementById('lng-display').textContent = studentLon.toFixed(4);
                 document.getElementById('acc-display').textContent = '±' + acc + 'm';
                 document.getElementById('location-status').innerHTML =
                     '<i class="fas fa-circle-check mr-1 text-emerald-500"></i>High-accuracy GPS active.';
@@ -553,64 +309,38 @@
                     ? 'text-xs bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1.5 font-bold'
                     : 'text-xs bg-amber-100 text-amber-700 border border-amber-200 rounded-full px-3 py-1.5 font-bold';
 
-                updateStudentOnMap(studentLat, studentLon, pos.coords.accuracy);
+                updateDistanceUI(studentLat, studentLon, acc);
             },
             (err) => {
                 document.getElementById('location-status').innerHTML =
-                    '<i class="fas fa-triangle-exclamation mr-1 text-red-500"></i>GPS error: ' + err.message;
+                    '<i class="fas fa-triangle-exclamation mr-1 text-red-500"></i>GPS: ' + err.message;
             },
             { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
         );
     }
 
-    /* ────────────────────────────────────────────────────
-       COUNTDOWN
-    ──────────────────────────────────────────────────── */
     function updateCountdown() {
         const now = new Date(), end = new Date(SESSION_END_ISO);
+        const inline = document.getElementById('countdown-timer-inline');
+        if (!inline) return;
         const ms = end - now;
-        const timer = document.getElementById('countdown-timer');
-        const cap   = document.getElementById('countdown-caption');
-        if (ms <= 0) {
-            timer.innerHTML = '<span>00</span><span class="text-indigo-300">:</span><span>00</span><span class="text-indigo-300">:</span><span>00</span>';
-            cap.textContent = 'Attendance window has ended.';
-            return;
-        }
+        if (ms <= 0) { inline.textContent = '00:00:00'; return; }
         const tot = Math.floor(ms / 1000);
         const h = String(Math.floor(tot/3600)).padStart(2,'0');
         const m = String(Math.floor((tot%3600)/60)).padStart(2,'0');
         const s = String(tot%60).padStart(2,'0');
-        timer.innerHTML = `<span>${h}</span><span class="text-indigo-300">:</span><span>${m}</span><span class="text-indigo-300">:</span><span>${s}</span>`;
-        cap.textContent = tot < 300 ? '🚨 Last 5 minutes — mark NOW!' : 'Stay within the geofence and submit before time runs out.';
+        inline.textContent = `${h}:${m}:${s}`;
     }
 
-    /* ────────────────────────────────────────────────────
-       NAVIGATION
-    ──────────────────────────────────────────────────── */
     function openDirections(provider) {
         if (!HALL_LAT || !HALL_LON) { alert('No GPS coordinates for this hall.'); return; }
         const urls = {
-            google: `https://www.google.com/maps/dir/?api=1&destination=${HALL_LAT},${HALL_LON}&dir_action=navigate&travelmode=walking`,
-            waze:   `https://www.waze.com/ul?ll=${HALL_LAT},${HALL_LON}&navigate=yes`,
-            apple:  `https://maps.apple.com/?daddr=${HALL_LAT},${HALL_LON}&dirflg=w`
+            google: `https://www.google.com/maps/dir/?api=1&destination=${HALL_LAT},${HALL_LON}&dir_action=navigate&travelmode=walking`
         };
         window.open(urls[provider], '_blank', 'noopener,noreferrer');
     }
 
-    function shareLocation() {
-        const text = `${HALL_NAME} — ${HALL_LAT.toFixed(6)}, ${HALL_LON.toFixed(6)}\nhttps://www.google.com/maps?q=${HALL_LAT},${HALL_LON}`;
-        if (navigator.share) {
-            navigator.share({ title: HALL_NAME, text, url: `https://www.google.com/maps?q=${HALL_LAT},${HALL_LON}` });
-        } else {
-            navigator.clipboard.writeText(text).then(() =>
-                Swal.fire({ icon:'success', title:'Copied!', text:'Hall location copied to clipboard.', timer:2000, showConfirmButton:false })
-            );
-        }
-    }
-
-    /* ────────────────────────────────────────────────────
-       CAMERA
-    ──────────────────────────────────────────────────── */
+    /* ── Camera ── */
     const video    = document.getElementById('video');
     const canvas   = document.getElementById('canvas');
     const captureBtn = document.getElementById('capture-btn');
@@ -628,7 +358,11 @@
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
             video.srcObject = stream;
         } catch {
-            Swal.fire({ icon:'error', title:'Camera unavailable', text:'Please allow camera access to mark attendance.' });
+            if (window.Swal) {
+                Swal.fire({ icon:'error', title:'Camera unavailable', text:'Please allow camera access to mark attendance.' });
+            } else {
+                alert('Camera unavailable. Please allow camera access to mark attendance.');
+            }
         }
     }
 
@@ -666,11 +400,7 @@
         attendanceForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
-    /* ────────────────────────────────────────────────────
-       BOOT
-    ──────────────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', () => {
-        initMap();
         watchLocation();
         startCamera();
         updateCountdown();
