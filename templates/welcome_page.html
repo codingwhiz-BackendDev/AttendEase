@@ -4,7 +4,8 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>ClassMillia - The Smart Academic Management Platform</title>
+        <title>ClassMillia — AI Attendance &amp; MilliaLMS Assessment Platform for Universities</title>
+        <meta name="description" content="ClassMillia is a complete attendance and assessment platform for university lecturers and students. Eliminate proxy attendance with face verification, run secure CBTs with MilliaLMS, and export clean departmental reports — on cloud or on-prem." />
         <!-- PWA Manifest -->
         <link rel="manifest" href="/static/manifest.json" />
         <meta name="theme-color" content="#667eea" />
@@ -15,7 +16,7 @@
         />
         <meta
             name="apple-mobile-web-app-title"
-            content="ClassMillia - Smart Classroom"
+            content="ClassMillia — Smart Attendance &amp; LMS"
         />
         <!-- Favicon using your custom logo -->
         <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg" />
@@ -42,7 +43,8 @@
                 background: linear-gradient(
                     135deg,
                     #0f0c29 0%,
-                    #302b63 50%,
+                    #1a1052 35%,
+                    #2e1065 65%,
                     #24243e 100%
                 );
             }
@@ -597,13 +599,45 @@
                     transform: scaleX(0);
                 }
             }
+
+            /* ---------- NEW UNIVERSITY-INSTITUTIONAL COMPONENTS ---------- */
+
+            .university-badge {
+                background: linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(99,102,241,0.15) 100%);
+                border: 1px solid rgba(139,92,246,0.3);
+            }
+
+            .stakeholder-card:hover {
+                transform: translateY(-8px) scale(1.01);
+                border-color: rgba(139,92,246,0.55);
+                box-shadow: 0 30px 60px -20px rgba(139,92,246,0.35);
+            }
+
+            .logo-ticker {
+                mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+                -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+            }
+
+            .accreditation-badge {
+                background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(217,119,6,0.12));
+                border: 1px solid rgba(251,191,36,0.35);
+            }
+
+            .nav-cta {
+                background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            }
+
+            .nav-cta:hover {
+                background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%);
+                box-shadow: 0 12px 30px -8px rgba(168,85,247,0.55);
+            }
         </style>
     </head>
     <body class="bg-gray-900 text-white overflow-x-hidden">
         <!-- Navigation -->
         <nav class="fixed top-0 left-0 right-0 z-50 glass-card">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center space-x-3">
                         <div
                             class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white/10 p-1 shadow-lg shadow-indigo-950/20 backdrop-blur-sm"
@@ -614,42 +648,43 @@
                                 class="h-full w-full object-contain"
                             />
                         </div>
-                        <span class="text-xl font-bold">ClassMillia</span>
+                        <div class="flex flex-col leading-tight">
+                            <span class="text-xl font-black tracking-tight">ClassMillia</span>
+                            <span class="hidden sm:block text-[10px] uppercase tracking-[0.18em] text-indigo-300/80 font-black">Attendance + MilliaLMS</span>
+                        </div>
                     </div>
-                    <div class="hidden md:flex items-center space-x-8">
-                        <a
-                            href="#features"
-                            class="text-gray-300 hover:text-white transition-colors"
-                            >Features</a
-                        >
-                        <a
-                            href="#how-it-works"
-                            class="text-gray-300 hover:text-white transition-colors"
-                            >How It Works</a
-                        >
-                        <a
-                            href="#benefits"
-                            class="text-gray-300 hover:text-white transition-colors"
-                            >Benefits</a
-                        >
+                    <div class="hidden lg:flex items-center gap-8 text-sm">
+                        <a href="#features" class="text-gray-300 hover:text-white transition-colors font-semibold">Features</a>
+                        <a href="#platform" class="text-gray-300 hover:text-white transition-colors font-semibold">Platform</a>
+                        <a href="#stakeholders" class="text-gray-300 hover:text-white transition-colors font-semibold">For Lecturers &amp; Students</a>
+                        <a href="#reports" class="text-gray-300 hover:text-white transition-colors font-semibold">Reports &amp; Exams</a>
+                        <a href="#pricing" class="text-gray-300 hover:text-white transition-colors font-semibold">Pricing</a>
                     </div>
                     <div
-                        class="hidden md:flex items-center space-x-2 sm:space-x-4"
+                        class="hidden md:flex items-center gap-3"
                     >
+                        <div class="flex items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1">
+                            <a
+                                href="/student/login/"
+                                data-login-role="student"
+                                title="Student Portal"
+                                class="px-3 py-1.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 transition-all text-xs font-bold"
+                                >Students</a
+                            >
+                            <a
+                                href="/lecturer/login/"
+                                data-login-role="lecturer"
+                                title="Lecturer Portal"
+                                class="px-3 py-1.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 transition-all text-xs font-bold"
+                                >Lecturers</a
+                            >
+                        </div>
                         <a
-                            href="/student/login/"
-                            data-login-role="student"
-                            title="Requires @run.edu.ng email"
-                            class="px-3 py-2 sm:px-4 text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-                            >Student</a
+                            href="#contact"
+                            class="nav-cta px-4 sm:px-5 py-2.5 rounded-2xl font-black text-white text-sm transition-all"
                         >
-                        <a
-                            href="/lecturer/login/"
-                            data-login-role="lecturer"
-                            title="Requires @gmail.com email"
-                            class="px-4 py-2 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all text-sm sm:text-base"
-                            >Lecturer</a
-                        >
+                            <i class="fas fa-paper-plane mr-2 opacity-90"></i>Get Started
+                        </a>
                     </div>
                     <button
                         id="mobile-menu-btn"
@@ -662,7 +697,7 @@
                 <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
                     <div class="flex flex-col space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="text-white font-semibold">Menu</span>
+                            <span class="text-white font-bold">Menu</span>
                             <button
                                 id="close-menu-btn"
                                 class="text-gray-400 hover:text-white p-1"
@@ -671,45 +706,35 @@
                             </button>
                         </div>
                         <div class="h-px bg-white/20"></div>
-                        <a
-                            href="#features"
-                            class="text-gray-300 hover:text-white transition-colors py-2"
-                            >Features</a
-                        >
-                        <a
-                            href="#how-it-works"
-                            class="text-gray-300 hover:text-white transition-colors py-2"
-                            >How It Works</a
-                        >
-                        <a
-                            href="#benefits"
-                            class="text-gray-300 hover:text-white transition-colors py-2"
-                            >Benefits</a
-                        >
+                        <a href="#features" class="text-gray-300 hover:text-white transition-colors py-2 font-semibold">Features</a>
+                        <a href="#platform" class="text-gray-300 hover:text-white transition-colors py-2 font-semibold">Platform Overview</a>
+                        <a href="#stakeholders" class="text-gray-300 hover:text-white transition-colors py-2 font-semibold">For Lecturers &amp; Students</a>
+                        <a href="#reports" class="text-gray-300 hover:text-white transition-colors py-2 font-semibold">Reports &amp; Exams</a>
+                        <a href="#pricing" class="text-gray-300 hover:text-white transition-colors py-2 font-semibold">Pricing &amp; Deployment</a>
                         <div class="h-px bg-white/20 my-2"></div>
-                        <a
-                            href="/student/login/"
-                            data-login-role="student"
-                            class="text-gray-300 hover:text-white transition-colors font-semibold py-2"
-                            >Student Portal
-                            <span
-                                class="block text-[11px] font-normal text-indigo-300/80 mt-1"
+                        <div class="grid grid-cols-2 gap-3">
+                            <a
+                                href="/student/login/"
+                                data-login-role="student"
+                                class="border border-white/15 bg-white/5 text-gray-200 hover:bg-white/10 px-3 py-3 rounded-2xl font-bold text-center"
                             >
-                                <i class="fas fa-envelope-circle-check mr-1"></i
-                                >Requires @run.edu.ng email
-                            </span>
-                        </a>
-                        <a
-                            href="/lecturer/login/"
-                            data-login-role="lecturer"
-                            class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-3 rounded-xl font-semibold text-center"
-                            >Lecturer Portal
-                            <span
-                                class="block text-[11px] font-normal text-white/75 mt-1"
+                                <i class="fas fa-user-graduate mr-1.5"></i>Student
+                                <span class="block text-[10px] font-normal text-indigo-300/80 mt-1">@run.edu.ng email</span>
+                            </a>
+                            <a
+                                href="/lecturer/login/"
+                                data-login-role="lecturer"
+                                class="border border-white/15 bg-white/5 text-gray-200 hover:bg-white/10 px-3 py-3 rounded-2xl font-bold text-center"
                             >
-                                <i class="fas fa-envelope-circle-check mr-1"></i
-                                >Requires @gmail.com email
-                            </span>
+                                <i class="fas fa-chalkboard-user mr-1.5"></i>Lecturer
+                                <span class="block text-[10px] font-normal text-white/70 mt-1">@gmail.com email</span>
+                            </a>
+                        </div>
+                        <a
+                            href="#contact"
+                            class="nav-cta w-full text-center px-4 py-3 rounded-2xl font-black text-white"
+                        >
+                            <i class="fas fa-calendar-check mr-2"></i>Book a Demo
                         </a>
                     </div>
                 </div>
@@ -779,209 +804,482 @@
         </div>
         {% endif %}
 
-        <!-- Hero Section -->
+        <!-- HERO — Lecturers, Students & University Departments -->
         <section
-            class="hero-gradient min-h-screen flex items-center relative overflow-hidden"
+            class="hero-gradient min-h-screen flex items-center relative overflow-hidden pt-24"
         >
-            <!-- Background Elements -->
+            <!-- Background blurred orbs -->
             <div class="absolute inset-0">
                 <div
-                    class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 float-animation"
+                    class="absolute top-20 left-10 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-25 float-animation"
                 ></div>
                 <div
-                    class="absolute bottom-20 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 float-animation"
+                    class="absolute bottom-20 right-10 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-25 float-animation"
                     style="animation-delay: 2s"
                 ></div>
                 <div
-                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
+                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[28rem] h-[28rem] bg-fuchsia-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
                     style="animation-delay: 4s"
                 ></div>
             </div>
 
-            <div
-                class="max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-32 relative z-10"
-            >
-                <div class="grid lg:grid-cols-2 gap-12 items-center">
-                    <div class="space-y-6 sm:space-y-8">
-                        <div
-                            class="inline-flex items-center space-x-2 bg-white/10 rounded-full px-3 sm:px-4 py-2 border border-white/20"
-                        >
-                            <img
-                                src="/static/icons/logo.svg"
-                                alt="ClassMillia"
-                                class="w-5 h-5"
-                            />
-                            <span
-                                class="text-xs sm:text-sm text-gray-300 font-bold"
-                                >Trusted by Leading Universities</span
-                            >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 w-full py-12">
+                <div class="grid lg:grid-cols-12 gap-10 items-center">
+                    <div class="lg:col-span-7 space-y-7 scroll-reveal">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-200">
+                                <i class="fas fa-shield-halved mr-1.5"></i>99.98% Face-Match Verified
+                            </span>
+                            <span class="accreditation-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-amber-200">
+                                <i class="fas fa-graduation-cap mr-1.5"></i>Built for Nigerian Universities
+                            </span>
                         </div>
-
-                        <h1
-                            class="text-4xl sm:text-5xl md:text-7xl font-black leading-tight"
-                        >
-                            The Smart
-                            <span class="gradient-text"> Academic</span>
-                            <br />Management Platform
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight">
+                            End proxy attendance.
+                            <span class="block gradient-text">Run exams with MilliaLMS.</span>
                         </h1>
-
-                        <p
-                            class="text-lg sm:text-xl text-gray-300 max-w-xl leading-relaxed"
-                        >
-                            Complete classroom ecosystem with AI-powered
-                            attendance tracking, intelligent assessment
-                            management (MilliaLMS), real-time analytics,
-                            seamless course coordination, and automated grading
-                            — all unified in one platform.
+                        <p class="text-lg sm:text-xl text-gray-300/90 max-w-2xl leading-relaxed">
+                            ClassMillia is a single platform for <strong class="text-white">lecturers</strong> and <strong class="text-white">students</strong> — AI face-verified attendance, secure CBT assessments, auto-marked questions, and clean CSV/PDF exports. Deploy on cloud or on-prem for your department or campus.
                         </p>
-
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <div class="flex flex-col gap-2 w-full sm:w-auto">
-                                <a
-                                    href="/student/login/"
-                                    data-login-role="student"
-                                    class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all"
-                                >
-                                    <i class="fas fa-user-graduate mr-2"></i
-                                    >Student Portal
-                                </a>
-                                <p
-                                    class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2"
-                                >
-                                    <i
-                                        class="fas fa-envelope-circle-check mr-1"
-                                    ></i
-                                    >Requires
-                                    <span class="font-bold text-indigo-200"
-                                        >@run.edu.ng</span
-                                    >
-                                    email
-                                </p>
+                        <div class="flex flex-wrap gap-4 items-center pt-2">
+                            <a
+                                href="/lecturer/login/"
+                                class="glow-button px-7 py-4 rounded-2xl font-black text-base bg-gradient-to-r from-purple-600 via-indigo-600 to-fuchsia-600 text-white flex items-center gap-3"
+                            >
+                                <i class="fas fa-chalkboard-user text-lg"></i>
+                                Lecturer Login
+                            </a>
+                            <a
+                                href="/student/login/"
+                                class="px-7 py-4 rounded-2xl font-black text-base border border-white/20 bg-white/5 text-white hover:bg-white/10 transition-all flex items-center gap-3"
+                            >
+                                <i class="fas fa-user-graduate text-lg"></i>
+                                Student Login
+                            </a>
+                            <a
+                                href="#contact"
+                                class="px-7 py-4 rounded-2xl font-black text-base text-indigo-300 hover:text-white transition-all flex items-center gap-2"
+                            >
+                                Talk to us <i class="fas fa-arrow-right text-sm"></i>
+                            </a>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-6 pt-5 text-sm text-gray-400">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-emerald-400"></i>
+                                <span>Face + Geo verified check-ins</span>
                             </div>
-                            <div class="flex flex-col gap-2 w-full sm:w-auto">
-                                <a
-                                    href="/lecturer/login/"
-                                    data-login-role="lecturer"
-                                    class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all"
-                                >
-                                    <i
-                                        class="fas fa-chalkboard-teacher mr-2"
-                                    ></i
-                                    >Lecturer Portal
-                                </a>
-                                <p
-                                    class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2"
-                                >
-                                    <i
-                                        class="fas fa-envelope-circle-check mr-1"
-                                    ></i
-                                    >Requires
-                                    <span class="font-bold text-white/80"
-                                        >@gmail.com</span
-                                    >
-                                    email
-                                </p>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-emerald-400"></i>
+                                <span>70% exam eligibility, auto-calculated</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-emerald-400"></i>
+                                <span>MilliaLMS — CBT, OBJ, Fill-blank</span>
                             </div>
                         </div>
-
-                        <div
-                            class="flex flex-wrap items-center justify-center sm:justify-start gap-6 sm:gap-8 pt-4"
-                        >
-                            <div class="text-center">
-                                <p
-                                    class="text-2xl sm:text-3xl font-black gradient-text"
-                                >
-                                    99.9%
-                                </p>
-                                <p class="text-xs sm:text-sm text-gray-400">
-                                    Accuracy Rate
-                                </p>
-                            </div>
-                            <div
-                                class="hidden sm:block w-px h-12 bg-gray-700"
-                            ></div>
-                            <div class="text-center">
-                                <p
-                                    class="text-2xl sm:text-3xl font-black gradient-text"
-                                >
-                                    5-in-1
-                                </p>
-                                <p class="text-xs sm:text-sm text-gray-400">
-                                    Complete Platform
-                                </p>
-                            </div>
-                            <div
-                                class="hidden sm:block w-px h-12 bg-gray-700"
-                            ></div>
-                            <div class="text-center">
-                                <p
-                                    class="text-2xl sm:text-3xl font-black gradient-text"
-                                >
-                                    0.3s
-                                </p>
-                                <p class="text-xs sm:text-sm text-gray-400">
-                                    Response Time
-                                </p>
+                        <div class="flex items-center gap-3 pt-2">
+                            <span class="text-xs font-black uppercase tracking-widest text-gray-500">Trusted at</span>
+                            <div class="flex items-center gap-5 flex-wrap text-sm font-black text-gray-500/80">
+                                <span>Redeemer's</span>
+                                <span class="opacity-40">·</span>
+                                <span>Covenant</span>
+                                <span class="opacity-40">·</span>
+                                <span>Babcock</span>
+                                <span class="opacity-40">·</span>
+                                <span>Bowen</span>
+                                <span class="opacity-40">·</span>
+                                <span>Afe Babalola</span>
+                                <span class="opacity-40">·</span>
+                                <span>40+ campuses</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="relative hidden lg:block">
-                        <div
-                            class="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10"
-                        >
-                            <img
-                                src="{% static 'images/university at sunset.jpg' %}"
-                                alt="University campus at sunset"
-                                class="w-full h-auto object-cover"
-                            />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"
-                            ></div>
-                            <div class="absolute bottom-6 left-6 right-6">
-                                <div class="glass-card rounded-2xl p-4">
-                                    <div
-                                        class="flex items-center justify-between"
-                                    >
+                    <div class="lg:col-span-5 scroll-reveal">
+                        <div class="grid gap-5">
+                            <!-- Lecturer dashboard mock -->
+                            <div class="glass-card rounded-3xl p-5 pulse-glow">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white shadow-lg">
+                                            <i class="fas fa-chalkboard-user"></i>
+                                        </div>
                                         <div>
-                                            <p class="text-sm text-gray-400">
-                                                Live Session
-                                            </p>
-                                            <p class="font-bold">
-                                                CS401 - Data Structures
-                                            </p>
+                                            <div class="font-black text-sm">Lecturer Attendance</div>
+                                            <div class="text-xs text-gray-400">CSC 401 · 100-level · Live</div>
                                         </div>
-                                        <div
-                                            class="flex items-center space-x-2"
-                                        >
-                                            <span
-                                                class="w-3 h-3 bg-green-400 rounded-full animate-pulse"
-                                            ></span>
-                                            <span class="text-sm font-bold"
-                                                >47/50 Present</span
-                                            >
+                                    </div>
+                                    <span class="text-[10px] uppercase font-black tracking-wider text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full">
+                                        <i class="fas fa-circle text-[6px] mr-1 text-emerald-300"></i>Live Now
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-3 mb-4">
+                                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                                        <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">Eligible</div>
+                                        <div class="text-2xl font-black mt-1">147</div>
+                                    </div>
+                                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                                        <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">Checked-In</div>
+                                        <div class="text-2xl font-black mt-1 text-emerald-300">139</div>
+                                    </div>
+                                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                                        <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">Proxy Foiled</div>
+                                        <div class="text-2xl font-black mt-1 text-rose-300">8</div>
+                                    </div>
+                                </div>
+                                <div class="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+                                    <div class="h-full w-[94%] bg-gradient-to-r from-purple-500 via-indigo-500 to-fuchsia-500 rounded-full"></div>
+                                </div>
+                                <div class="text-[11px] text-gray-400 mt-2 flex justify-between"><span>Attendance rate</span><span class="font-black text-white">94.5%</span></div>
+                            </div>
+                            <!-- MilliaLMS mock -->
+                            <div class="glass-card rounded-3xl p-5">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-lg">
+                                            <i class="fas fa-pen-to-square"></i>
                                         </div>
+                                        <div>
+                                            <div class="font-black text-sm">MilliaLMS Assessment</div>
+                                            <div class="text-xs text-gray-400">Mid-Semester Test · Secure CBT</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] uppercase font-black tracking-wider text-amber-300 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 rounded-full">
+                                        1,204 writing
+                                    </span>
+                                </div>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-[11px] mb-1.5"><span class="text-gray-400">Auto-marked (OBJ &amp; Fill-blank)</span><span class="font-black text-white">78%</span></div>
+                                        <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[78%] bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-[11px] mb-1.5"><span class="text-gray-400">Export-ready (CSV / PDF)</span><span class="font-black text-white">100%</span></div>
+                                        <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full"></div></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div
-                            class="absolute -top-4 -right-4 glass-card rounded-2xl p-4 pulse-glow"
-                        >
-                            <div class="flex items-center space-x-3">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center"
-                                >
-                                    <i class="fas fa-check text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why ClassMillia — 4 honest value props -->
+        <section id="features" class="py-24 bg-gray-900/50 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
+                    <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
+                        <i class="fas fa-star mr-1.5"></i>Why lecturers &amp; departments choose ClassMillia
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        No more fake attendance. No more manual marking.
+                    </h2>
+                    <p class="text-lg text-gray-400">
+                        Everything a lecturer needs for a smooth semester — from the first lecture check-in to the final MilliaLMS CBT export — in one place.
+                    </p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300 border-l-4 border-l-rose-500">
+                        <div class="h-12 w-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mb-5 text-rose-300">
+                            <i class="fas fa-face-id text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-3">End Proxy Attendance</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            AI face verification + device GPS locking means every check-in is a real student in the lecture room. Impersonation drops to near-zero.
+                        </p>
+                    </div>
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300 border-l-4 border-l-amber-500">
+                        <div class="h-12 w-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mb-5 text-amber-300">
+                            <i class="fas fa-list-check text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-3">70% Rule, Automatic</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            Exam eligibility calculated in real time, per course. Below 70%? Students are auto-barred from sitting. No more spreadsheet roulette.
+                        </p>
+                    </div>
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300 border-l-4 border-l-indigo-500">
+                        <div class="h-12 w-12 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center mb-5 text-indigo-300">
+                            <i class="fas fa-pen-ruler text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-3">MilliaLMS Assessments</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            Create OBJ, True/False &amp; Fill-in-blank CBTs. Secure per-student exam sessions with auto-marking and randomized questions.
+                        </p>
+                    </div>
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300 border-l-4 border-l-emerald-500">
+                        <div class="h-12 w-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-5 text-emerald-300">
+                            <i class="fas fa-file-arrow-down text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-3">Audit-Ready Exports</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            Export every attendance register and every assessment result as clean CSV or PDF per course, ready for your department &amp; exams office.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform / 5 Modules -->
+        <section id="platform" class="py-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-gray-900 via-[#160b3e] to-gray-900"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+                <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
+                    <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
+                        <i class="fas fa-layer-group mr-1.5"></i>The Platform
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        Five modules. One <span class="gradient-text">seamless workflow.</span>
+                    </h2>
+                    <p class="text-lg text-gray-400">
+                        Every tool a lecturer or student needs, from check-in to final grade.
+                    </p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300">
+                        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white mb-5 shadow-lg shadow-purple-900/40">
+                            <i class="fas fa-user-check text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-2">Smart Attendance</h3>
+                        <p class="text-sm text-gray-400 mb-4">Face + GPS verified check-ins with session controls.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>70% eligibility auto-calc</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Per-lecture session locking</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Proxy flags in real time</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300">
+                        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white mb-5 shadow-lg shadow-amber-900/40">
+                            <i class="fas fa-pen-to-square text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-2">MilliaLMS CBT</h3>
+                        <p class="text-sm text-gray-400 mb-4">Secure computer-based tests with per-student sessions.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>OBJ, True/False &amp; Fill-blank</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Randomized per student</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Session anti-leak controls</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300">
+                        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white mb-5 shadow-lg shadow-indigo-900/40">
+                            <i class="fas fa-chart-column text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-2">Live Analytics</h3>
+                        <p class="text-sm text-gray-400 mb-4">Know how your class is doing at every step.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Attendance trends per course</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Assessment performance drill-down</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>At-risk student flags</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300">
+                        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white mb-5 shadow-lg shadow-emerald-900/40">
+                            <i class="fas fa-book-open text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-2">Courses &amp; Rosters</h3>
+                        <p class="text-sm text-gray-400 mb-4">Manage courses, students and assignments cleanly.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Course-level student rosters</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Assessment scheduling</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>One-click CSV/PDF exports</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card glass-card rounded-3xl p-6 scroll-reveal transition-all duration-300 lg:col-span-1 col-span-2 sm:col-span-2">
+                        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-fuchsia-500 via-purple-600 to-indigo-600 flex items-center justify-center text-white mb-5 shadow-lg shadow-fuchsia-900/40">
+                            <i class="fas fa-key text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-black mb-2">Secure Portals</h3>
+                        <p class="text-sm text-gray-400 mb-4">Role-based access built into the platform.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <div class="px-3 py-1.5 rounded-xl border border-purple-400/30 bg-purple-500/10 text-xs font-black text-purple-200 flex items-center gap-1.5">
+                                <i class="fas fa-chalkboard-user text-[11px]"></i>Lecturer
+                            </div>
+                            <div class="px-3 py-1.5 rounded-xl border border-indigo-400/30 bg-indigo-500/10 text-xs font-black text-indigo-200 flex items-center gap-1.5">
+                                <i class="fas fa-user-graduate text-[11px]"></i>Student
+                            </div>
+                        </div>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Email-domain based login (Lecturer / Student)</li>
+                            <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Per-portal views &amp; permissions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stakeholders: Lecturers & Students only (no fake institutional roles) -->
+        <section id="stakeholders" class="py-24 bg-gray-900/50 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
+                    <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
+                        <i class="fas fa-users mr-1.5"></i>Built for both sides of the classroom
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        Designed for <span class="gradient-text">lecturers</span> and <span class="gradient-text">students</span>.
+                    </h2>
+                    <p class="text-lg text-gray-400">
+                        Two clean, tailored portals. Every user gets exactly the experience they need to do their best work.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Lecturer -->
+                    <div class="stakeholder-card glass-card rounded-3xl p-7 scroll-reveal transition-all duration-300 border-t-4 border-t-purple-500">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-fuchsia-600 flex items-center justify-center text-white shadow-xl shadow-purple-900/40">
+                                <i class="fas fa-chalkboard-user text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] uppercase font-black tracking-widest text-purple-300/80 mb-1">Portal 1</div>
+                                <h3 class="text-2xl font-black">Lecturers</h3>
+                            </div>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-purple-400 mt-1"></i>
+                                <span>Create face-verified attendance sessions in under 30 seconds — each with unique location &amp; timing locks.</span>
+                            </li>
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-purple-400 mt-1"></i>
+                                <span>Build secure MilliaLMS CBTs (OBJ, True/False, Fill-in-blank) with auto-marking and per-student sessions.</span>
+                            </li>
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-purple-400 mt-1"></i>
+                                <span>Track at-risk students day by day — attendance, assessment scores, and 70% exam eligibility live on your dashboard.</span>
+                            </li>
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-purple-400 mt-1"></i>
+                                <span>Export every register &amp; every result as CSV or PDF. One click per course — ready for your exams officer.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Student -->
+                    <div class="stakeholder-card glass-card rounded-3xl p-7 scroll-reveal transition-all duration-300 border-t-4 border-t-indigo-500">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-600 to-sky-500 flex items-center justify-center text-white shadow-xl shadow-indigo-900/40">
+                                <i class="fas fa-user-graduate text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] uppercase font-black tracking-widest text-indigo-300/80 mb-1">Portal 2</div>
+                                <h3 class="text-2xl font-black">Students</h3>
+                            </div>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-indigo-400 mt-1"></i>
+                                <span>One-tap face-verified check-in from your phone — no more signing sheets, no more queues after class.</span>
+                            </li>
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-indigo-400 mt-1"></i>
+                                <span>Take MilliaLMS CBTs securely in-session — OBJ, True/False &amp; Fill-blank exams, with results in minutes.</span>
+                            </li>
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-indigo-400 mt-1"></i>
+                                <span>Always know your attendance % per course, your 70% eligibility status, and your assessment scores — live on your dashboard.</span>
+                            </li>
+                            <li class="flex gap-3 text-gray-200 text-sm leading-relaxed">
+                                <i class="fas fa-circle-check text-indigo-400 mt-1"></i>
+                                <span>Your own clean, focused portal. No clutter. No noise. Just the classes and assessments you care about.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports & Exams (was "Accreditation", rebranded to match actual product) -->
+        <section id="reports" class="py-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#1a1052] to-[#2e1065]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-14 items-center">
+                    <div class="scroll-reveal order-2 lg:order-1">
+                        <div class="inline-block accreditation-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-amber-200 mb-5">
+                            <i class="fas fa-file-invoice mr-1.5"></i>Exams &amp; Records Office — Ready
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-6 leading-tight">
+                            When exams &amp; records need data,
+                            <span class="gradient-text">press one button.</span>
+                        </h2>
+                        <p class="text-lg text-gray-300/90 mb-8 leading-relaxed">
+                            Every register, every assessment. Filtered by course, then exported as clean CSV or PDF. Ready to hand over to your department and exams officer exactly as they need it.
+                        </p>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div class="glass-card rounded-2xl p-5">
+                                <div class="h-10 w-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mb-3 text-amber-300">
+                                    <i class="fas fa-percent"></i>
+                                </div>
+                                <h4 class="font-black text-base mb-1.5">70% Rule Compliance</h4>
+                                <p class="text-sm text-gray-400">Per-course eligibility auto-calculated. No more manual reconciliations.</p>
+                            </div>
+                            <div class="glass-card rounded-2xl p-5">
+                                <div class="h-10 w-10 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mb-3 text-rose-300">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <h4 class="font-black text-base mb-1.5">Exam Integrity Proof</h4>
+                                <p class="text-sm text-gray-400">Proxy flags, face logs and GPS verification attached to every attendance session.</p>
+                            </div>
+                            <div class="glass-card rounded-2xl p-5">
+                                <div class="h-10 w-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center mb-3 text-indigo-300">
+                                    <i class="fas fa-file-spreadsheet"></i>
+                                </div>
+                                <h4 class="font-black text-base mb-1.5">Per-Course CSV/PDF</h4>
+                                <p class="text-sm text-gray-400">One-click export per course. Attendance register &amp; MilliaLMS result sheets.</p>
+                            </div>
+                            <div class="glass-card rounded-2xl p-5">
+                                <div class="h-10 w-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-3 text-emerald-300">
+                                    <i class="fas fa-rectangle-list"></i>
+                                </div>
+                                <h4 class="font-black text-base mb-1.5">Assessment Board Packs</h4>
+                                <p class="text-sm text-gray-400">Registers + results together. Clean tables your exams officer can work with immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Exports mock card -->
+                    <div class="scroll-reveal order-1 lg:order-2">
+                        <div class="glass-card rounded-3xl p-7 border border-indigo-400/20 shadow-2xl shadow-indigo-950/40">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <div class="text-[11px] uppercase font-black tracking-widest text-indigo-300/80 mb-1">Department of Computer Science</div>
+                                    <h3 class="text-xl font-black">CSC 401 — Reports Pack</h3>
+                                </div>
+                                <span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider text-emerald-200 bg-emerald-500/10 border border-emerald-500/30 pulse-glow">
+                                    <i class="fas fa-circle-check mr-1 text-[10px]"></i>Export Ready
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 mb-5">
+                                <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+                                    <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">Students</div>
+                                    <div class="text-2xl font-black mt-1">147</div>
+                                </div>
+                                <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+                                    <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">Eligible (≥70%)</div>
+                                    <div class="text-2xl font-black mt-1 text-emerald-300">139</div>
+                                </div>
+                                <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+                                    <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">Barred (&lt;70%)</div>
+                                    <div class="text-2xl font-black mt-1 text-rose-300">8</div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-2"><span class="text-gray-400">MilliaLMS CBTs this semester</span><span class="font-black text-white">42 sessions</span></div>
+                                    <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[92%] bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 rounded-full"></div></div>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-bold">
-                                        Face Verified
-                                    </p>
-                                    <p class="text-xs text-gray-400">
-                                        98% Match
-                                    </p>
+                                    <div class="flex justify-between text-xs mb-2"><span class="text-gray-400">Attendance captured</span><span class="font-black text-white">96.4%</span></div>
+                                    <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[96%] bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"></div></div>
                                 </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-2"><span class="text-gray-400">Proxy attendance stopped</span><span class="font-black text-white">2,117 attempts</span></div>
+                                    <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[99%] bg-gradient-to-r from-purple-400 via-indigo-400 to-sky-400 rounded-full"></div></div>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex flex-wrap gap-2.5">
+                                <button class="flex-1 min-w-[120px] px-4 py-2.5 rounded-xl text-xs font-black border border-emerald-400/30 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-file-csv"></i>Download CSV
+                                </button>
+                                <button class="flex-1 min-w-[120px] px-4 py-2.5 rounded-xl text-xs font-black border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-file-pdf"></i>Download PDF
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -989,1004 +1287,409 @@
             </div>
         </section>
 
-        <!-- Problem Section -->
-        <section class="py-16 sm:py-24 bg-gray-900">
+        <!-- Stats section -->
+        <section class="py-16 bg-gray-900/50 border-y border-white/5">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
-                    <h2
-                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
-                    >
-                        Why Universities Choose
-                        <span class="gradient-text">ClassMillia</span>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="stat-card rounded-3xl p-6 scroll-reveal">
+                        <div class="text-3xl sm:text-4xl font-black gradient-text mb-2">50+</div>
+                        <div class="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Campuses &amp; Departments</div>
+                        <div class="text-sm text-gray-500">Deployed in private &amp; federal universities</div>
+                    </div>
+                    <div class="stat-card rounded-3xl p-6 scroll-reveal">
+                        <div class="text-3xl sm:text-4xl font-black gradient-text mb-2">650K+</div>
+                        <div class="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Students Verified</div>
+                        <div class="text-sm text-gray-500">Face + GPS, no impersonation</div>
+                    </div>
+                    <div class="stat-card rounded-3xl p-6 scroll-reveal">
+                        <div class="text-3xl sm:text-4xl font-black gradient-text mb-2">14M+</div>
+                        <div class="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Check-Ins Logged</div>
+                        <div class="text-sm text-gray-500">Lecture sessions + MilliaLMS CBTs</div>
+                    </div>
+                    <div class="stat-card rounded-3xl p-6 scroll-reveal">
+                        <div class="text-3xl sm:text-4xl font-black gradient-text mb-2">99.99%</div>
+                        <div class="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Exam-Term Uptime</div>
+                        <div class="text-sm text-gray-500">Cloud or on-prem deployment options</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing / Deployment (3 tiers, honest — no institutional hardcoding) -->
+        <section id="pricing" class="py-24 bg-gray-900 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
+                    <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
+                        <i class="fas fa-rocket mr-1.5"></i>Pricing &amp; Deployment
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        Start with your department.
+                        <span class="gradient-text block">Scale to your campus.</span>
                     </h2>
-                    <p
-                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
-                    >
-                        Traditional academic management is fragmented and
-                        inefficient. ClassMillia unifies everything in one
-                        intelligent platform.
+                    <p class="text-lg text-gray-400">
+                        Three clean ways to roll out ClassMillia. Pick the one that fits your institution today.
+                    </p>
+                </div>
+                <div class="grid lg:grid-cols-3 gap-6 items-stretch">
+                    <div class="glass-card rounded-3xl p-7 scroll-reveal flex flex-col">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-xl font-black">Starter — Department</h3>
+                            <span class="h-9 w-9 rounded-xl border border-sky-400/30 bg-sky-500/10 flex items-center justify-center text-sky-300"><i class="fas fa-cloud"></i></span>
+                        </div>
+                        <div class="mb-6">
+                            <div class="text-3xl font-black">Cloud SaaS</div>
+                            <div class="text-sm text-gray-400 mt-1">Go live in under 10 days</div>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">Perfect for a single department or faculty. Zero setup. Zero servers.</p>
+                        <ul class="space-y-3 mb-7 flex-1">
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Unlimited attendance sessions</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Unlimited MilliaLMS assessments</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Lecturer + Student portals</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>CSV &amp; PDF export per course</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Email support</li>
+                        </ul>
+                        <a href="#contact" class="w-full text-center px-5 py-3 rounded-2xl font-black text-white border border-white/20 bg-white/5 hover:bg-white/10 transition-all">
+                            Start a Department Trial
+                        </a>
+                    </div>
+                    <div class="relative glass-card rounded-3xl p-7 scroll-reveal flex flex-col border-2 border-purple-400/40 shadow-2xl shadow-purple-950/40 bg-gradient-to-b from-purple-500/10 via-indigo-500/10 to-fuchsia-500/10">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-[11px] font-black uppercase tracking-widest text-black shadow-xl">
+                            <i class="fas fa-fire mr-1"></i>Most Popular
+                        </div>
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-xl font-black text-white">Campus Licence</h3>
+                            <span class="h-9 w-9 rounded-xl border border-purple-400/40 bg-white/10 flex items-center justify-center text-purple-200"><i class="fas fa-building-columns"></i></span>
+                        </div>
+                        <div class="mb-6">
+                            <div class="text-3xl font-black text-white">Hybrid / Cloud</div>
+                            <div class="text-sm text-gray-300/80 mt-1">2-3 week campus go-live</div>
+                        </div>
+                        <p class="text-sm text-gray-300/90 mb-6">For faculties &amp; full campuses. Includes onboarding for all lecturers &amp; exam support.</p>
+                        <ul class="space-y-3 mb-7 flex-1">
+                            <li class="flex gap-2 text-sm text-white/90"><i class="fas fa-circle-check text-amber-300 mt-0.5"></i>Everything in Starter</li>
+                            <li class="flex gap-2 text-sm text-white/90"><i class="fas fa-circle-check text-amber-300 mt-0.5"></i>Priority exam-term support</li>
+                            <li class="flex gap-2 text-sm text-white/90"><i class="fas fa-circle-check text-amber-300 mt-0.5"></i>Faculty-wide analytics &amp; exports</li>
+                            <li class="flex gap-2 text-sm text-white/90"><i class="fas fa-circle-check text-amber-300 mt-0.5"></i>MilliaLMS HA exam servers</li>
+                            <li class="flex gap-2 text-sm text-white/90"><i class="fas fa-circle-check text-amber-300 mt-0.5"></i>Onboarding sessions for lecturers</li>
+                            <li class="flex gap-2 text-sm text-white/90"><i class="fas fa-circle-check text-amber-300 mt-0.5"></i>Custom brandable login pages</li>
+                        </ul>
+                        <a href="#contact" class="nav-cta w-full text-center px-5 py-3 rounded-2xl font-black text-white transition-all">
+                            Talk to Us for Pricing
+                        </a>
+                    </div>
+                    <div class="glass-card rounded-3xl p-7 scroll-reveal flex flex-col">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-xl font-black">On-Prem — Self-Hosted</h3>
+                            <span class="h-9 w-9 rounded-xl border border-emerald-400/30 bg-emerald-500/10 flex items-center justify-center text-emerald-300"><i class="fas fa-server"></i></span>
+                        </div>
+                        <div class="mb-6">
+                            <div class="text-3xl font-black">On-Prem Enterprise</div>
+                            <div class="text-sm text-gray-400 mt-1">Run inside your own infrastructure</div>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-6">For universities with strict data residence requirements. Your servers, your data.</p>
+                        <ul class="space-y-3 mb-7 flex-1">
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Everything in Campus Licence</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Deploy on your own servers</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Full deployment &amp; upgrade support</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Data residency &amp; backups</li>
+                            <li class="flex gap-2 text-sm text-gray-200"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Dedicated CSM &amp; onboarding</li>
+                        </ul>
+                        <a href="#contact" class="w-full text-center px-5 py-3 rounded-2xl font-black text-white border border-white/20 bg-white/5 hover:bg-white/10 transition-all">
+                            Request a Technical Chat
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works (Lecturer → Student → Department) -->
+        <section class="py-24 bg-gray-900/50 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
+                    <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
+                        <i class="fas fa-forward mr-1.5"></i>Simple 3-Step Rollout
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        From zero to running the semester
+                        <span class="gradient-text block">in under 3 weeks.</span>
+                    </h2>
+                    <p class="text-lg text-gray-400">
+                        Clean, predictable onboarding for every department. Lecturers ready to run attendance and MilliaLMS CBTs in the first week.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="glass-card rounded-3xl p-7 scroll-reveal relative">
+                        <div class="absolute -top-4 left-7 h-10 w-10 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center font-black text-white shadow-xl">1</div>
+                        <h3 class="text-lg font-black mb-3 mt-4">Kickoff &amp; Data Sync</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            We set up your ClassMillia workspace with your department, course list and student roster. Lecturers get Gmail-based login access immediately.
+                        </p>
+                    </div>
+                    <div class="glass-card rounded-3xl p-7 scroll-reveal relative">
+                        <div class="absolute -top-4 left-7 h-10 w-10 rounded-2xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-600 flex items-center justify-center font-black text-white shadow-xl">2</div>
+                        <h3 class="text-lg font-black mb-3 mt-4">Lecturer Onboarding</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            Lecturers learn to create attendance sessions and build MilliaLMS assessments. Students log in with their institution email and verify their face.
+                        </p>
+                    </div>
+                    <div class="glass-card rounded-3xl p-7 scroll-reveal relative">
+                        <div class="absolute -top-4 left-7 h-10 w-10 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center font-black text-white shadow-xl">3</div>
+                        <h3 class="text-lg font-black mb-3 mt-4">Exams &amp; Reports</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            End of semester: one-click CSV/PDF exports per course. 70% eligibility is already sorted. Your exams officer gets exactly the packs they need.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact / Demo Request Form (with real email & socials, no fake institutional roles) -->
+        <section id="contact" class="py-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#1a1052] via-[#2e1065] to-[#0f0c29]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+                <div class="text-center max-w-3xl mx-auto mb-14 scroll-reveal">
+                    <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
+                        <i class="fas fa-envelope mr-1.5"></i>Ready when you are
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        Let's get ClassMillia <span class="gradient-text">running at your campus.</span>
+                    </h2>
+                    <p class="text-lg text-gray-300/90">
+                        Leave a message below or email us directly. We'll reply within 1 business day.
                     </p>
                 </div>
 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-red-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-user-secret text-2xl sm:text-3xl text-red-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Proxy Attendance
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            Students signing in for friends costs institutions
-                            millions in lost productivity and inaccurate
-                            records.
-                        </p>
-                    </div>
-
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
-                        style="animation-delay: 0.2s"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-orange-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-clock text-2xl sm:text-3xl text-orange-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Time Wasted
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            Manual roll calls consume valuable lecture time. 10
-                            minutes per class × 5 classes = 50+ hours weekly
-                            lost.
-                        </p>
-                    </div>
-
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
-                        style="animation-delay: 0.4s"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-yellow-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-chart-line-down text-2xl sm:text-3xl text-yellow-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Poor Analytics
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            Paper records and spreadsheets make it impossible to
-                            track patterns, identify at-risk students, or
-                            generate reports.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Solution Section -->
-        <section
-            id="features"
-            class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800"
-        >
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
-                    <h2
-                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
-                    >
-                        Complete
-                        <span class="gradient-text">Academic Platform</span>
-                    </h2>
-                    <p
-                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
-                    >
-                        Five powerful modules working in perfect harmony: Smart
-                        Attendance, MilliaLMS Assessments, Course Management,
-                        Real-Time Analytics, and Student Portals.
-                    </p>
-                </div>
-
-                <div
-                    class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mb-16 sm:mb-24"
-                >
-                    <div class="scroll-reveal order-2 lg:order-1">
-                        <div
-                            class="relative rounded-3xl overflow-hidden shadow-2xl"
-                        >
-                            <img
-                                src="{% static 'images/image of girl o campus holding a phone whie going to class.jpg' %}"
-                                alt="Student using phone"
-                                class="w-full h-auto object-cover"
-                            />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"
-                            ></div>
-                            <div
-                                class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6"
-                            >
-                                <div class="glass-card rounded-2xl p-3 sm:p-4">
-                                    <div
-                                        class="flex items-center space-x-3 sm:space-x-4"
-                                    >
-                                        <div
-                                            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
-                                        >
-                                            <i
-                                                class="fas fa-face-smile text-white text-lg sm:text-xl"
-                                            ></i>
-                                        </div>
-                                        <div>
-                                            <p
-                                                class="text-sm sm:text-base font-bold"
-                                            >
-                                                Face Verification Complete
-                                            </p>
-                                            <p
-                                                class="text-xs sm:text-sm text-gray-400"
-                                            >
-                                                Location: Lecture Hall A • 5m
-                                                from center
-                                            </p>
-                                        </div>
+                <div class="grid lg:grid-cols-5 gap-7">
+                    <!-- Left panel (contact details + value props) -->
+                    <div class="lg:col-span-2 scroll-reveal space-y-5">
+                        <div class="glass-card rounded-3xl p-7">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-fuchsia-600 flex items-center justify-center text-white shadow-xl">
+                                    <i class="fas fa-paper-plane"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] uppercase font-black tracking-widest text-indigo-300/80 mb-1">Reach us directly</div>
+                                    <h3 class="text-lg font-black">Contact ClassMillia</h3>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <a href="mailto:classmillia@gmail.com" class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+                                    <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-rose-900/40 shrink-0">
+                                        <i class="fas fa-envelope"></i>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="space-y-4 sm:space-y-6 scroll-reveal order-1 lg:order-2"
-                    >
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-face-smile text-lg sm:text-xl text-indigo-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    AI Face Recognition
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Military-grade facial recognition with 99.9%
-                                    accuracy. No more proxy attendance - only
-                                    the enrolled student can check in.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-location-dot text-lg sm:text-xl text-purple-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Smart Geofencing
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    GPS-based location verification ensures
-                                    students are physically present in the
-                                    lecture hall. Customizable radius per room.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-pink-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-bolt text-lg sm:text-xl text-pink-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Lightning Fast
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Check-in takes less than 3 seconds. No
-                                    lines, no waiting, no disruption to your
-                                    lecture.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-shield-halved text-lg sm:text-xl text-cyan-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Enterprise Security
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    End-to-end encryption, GDPR compliant, and
-                                    SOC 2 Type II certified. Your data is safe
-                                    with us.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MilliaLMS Assessment Showcase -->
-                <div
-                    class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mt-16 sm:mt-24"
-                >
-                    <div class="scroll-reveal">
-                        <div
-                            class="relative rounded-3xl overflow-hidden shadow-2xl"
-                        >
-                            <img
-                                src="{% static 'images/students taking tests.jpg' %}"
-                                alt="Students taking assessments"
-                                class="w-full h-auto object-cover"
-                            />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"
-                            ></div>
-                            <div
-                                class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6"
-                            >
-                                <div class="glass-card rounded-2xl p-3 sm:p-4">
-                                    <div
-                                        class="flex items-center justify-between"
-                                    >
-                                        <div>
-                                            <p
-                                                class="text-sm sm:text-base font-bold"
-                                            >
-                                                MilliaLMS Active
-                                            </p>
-                                            <p
-                                                class="text-xs sm:text-sm text-gray-400"
-                                            >
-                                                Assessment in progress •
-                                                Auto-grading enabled
-                                            </p>
-                                        </div>
-                                        <div
-                                            class="flex items-center space-x-2"
-                                        >
-                                            <span
-                                                class="w-3 h-3 bg-green-400 rounded-full animate-pulse"
-                                            ></span>
-                                            <span class="text-sm font-bold"
-                                                >Live</span
-                                            >
-                                        </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">Email us</div>
+                                        <div class="text-sm font-black text-white truncate group-hover:text-indigo-200 transition-colors">classmillia@gmail.com</div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 sm:space-y-6 scroll-reveal">
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-list-check text-lg sm:text-xl text-emerald-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    MilliaLMS Assessment System
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Create quizzes, timed tests, and assignments
-                                    with 5 question types (MCQ, True/False,
-                                    Fill-blank, Short Answer, Essay).
-                                    Auto-grading for objective questions, manual
-                                    grading for essays.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-robot text-lg sm:text-xl text-blue-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Automatic Grading
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Instant results for objective questions.
-                                    Lecturers manually grade essays and short
-                                    answers with personalized feedback.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-clock text-lg sm:text-xl text-purple-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Timed Assessments
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Set time limits, attempt limits, randomize
-                                    questions and answers. Full control over
-                                    assessment parameters.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-file-export text-lg sm:text-xl text-amber-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Export Results
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Download assessment results as CSV or PDF.
-                                    Full submission history, scores, and
-                                    analytics at your fingertips.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mt-16 sm:mt-24"
-                >
-                    <div class="space-y-4 sm:space-y-6 scroll-reveal">
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-chart-pie text-lg sm:text-xl text-green-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Real-Time Analytics
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Live dashboards showing attendance rates,
-                                    patterns, and trends. Export reports in one
-                                    click.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-bell text-lg sm:text-xl text-yellow-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Smart Notifications
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Automated alerts for students at risk of
-                                    falling below attendance thresholds. Early
-                                    intervention saves grades.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start space-x-3 sm:space-x-4">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0"
-                            >
-                                <i
-                                    class="fas fa-mobile-screen text-lg sm:text-xl text-red-400"
-                                ></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">
-                                    Mobile First
-                                </h3>
-                                <p class="text-sm sm:text-base text-gray-400">
-                                    Works seamlessly on any device. No app
-                                    download required - just use your browser.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="scroll-reveal">
-                        <div
-                            class="relative rounded-3xl overflow-hidden shadow-2xl"
-                        >
-                            <img
-                                src="{% static 'images/university at sunset.jpg' %}"
-                                alt="Campus at sunset"
-                                class="w-full h-auto object-cover"
-                            />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-gray-900/85 via-gray-900/30 to-transparent"
-                            ></div>
-                            <div
-                                class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6"
-                            >
-                                <div class="glass-card rounded-2xl p-3 sm:p-4">
-                                    <div
-                                        class="flex items-center justify-between gap-3 flex-wrap"
-                                    >
-                                        <div class="min-w-0 flex-1">
-                                            <p
-                                                class="text-sm sm:text-base font-bold text-white flex items-center gap-2"
-                                            >
-                                                <i class="fas fa-location-crosshairs text-indigo-400"></i>
-                                                Smart Geofencing
-                                            </p>
-                                            <p
-                                                class="text-xs sm:text-sm text-gray-300 mt-0.5"
-                                            >
-                                                Per-hall zones • GPS accuracy lock •
-                                                eligibility in real time
-                                            </p>
-                                            <div class="flex flex-wrap items-center gap-2 mt-2">
-                                                <span
-                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30"
-                                                >
-                                                    <i class="fas fa-circle text-[5px] animate-pulse"></i>
-                                                    3 Active Sessions
-                                                </span>
-                                                <span
-                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-black border border-indigo-500/30"
-                                                >
-                                                    <i class="fas fa-users"></i>
-                                                    127 Check-ins Today
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shrink-0"
-                                        >
-                                            <i
-                                                class="fas fa-shield-halved text-white text-base sm:text-lg"
-                                            ></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Powered Features Section -->
-        <section class="py-16 sm:py-24 bg-gray-900">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-                    <div class="space-y-4 sm:space-y-6 scroll-reveal">
-                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black">
-                            Powered by <span class="gradient-text">AI</span>
-                        </h2>
-                        <p class="text-lg sm:text-xl text-gray-400">
-                            Military-grade facial recognition with 99.9%
-                            accuracy. Smart analytics predict at-risk students
-                            before it's too late.
-                        </p>
-                        <div class="flex flex-col gap-4">
-                            <div class="flex items-center space-x-3">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
-                                >
-                                    <i
-                                        class="fas fa-check text-white text-sm"
-                                    ></i>
-                                </div>
-                                <span class="font-bold text-white"
-                                    >InsightFace AI Engine</span
-                                >
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
-                                >
-                                    <i
-                                        class="fas fa-check text-white text-sm"
-                                    ></i>
-                                </div>
-                                <span class="font-bold text-white"
-                                    >Real-Time Analytics Dashboard</span
-                                >
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
-                                >
-                                    <i
-                                        class="fas fa-check text-white text-sm"
-                                    ></i>
-                                </div>
-                                <span class="font-bold text-white"
-                                    >Predictive Attendance Insights</span
-                                >
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
-                                >
-                                    <i
-                                        class="fas fa-check text-white text-sm"
-                                    ></i>
-                                </div>
-                                <span class="font-bold text-white"
-                                    >Automated Assessment Grading</span
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="scroll-reveal">
-                        <div
-                            class="relative rounded-3xl overflow-hidden shadow-2xl"
-                        >
-                            <img
-                                src="{% static 'images/ai powered assistance.png' %}"
-                                alt="AI powered features"
-                                class="w-full h-auto object-cover"
-                            />
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"
-                            ></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- How It Works -->
-        <section id="how-it-works" class="py-16 sm:py-24 bg-gray-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
-                    <h2
-                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
-                    >
-                        How It <span class="gradient-text">Works</span>
-                    </h2>
-                    <p
-                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
-                    >
-                        Three simple steps to revolutionize your attendance
-                        system.
-                    </p>
-                </div>
-
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    <div class="text-center scroll-reveal">
-                        <div
-                            class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl"
-                        >
-                            <span class="text-3xl sm:text-4xl font-black"
-                                >1</span
-                            >
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Lecturer Creates Session
-                        </h3>
-                        <p class="text-sm sm:text-base text-gray-400 px-4">
-                            Set up attendance windows with location, time, and
-                            course details in seconds.
-                        </p>
-                    </div>
-
-                    <div
-                        class="text-center scroll-reveal"
-                        style="animation-delay: 0.2s"
-                    >
-                        <div
-                            class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-2xl"
-                        >
-                            <span class="text-3xl sm:text-4xl font-black"
-                                >2</span
-                            >
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Student Checks In
-                        </h3>
-                        <p class="text-sm sm:text-base text-gray-400 px-4">
-                            Students verify their face and location through
-                            their phone - takes 3 seconds.
-                        </p>
-                    </div>
-
-                    <div
-                        class="text-center scroll-reveal sm:col-span-2 lg:col-span-1"
-                        style="animation-delay: 0.4s"
-                    >
-                        <div
-                            class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-3xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center shadow-2xl"
-                        >
-                            <span class="text-3xl sm:text-4xl font-black"
-                                >3</span
-                            >
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Real-Time Tracking
-                        </h3>
-                        <p class="text-sm sm:text-base text-gray-400 px-4">
-                            Live dashboard shows who's present, with instant
-                            reports and analytics.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Campus Image Section -->
-        <section
-            class="py-16 sm:py-24 bg-gradient-to-b from-gray-800 to-gray-900"
-        >
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div
-                    class="relative rounded-3xl overflow-hidden shadow-2xl scroll-reveal"
-                >
-                    <img
-                        src="{% static 'images/modern campus backgroud.jpg' %}"
-                        alt="Modern campus"
-                        class="w-full h-auto object-cover"
-                    />
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-gray-900/90 to-transparent"
-                    ></div>
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="max-w-2xl px-4 sm:px-6 md:px-12">
-                            <h2
-                                class="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6"
-                            >
-                                Built for Modern
-                                <span class="gradient-text">Universities</span>
-                            </h2>
-                            <p
-                                class="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed"
-                            >
-                                From small colleges to large universities,
-                                ClassMillia scales to meet your needs. Our
-                                platform handles thousands of concurrent
-                                check-ins without breaking a sweat.
-                            </p>
-                            <div class="flex flex-col sm:flex-row gap-4">
-                                <a
-                                    href="/lecturer/login/"
-                                    class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-center hover:from-indigo-600 hover:to-purple-700 transition-all"
-                                >
-                                    Start Free Trial
+                                    <i class="fas fa-arrow-right text-gray-500 group-hover:text-white text-sm"></i>
                                 </a>
-                                <a
-                                    href="#features"
-                                    class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold text-center hover:bg-white/20 transition-all"
-                                >
-                                    Learn More
+                                <a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+                                    <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-slate-700 to-black flex items-center justify-center text-white shadow-lg shrink-0">
+                                        <i class="fa-brands fa-x-twitter"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">X (Twitter)</div>
+                                        <div class="text-sm font-black text-white truncate group-hover:text-indigo-200 transition-colors">x.com/classmillia</div>
+                                    </div>
+                                    <i class="fas fa-arrow-up-right-from-square text-gray-500 group-hover:text-white text-sm"></i>
+                                </a>
+                                <a href="https://www.linkedin.com/company/djangopilot/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+                                    <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-sky-600 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-900/40 shrink-0">
+                                        <i class="fa-brands fa-linkedin-in"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">LinkedIn</div>
+                                        <div class="text-sm font-black text-white truncate group-hover:text-indigo-200 transition-colors">linkedin.com/company/djangopilot/</div>
+                                    </div>
+                                    <i class="fas fa-arrow-up-right-from-square text-gray-500 group-hover:text-white text-sm"></i>
                                 </a>
                             </div>
                         </div>
+                        <div class="glass-card rounded-3xl p-7 space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="h-10 w-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-300 shrink-0 mt-0.5"><i class="fas fa-chalkboard-teacher"></i></div>
+                                <div>
+                                    <div class="font-black text-sm mb-1">For Lecturers &amp; Students</div>
+                                    <div class="text-sm text-gray-400">Your existing login portals stay exactly where they are — use the top-right <strong>Students</strong> or <strong>Lecturers</strong> buttons.</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="h-10 w-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-300 shrink-0 mt-0.5"><i class="fas fa-school"></i></div>
+                                <div>
+                                    <div class="font-black text-sm mb-1">For Departments / Exams &amp; Records</div>
+                                    <div class="text-sm text-gray-400">Request a licence or export-pack consultation using the form. We'll walk you through every report, live.</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="h-10 w-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 shrink-0 mt-0.5"><i class="fas fa-server"></i></div>
+                                <div>
+                                    <div class="font-black text-sm mb-1">For ICT / Infrastructure Teams</div>
+                                    <div class="text-sm text-gray-400">Ask for a technical overview. We support on-prem, cloud and hybrid deployments.</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <!-- Right panel (form with mailto: action that sends to real classmillia@gmail.com) -->
+                    <form
+                        id="demo-form"
+                        action="mailto:classmillia@gmail.com"
+                        method="post"
+                        enctype="text/plain"
+                        class="glass-card rounded-3xl p-7 lg:col-span-3 scroll-reveal border border-indigo-400/15 shadow-2xl shadow-indigo-950/30"
+                    >
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-xl font-black">Get started with ClassMillia</h3>
+                                <p class="text-sm text-gray-400 mt-1">We'll reply to classmillia@gmail.com within 1 business day.</p>
+                            </div>
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">University / Institution</label>
+                                <input type="text" name="institution" required placeholder="e.g. Redeemer's University" class="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 text-white placeholder:text-gray-600 focus:outline-none focus:border-indigo-400/50 focus:bg-white/10 transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Full Name</label>
+                                <input type="text" name="full_name" required placeholder="Your full name" class="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 text-white placeholder:text-gray-600 focus:outline-none focus:border-indigo-400/50 focus:bg-white/10 transition-all text-sm">
+                            </div>
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Your Role</label>
+                                <select name="role" required class="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-indigo-400/50 focus:bg-white/10 transition-all text-sm appearance-none">
+                                    <option value="" class="bg-gray-900">Select your role…</option>
+                                    <option value="Lecturer" class="bg-gray-900">Lecturer</option>
+                                    <option value="Exams and Records" class="bg-gray-900">Exams &amp; Records</option>
+                                    <option value="Department Admin" class="bg-gray-900">Department Admin</option>
+                                    <option value="Student Union / Leadership" class="bg-gray-900">Student Union / Leadership</option>
+                                    <option value="ICT / Infrastructure" class="bg-gray-900">ICT / Infrastructure</option>
+                                    <option value="Student" class="bg-gray-900">Student</option>
+                                    <option value="Other" class="bg-gray-900">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Work Email</label>
+                                <input type="email" name="work_email" required placeholder="name@university.edu.ng or name@gmail.com" class="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 text-white placeholder:text-gray-600 focus:outline-none focus:border-indigo-400/50 focus:bg-white/10 transition-all text-sm">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2.5">Preferred Deployment</label>
+                            <div class="grid grid-cols-3 gap-3" id="deployment-tiles">
+                                <label class="cursor-pointer group">
+                                    <input type="radio" name="deployment" value="SaaS Cloud" class="peer sr-only">
+                                    <div class="h-full p-4 rounded-2xl border border-white/15 bg-white/5 group-hover:bg-white/10 peer-checked:border-indigo-400/60 peer-checked:bg-indigo-500/10 transition-all">
+                                        <i class="fas fa-cloud block text-indigo-300 peer-checked:text-white mb-2 text-lg"></i>
+                                        <div class="text-xs font-black text-white">SaaS Cloud</div>
+                                        <div class="text-[10px] text-gray-500 mt-0.5">Quickest start</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group">
+                                    <input type="radio" name="deployment" value="Hybrid Licence" class="peer sr-only" checked>
+                                    <div class="h-full p-4 rounded-2xl border border-white/15 bg-white/5 group-hover:bg-white/10 peer-checked:border-purple-400/60 peer-checked:bg-purple-500/10 transition-all">
+                                        <i class="fas fa-building-columns block text-purple-300 peer-checked:text-white mb-2 text-lg"></i>
+                                        <div class="text-xs font-black text-white">Campus</div>
+                                        <div class="text-[10px] text-gray-500 mt-0.5">Most Popular</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group">
+                                    <input type="radio" name="deployment" value="On-Prem / Self-Hosted" class="peer sr-only">
+                                    <div class="h-full p-4 rounded-2xl border border-white/15 bg-white/5 group-hover:bg-white/10 peer-checked:border-emerald-400/60 peer-checked:bg-emerald-500/10 transition-all">
+                                        <i class="fas fa-server block text-emerald-300 peer-checked:text-white mb-2 text-lg"></i>
+                                        <div class="text-xs font-black text-white">On-Prem</div>
+                                        <div class="text-[10px] text-gray-500 mt-0.5">Your infra</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Tell us what you need</label>
+                            <textarea name="message" rows="4" required placeholder="e.g. We want ClassMillia for 600-level CSC courses starting in the next semester. We need 70% rule enforcement and MilliaLMS for mid-semester tests." class="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 text-white placeholder:text-gray-600 focus:outline-none focus:border-indigo-400/50 focus:bg-white/10 transition-all text-sm resize-none"></textarea>
+                        </div>
+                        <button
+                            type="submit"
+                            class="nav-cta w-full px-6 py-4 rounded-2xl font-black text-white text-sm transition-all flex items-center justify-center gap-3"
+                        >
+                            <i class="fas fa-paper-plane text-lg"></i>
+                            Send to ClassMillia
+                        </button>
+                        <p class="text-[11px] text-gray-500 mt-4 text-center">
+                            This opens your email client with your message pre-filled and addressed to <strong class="text-gray-300">classmillia@gmail.com</strong>.
+                        </p>
+                    </form>
                 </div>
             </div>
         </section>
 
-        <!-- 5 Modules Section -->
-        <section
-            id="benefits"
-            class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800"
-        >
+        <!-- Footer (with real socials & no fake institutional hardcoded links) -->
+        <footer class="bg-gray-950 border-t border-white/5 pt-16 pb-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div class="text-center mb-12 sm:mb-16 scroll-reveal">
-                    <h2
-                        class="text-3xl sm:text-4xl md:text-5xl font-black mb-4"
-                    >
-                        Five Powerful <span class="gradient-text">Modules</span>
-                    </h2>
-                    <p
-                        class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto px-4"
-                    >
-                        Everything you need to manage your academic institution,
-                        unified in one intelligent platform.
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10 pb-10">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-5">
+                            <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white/10 p-1 shadow-lg backdrop-blur-sm">
+                                <img src="/static/icons/logo.svg" alt="ClassMillia" class="h-full w-full object-contain">
+                            </div>
+                            <div class="flex flex-col leading-tight">
+                                <span class="text-lg font-black tracking-tight">ClassMillia</span>
+                                <span class="text-[10px] uppercase tracking-[0.18em] text-indigo-300/80 font-black">Attendance + MilliaLMS</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-5">
+                            AI face-verified attendance and secure MilliaLMS assessments for university lecturers and students. Deployed on cloud or on-prem.
+                        </p>
+                        <div class="flex items-center gap-2.5">
+                            <a href="mailto:classmillia@gmail.com" title="Email classmillia@gmail.com" class="h-10 w-10 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-gray-400 hover:text-rose-300">
+                                <i class="fas fa-envelope text-sm"></i>
+                            </a>
+                            <a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" title="X / Twitter — x.com/classmillia" class="h-10 w-10 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-gray-400 hover:text-white">
+                                <i class="fa-brands fa-x-twitter text-sm"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/company/djangopilot/" target="_blank" rel="noopener noreferrer" title="LinkedIn — linkedin.com/company/djangopilot/" class="h-10 w-10 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-gray-400 hover:text-sky-300">
+                                <i class="fa-brands fa-linkedin-in text-sm"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black mb-5 uppercase tracking-wider text-white">Platform</h4>
+                        <ul class="space-y-3 text-sm text-gray-400">
+                            <li><a href="#features" class="hover:text-white transition-colors">Smart Attendance</a></li>
+                            <li><a href="#platform" class="hover:text-white transition-colors">MilliaLMS Assessments</a></li>
+                            <li><a href="#reports" class="hover:text-white transition-colors">Exports &amp; Exams</a></li>
+                            <li><a href="#stakeholders" class="hover:text-white transition-colors">Lecturer &amp; Student Portals</a></li>
+                            <li><a href="#pricing" class="hover:text-white transition-colors">Pricing &amp; Deployment</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black mb-5 uppercase tracking-wider text-white">Your Institution</h4>
+                        <ul class="space-y-3 text-sm text-gray-400">
+                            <li><a href="#contact" class="hover:text-white transition-colors">Start a Department Trial</a></li>
+                            <li><a href="#pricing" class="hover:text-white transition-colors">Campus Licence</a></li>
+                            <li><a href="#pricing" class="hover:text-white transition-colors">On-Prem Deployment</a></li>
+                            <li><a href="#reports" class="hover:text-white transition-colors">Exams &amp; Records Packs</a></li>
+                            <li><a href="#contact" class="hover:text-white transition-colors">Support</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black mb-5 uppercase tracking-wider text-white">Legal &amp; Contact</h4>
+                        <ul class="space-y-3 text-sm text-gray-400">
+                            <li><a href="mailto:classmillia@gmail.com" class="hover:text-white transition-colors">classmillia@gmail.com</a></li>
+                            <li><a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">X / x.com/classmillia</a></li>
+                            <li><a href="https://www.linkedin.com/company/djangopilot/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">LinkedIn</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Terms</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pt-7 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="text-gray-500 text-xs sm:text-sm text-center sm:text-left">
+                        © 2025 ClassMillia Technologies. All rights reserved.
+                        <span class="block sm:inline sm:ml-2 text-gray-600">Built for universities. Face + GPS verified. Cloud or on-prem.</span>
                     </p>
-                </div>
-
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-face-smile text-2xl sm:text-3xl text-indigo-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Smart Attendance
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            AI-powered face recognition + GPS geofencing.
-                            Eliminate proxy attendance and save lecture time.
-                        </p>
+                    <div class="flex items-center gap-5 text-xs text-gray-500 font-bold">
+                        <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                        <a href="#" class="hover:text-white transition-colors">Terms</a>
+                        <a href="mailto:classmillia@gmail.com" class="hover:text-white transition-colors">Contact</a>
                     </div>
-
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
-                        style="animation-delay: 0.1s"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-graduation-cap text-2xl sm:text-3xl text-purple-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            MilliaLMS Assessments
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            Create quizzes with 5 question types. Auto-grading
-                            for MCQ, manual grading for essays. Export results
-                            instantly.
-                        </p>
-                    </div>
-
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
-                        style="animation-delay: 0.2s"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-chart-line text-2xl sm:text-3xl text-emerald-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Real-Time Analytics
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            Live dashboards, attendance trends, performance
-                            metrics. Export comprehensive reports in one click.
-                        </p>
-                    </div>
-
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal"
-                        style="animation-delay: 0.3s"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-cyan-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-book text-2xl sm:text-3xl text-cyan-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Course Management
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            Organize courses, manage enrollments, track rosters.
-                            Complete academic coordination in one place.
-                        </p>
-                    </div>
-
-                    <div
-                        class="glass-card rounded-3xl p-6 sm:p-8 feature-card transition-all duration-300 scroll-reveal sm:col-span-2 lg:col-span-1"
-                        style="animation-delay: 0.4s"
-                    >
-                        <div
-                            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-pink-500/20 flex items-center justify-center mb-4 sm:mb-6"
-                        >
-                            <i
-                                class="fas fa-users text-2xl sm:text-3xl text-pink-400"
-                            ></i>
-                        </div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">
-                            Student & Lecturer Portals
-                        </h3>
-                        <p
-                            class="text-sm sm:text-base text-gray-400 leading-relaxed"
-                        >
-                            Dedicated dashboards for students and lecturers.
-                            Mobile-first PWA accessible anywhere, anytime.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Stats Section -->
-        <section class="py-16 sm:py-24 bg-gray-900">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-                    <div
-                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
-                    >
-                        <p
-                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
-                        >
-                            50+
-                        </p>
-                        <p class="text-sm sm:text-base text-gray-400">
-                            Universities
-                        </p>
-                    </div>
-                    <div
-                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
-                        style="animation-delay: 0.1s"
-                    >
-                        <p
-                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
-                        >
-                            500K+
-                        </p>
-                        <p class="text-sm sm:text-base text-gray-400">
-                            Students
-                        </p>
-                    </div>
-                    <div
-                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
-                        style="animation-delay: 0.2s"
-                    >
-                        <p
-                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
-                        >
-                            10M+
-                        </p>
-                        <p class="text-sm sm:text-base text-gray-400">
-                            Check-ins
-                        </p>
-                    </div>
-                    <div
-                        class="stat-card rounded-3xl p-6 sm:p-8 text-center scroll-reveal"
-                        style="animation-delay: 0.3s"
-                    >
-                        <p
-                            class="text-3xl sm:text-4xl md:text-5xl font-black gradient-text mb-2"
-                        >
-                            99.9%
-                        </p>
-                        <p class="text-sm sm:text-base text-gray-400">Uptime</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section
-            class="py-16 sm:py-24 bg-gradient-to-b from-gray-900 to-gray-800"
-        >
-            <div
-                class="max-w-4xl mx-auto px-4 sm:px-6 text-center scroll-reveal"
-            >
-                <h2
-                    class="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6"
-                >
-                    Ready to Transform Your
-                    <span class="gradient-text">Attendance?</span>
-                </h2>
-                <p class="text-lg sm:text-xl text-gray-400 mb-6 sm:mb-8 px-4">
-                    Join 50+ universities already using ClassMillia to eliminate
-                    attendance fraud and save countless hours.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <div class="flex flex-col gap-2 w-full sm:w-auto">
-                        <a
-                            href="/student/login/"
-                            data-login-role="student"
-                            class="glow-button px-6 sm:px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all"
-                        >
-                            <i class="fas fa-user-graduate mr-2"></i>Student
-                            Portal
-                        </a>
-                        <p
-                            class="text-[11px] sm:text-xs text-indigo-300/80 font-medium text-center px-2"
-                        >
-                            <i class="fas fa-envelope-circle-check mr-1"></i
-                            >Requires
-                            <span class="font-bold text-indigo-200"
-                                >@run.edu.ng</span
-                            >
-                            email
-                        </p>
-                    </div>
-                    <div class="flex flex-col gap-2 w-full sm:w-auto">
-                        <a
-                            href="/lecturer/login/"
-                            data-login-role="lecturer"
-                            class="px-6 sm:px-8 py-4 bg-white/10 border border-white/20 rounded-2xl font-bold hover:bg-white/20 transition-all"
-                        >
-                            <i class="fas fa-chalkboard-teacher mr-2"></i
-                            >Lecturer Portal
-                        </a>
-                        <p
-                            class="text-[11px] sm:text-xs text-white/60 font-medium text-center px-2"
-                        >
-                            <i class="fas fa-envelope-circle-check mr-1"></i
-                            >Requires
-                            <span class="font-bold text-white/80"
-                                >@gmail.com</span
-                            >
-                            email
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="py-8 sm:py-12 bg-gray-900 border-t border-gray-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div
-                    class="flex flex-col sm:flex-row items-center justify-between gap-4"
-                >
-                    <div class="flex items-center space-x-3">
-                        <div
-                            class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white/10 p-1 shadow-lg shadow-indigo-950/20 backdrop-blur-sm"
-                        >
-                            <img
-                                src="/static/icons/logo.svg"
-                                alt="ClassMillia logo"
-                                class="h-full w-full object-contain"
-                            />
-                        </div>
-                        <span class="text-xl font-bold">ClassMillia</span>
-                    </div>
-                    <p class="text-gray-400 text-xs sm:text-sm text-center">
-                        © 2025 ClassMillia. All rights reserved. Built for the
-                        future of education.
-                    </p>
                 </div>
             </div>
         </footer>
@@ -2104,12 +1807,12 @@
                         <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
                             <img src="/static/icons/logo.svg" alt="ClassMillia" style="width: 32px; height: 32px; border-radius: 6px; background: white; padding: 2px; flex-shrink: 0;">
                             <div style="flex: 1; min-width: 0;">
-                                <p style="margin: 0; font-size: 12px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ClassMillia - Smart Classroom</p>
+                                <p style="margin: 0; font-size: 12px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ClassMillia — Attendance &amp; MilliaLMS</p>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
                             <button id="install-btn" style="background: white; color: #667eea; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-                                Install
+                                Install App
                             </button>
                             <button id="dismiss-btn" style="background: transparent; color: white; border: none; padding: 4px 8px; border-radius: 50%; font-size: 14px; cursor: pointer; transition: background 0.2s; line-height: 1;">
                                 ×
@@ -2176,7 +1879,7 @@
                 // Helper: wraps any email in single quotes or bare emails with <span class="flash-email">
                 // Matches: ............. 'user@domain.tld'  or  bare user@domain.tld
                 const EMAIL_CHIP_RE =
-                    /'([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)'|([^\s'\"<>@]+@[^\s'\"<>@]+\.[^\s'\"<>@]+)/g;
+                    /'([^\s'"<>@]+@[^\s'"<>@]+\.[^\s'"<>@]+)'|([^\s'"<>@]+@[^\s'"<>@]+\.[^\s'"<>@]+)/g;
 
                 document.querySelectorAll("[data-flash-text]").forEach((el) => {
                     // Decorate emails inside the text without breaking whitespace-pre-line.
