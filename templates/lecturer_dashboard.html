@@ -197,8 +197,7 @@
                                 <p
                                     class="text-white font-black text-xs sm:text-sm truncate"
                                 >
-                                    <i class="fas fa-building mr-1"></i>{{
-                                    next_session.lecture_hall }}
+                                    <i class="fas fa-building mr-1"></i>{{ next_session.lecture_hall }}
                                 </p>
                             </div>
                             <div
@@ -214,9 +213,8 @@
                                 >
                                     {{ next_session.start_time|date:"M d" }}<br />
                                     <span class="font-mono"
-                                        >{{ next_session.start_time|date:"H:i"
-                                        }}–{{ next_session.end_time|date:"H:i"
-                                        }}</span
+                                        >{{ next_session.start_time|date:"H:i"}}
+                                      –  {{ next_session.end_time|date:"H:i"}}</span
                                     >
                                 </p>
                             </div>
@@ -248,8 +246,8 @@
                                 <p
                                     class="text-white font-black text-xs sm:text-sm"
                                 >
-                                    <i class="fas fa-users mr-1"></i>{{
-                                    next_session.marked_count }}
+                                    <i class="fas fa-users mr-1"></i>
+                                    {{ next_session.marked_count }}
                                 </p>
                             </div>
                         </div>
@@ -616,8 +614,7 @@
                                         <span
                                             class="px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] sm:text-xs font-bold border border-emerald-500/30"
                                         >
-                                            <i class="fas fa-users mr-1"></i>{{
-                                            class.marked_count }} marked
+                                            <i class="fas fa-users mr-1"></i>{{ class.marked_count }} marked
                                         </span>
                                     </div>
                                 </div>
@@ -659,8 +656,7 @@
                                             <p
                                                 class="text-xs sm:text-sm font-bold text-white"
                                             >
-                                                {{ class.start_time|date:"M d,
-                                                Y" }}
+                                                {{ class.start_time|date:"M d,Y" }}
                                             </p>
                                         </div>
                                     </div>
@@ -679,9 +675,7 @@
                                             <p
                                                 class="text-xs sm:text-sm font-bold text-white font-mono"
                                             >
-                                                {{ class.start_time|date:"H:i"
-                                                }}–{{ class.end_time|date:"H:i"
-                                                }}
+                                                {{ class.start_time|date:"H:i" }} – {{ class.end_time|date:"H:i" }}
                                             </p>
                                         </div>
                                     </div>
