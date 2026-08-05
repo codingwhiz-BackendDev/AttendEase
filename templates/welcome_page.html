@@ -24,16 +24,50 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         />
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
             * {
                 font-family: "Inter", sans-serif;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Enhanced Typography */
+            h1, h2, h3, h4, h5, h6 {
+                letter-spacing: -0.02em;
+                line-height: 1.1;
+            }
+
+            h1 {
+                font-weight: 900;
+                letter-spacing: -0.03em;
+            }
+
+            h2 {
+                font-weight: 800;
+                letter-spacing: -0.025em;
+            }
+
+            h3 {
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+            p, li, span {
+                line-height: 1.6;
             }
 
             .gradient-text {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .gradient-text {
+                background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #0ea5e9 100%);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -42,27 +76,35 @@
             .hero-gradient {
                 background: linear-gradient(
                     135deg,
-                    #0f0c29 0%,
-                    #1a1052 35%,
-                    #2e1065 65%,
-                    #24243e 100%
+                    #0f172a 0%,
+                    #1e293b 25%,
+                    #1e3a5f 50%,
+                    #0f172a 75%,
+                    #0f172a 100%
                 );
             }
 
             .glass-card {
-                background: rgba(255, 255, 255, 0.05);
+                background: rgba(255, 255, 255, 0.03);
                 backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            }
+
+            .glass-card:hover {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
             }
 
             .glow-button {
-                box-shadow: 0 0 40px rgba(102, 126, 234, 0.4);
-                transition: all 0.3s ease;
+                box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), 0 0 80px rgba(59, 130, 246, 0.2);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             .glow-button:hover {
-                box-shadow: 0 0 60px rgba(102, 126, 234, 0.6);
-                transform: translateY(-2px);
+                box-shadow: 0 0 60px rgba(59, 130, 246, 0.6), 0 0 100px rgba(59, 130, 246, 0.3);
+                transform: translateY(-3px) scale(1.02);
             }
 
             .float-animation {
@@ -96,15 +138,34 @@
             .stat-card {
                 background: linear-gradient(
                     135deg,
-                    rgba(102, 126, 234, 0.1) 0%,
-                    rgba(118, 75, 162, 0.1) 100%
+                    rgba(30, 64, 175, 0.15) 0%,
+                    rgba(59, 130, 246, 0.15) 50%,
+                    rgba(14, 165, 233, 0.1) 100%
                 );
-                border: 1px solid rgba(102, 126, 234, 0.2);
+                border: 1px solid rgba(30, 64, 175, 0.25);
+                box-shadow: 0 8px 32px rgba(30, 64, 175, 0.15), 0 0 0 1px rgba(30, 64, 175, 0.1) inset;
+            }
+
+            .stat-card:hover {
+                background: linear-gradient(
+                    135deg,
+                    rgba(30, 64, 175, 0.2) 0%,
+                    rgba(59, 130, 246, 0.2) 50%,
+                    rgba(14, 165, 233, 0.15) 100%
+                );
+                border: 1px solid rgba(30, 64, 175, 0.35);
+                box-shadow: 0 12px 40px rgba(30, 64, 175, 0.25), 0 0 0 1px rgba(30, 64, 175, 0.15) inset;
+            }
+
+            .feature-card {
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid rgba(255, 255, 255, 0.08);
             }
 
             .feature-card:hover {
-                transform: translateY(-10px);
-                border-color: rgba(102, 126, 234, 0.5);
+                transform: translateY(-12px) scale(1.02);
+                border-color: rgba(59, 130, 246, 0.6);
+                box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1) inset;
             }
 
             .scroll-reveal {
@@ -118,7 +179,113 @@
                 transform: translateY(0);
             }
 
-            /* Mobile menu improvements */
+            /* Enhanced Spacing & Layout */
+            section {
+                scroll-margin-top: 80px;
+            }
+
+            .container-custom {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+            }
+
+            @media (max-width: 768px) {
+                .container-custom {
+                    padding: 0 1.5rem;
+                }
+            }
+
+            /* Enhanced Section Spacing */
+            .section-hero {
+                padding: 8rem 0 6rem 0;
+            }
+
+            .section-features {
+                padding: 6rem 0;
+            }
+
+            .section-platform {
+                padding: 6rem 0;
+            }
+
+            .section-stakeholders {
+                padding: 6rem 0;
+            }
+
+            .section-reports {
+                padding: 6rem 0;
+            }
+
+            .section-pricing {
+                padding: 6rem 0;
+            }
+
+            .section-contact {
+                padding: 6rem 0;
+            }
+
+            @media (max-width: 768px) {
+                .section-hero,
+                .section-features,
+                .section-platform,
+                .section-stakeholders,
+                .section-reports,
+                .section-pricing,
+                .section-contact {
+                    padding: 4rem 0;
+                }
+            }
+            /* Enhanced Button Styles */
+            .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+                border: none;
+                color: white;
+                font-weight: 700;
+                padding: 1rem 2rem;
+                border-radius: 1rem;
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-primary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-primary:hover::before {
+                left: 100%;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+            }
+
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.05);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                color: white;
+                font-weight: 600;
+                padding: 1rem 2rem;
+                border-radius: 1rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.4);
+                transform: translateY(-2px);
+            }
+
             #mobile-menu {
                 animation: slideDown 0.3s ease-out;
             }
@@ -134,13 +301,351 @@
                 }
             }
 
+            /* Professional Micro-interactions */
+            a {
+                transition: color 0.2s ease, transform 0.2s ease;
+            }
+
+            a:hover {
+                transform: translateY(-1px);
+            }
+
+            /* Focus states for accessibility */
+            a:focus-visible,
+            button:focus-visible,
+            input:focus-visible,
+            select:focus-visible,
+            textarea:focus-visible {
+                outline: 2px solid #3b82f6;
+                outline-offset: 2px;
+            }
+
+            /* Smooth image hover effects */
+            .glass-card img {
+                transition: transform 0.4s ease, filter 0.4s ease;
+            }
+
+            .glass-card:hover img {
+                transform: scale(1.03);
+                filter: brightness(1.05);
+            }
+
+            /* Icon animations */
+            .fa-arrow-right {
+                transition: transform 0.3s ease;
+            }
+
+            a:hover .fa-arrow-right {
+                transform: translateX(4px);
+            }
+
+            /* Badge glow effect */
+            .university-badge,
+            .accreditation-badge {
+                animation: subtle-glow 3s ease-in-out infinite;
+                box-shadow: 0 4px 20px rgba(30, 64, 175, 0.2), 0 0 0 1px rgba(30, 64, 175, 0.1) inset;
+            }
+
+            .accreditation-badge {
+                box-shadow: 0 4px 20px rgba(251,191,36,0.2), 0 0 0 1px rgba(251,191,36,0.1) inset;
+            }
+
+            @keyframes subtle-glow {
+                0%, 100% {
+                    box-shadow: 0 0 20px rgba(30, 64, 175, 0.2);
+                }
+                50% {
+                    box-shadow: 0 0 30px rgba(30, 64, 175, 0.4);
+                }
+            }
+
+            /* Smooth loading animation */
+            .scroll-reveal {
+                opacity: 0;
+                transform: translateY(30px);
+                transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                            transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .scroll-reveal.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Input focus enhancements */
+            input:focus,
+            select:focus,
+            textarea:focus {
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            }
+
+            /* Button active states */
+            .btn-primary:active,
+            .btn-secondary:active,
+            .glow-button:active {
+                transform: translateY(-1px) scale(0.98);
+            }
+
             @media (max-width: 768px) {
                 .glass-card {
                     backdrop-filter: blur(10px);
                 }
             }
 
-            /* Enhanced Mobile Responsiveness */
+            /* Enhanced Button Styles */
+            .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+                border: none;
+                color: white;
+                font-weight: 700;
+                padding: 1rem 2rem;
+                border-radius: 1rem;
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-primary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-primary:hover::before {
+                left: 100%;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+            }
+
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.05);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                color: white;
+                font-weight: 600;
+                padding: 1rem 2rem;
+                border-radius: 1rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.4);
+                transform: translateY(-2px);
+            }
+
+            /* Enhanced Visual Hierarchy */
+            .section-divider {
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+                margin: 4rem 0;
+            }
+
+            .section-header {
+                margin-bottom: 3rem;
+            }
+
+            .section-header h2 {
+                margin-bottom: 1rem;
+            }
+
+            .section-header p {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            /* Card visual hierarchy */
+            .feature-card h3 {
+                margin-bottom: 0.75rem;
+            }
+
+            .feature-card p {
+                margin-bottom: 1rem;
+            }
+
+            .stat-card {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #1e40af, #3b82f6, #0ea5e9);
+            }
+
+            /* Polish overall aesthetic */
+            body {
+                background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            }
+
+            /* Improved scrollbar */
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: rgba(102, 126, 234, 0.5);
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(102, 126, 234, 0.7);
+            }
+
+            /* Selection color */
+            ::selection {
+                background: rgba(102, 126, 234, 0.3);
+                color: white;
+            }
+
+            /* Smooth transitions for all interactive elements */
+            button, a, input, select, textarea {
+                transition: all 0.2s ease;
+            }
+
+            /* Focus ring improvements */
+            :focus-visible {
+                outline: 2px solid #667eea;
+                outline-offset: 2px;
+            }
+
+            /* Enhanced loading state */
+            .loading-skeleton {
+                background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+                background-size: 200% 100%;
+                animation: skeleton-loading 1.5s infinite;
+            }
+
+            @keyframes skeleton-loading {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            /* Enhanced image containers */
+            .image-container {
+                position: relative;
+                overflow: hidden;
+                border-radius: 1rem;
+            }
+
+            .image-container::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%);
+                pointer-events: none;
+            }
+
+            /* Text shadow for better readability */
+            .text-shadow-sm {
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Badge improvements */
+            .badge-glow {
+                position: relative;
+            }
+
+            .badge-glow::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                border-radius: inherit;
+                background: inherit;
+                filter: blur(8px);
+                opacity: 0.5;
+                z-index: -1;
+            }
+
+            /* Enhanced form elements */
+            input, select, textarea {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            input:hover, select:hover, textarea:hover {
+                border-color: rgba(255, 255, 255, 0.2);
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            /* Navigation improvements */
+            nav {
+                backdrop-filter: blur(20px) saturate(180%);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+            }
+
+            /* Smooth scroll behavior */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            /* Enhanced contrast for accessibility */
+            .high-contrast {
+                color: #ffffff;
+            }
+
+            /* Professional icon sizing */
+            .icon-sm {
+                font-size: 0.875rem;
+            }
+
+            .icon-md {
+                font-size: 1rem;
+            }
+
+            .icon-lg {
+                font-size: 1.25rem;
+            }
+
+            .icon-xl {
+                font-size: 1.5rem;
+            }
+
+            /* Enhanced spacing utilities */
+            .space-y-1 { gap: 0.25rem; }
+            .space-y-2 { gap: 0.5rem; }
+            .space-y-3 { gap: 0.75rem; }
+            .space-y-4 { gap: 1rem; }
+            .space-y-5 { gap: 1.25rem; }
+            .space-y-6 { gap: 1.5rem; }
+
+            /* Animated gradient borders */
+            .gradient-border {
+                position: relative;
+                background: linear-gradient(135deg, #1e40af, #3b82f6, #0ea5e9);
+                padding: 2px;
+                border-radius: 1rem;
+            }
+
+            .gradient-border > * {
+                background: #0f0c29;
+                border-radius: calc(1rem - 2px);
+            }
+
+            /* Responsive improvements */
+            @media (max-width: 768px) {
             @media (max-width: 640px) {
                 .hero-gradient {
                     padding-top: 6rem;
@@ -725,14 +1230,20 @@
             /* ---------- NEW UNIVERSITY-INSTITUTIONAL COMPONENTS ---------- */
 
             .university-badge {
-                background: linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(99,102,241,0.15) 100%);
-                border: 1px solid rgba(139,92,246,0.3);
+                background: linear-gradient(135deg, rgba(30, 64, 175, 0.2) 0%, rgba(59, 130, 246, 0.2) 50%, rgba(14, 165, 233, 0.15) 100%);
+                border: 1px solid rgba(30, 64, 175, 0.4);
+                box-shadow: 0 4px 20px rgba(30, 64, 175, 0.2);
+            }
+
+            .stakeholder-card {
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid rgba(255, 255, 255, 0.08);
             }
 
             .stakeholder-card:hover {
-                transform: translateY(-8px) scale(1.01);
-                border-color: rgba(139,92,246,0.55);
-                box-shadow: 0 30px 60px -20px rgba(139,92,246,0.35);
+                transform: translateY(-10px) scale(1.01);
+                border-color: rgba(59, 130, 246, 0.6);
+                box-shadow: 0 30px 60px -20px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.1) inset;
             }
 
             .logo-ticker {
@@ -740,18 +1251,16 @@
                 -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
             }
 
-            .accreditation-badge {
-                background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(217,119,6,0.12));
-                border: 1px solid rgba(251,191,36,0.35);
-            }
-
             .nav-cta {
-                background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+                background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #0ea5e9 100%);
+                box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             .nav-cta:hover {
-                background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%);
-                box-shadow: 0 12px 30px -8px rgba(168,85,247,0.55);
+                background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #0284c7 100%);
+                box-shadow: 0 8px 30px rgba(37, 99, 235, 0.6);
+                transform: translateY(-2px) scale(1.05);
             }
         </style>
     </head>
@@ -803,7 +1312,7 @@
                         </div>
                         <a
                             href="#contact"
-                            class="nav-cta px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 rounded-2xl font-black text-white text-xs sm:text-sm transition-all"
+                            class="nav-cta btn-primary px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 rounded-2xl font-black text-white text-xs sm:text-sm transition-all"
                         >
                             <i class="fas fa-paper-plane mr-1 sm:mr-2 opacity-90 text-xs sm:text-sm"></i><span class="hidden sm:inline">Get Started</span>
                         </a>
@@ -858,7 +1367,7 @@
                         </div>
                         <a
                             href="#contact"
-                            class="nav-cta w-full text-center px-4 py-4 rounded-2xl font-black text-white text-base touch-manipulation"
+                            class="nav-cta btn-primary w-full text-center px-4 py-4 rounded-2xl font-black text-white text-base touch-manipulation"
                         >
                             <i class="fas fa-calendar-check mr-2"></i>Book a Demo
                         </a>
@@ -932,25 +1441,25 @@
 
         <!-- HERO — University Departments & Campuses -->
         <section
-            class="hero-gradient min-h-screen flex items-center relative overflow-hidden pt-24"
+            class="hero-gradient min-h-screen flex items-center relative overflow-hidden pt-24 section-hero"
         >
             <!-- Background blurred orbs -->
             <div class="absolute inset-0">
                 <div
-                    class="absolute top-20 left-10 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-25 float-animation"
+                    class="absolute top-20 left-10 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-25 float-animation"
                 ></div>
                 <div
-                    class="absolute bottom-20 right-10 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-25 float-animation"
+                    class="absolute bottom-20 right-10 w-96 h-96 bg-sky-500 rounded-full mix-blend-multiply filter blur-3xl opacity-25 float-animation"
                     style="animation-delay: 2s"
                 ></div>
                 <div
-                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[28rem] h-[28rem] bg-fuchsia-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
+                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[28rem] h-[28rem] bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"
                     style="animation-delay: 4s"
                 ></div>
                 <!-- Campus background image overlay -->
                 <div class="absolute inset-0 opacity-20">
-                    <img src="{% static 'images/modern campus backgroud.jpg' %}" alt="Modern Campus" class="w-full h-full object-cover hidden sm:block">
-                    <img src="{% static 'images/modern campus backgroud.jpg' %}" alt="Modern Campus" class="w-full h-full object-cover sm:hidden" style="object-position: center 30%;">
+                    <img src="{% static 'images/modern campus backgroud.jpg' %}" alt="University Campus Aerial View" class="w-full h-full object-cover hidden sm:block">
+                     
                 </div>
             </div>
 
@@ -975,21 +1484,21 @@
                         <div class="flex flex-col sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-center pt-2">
                             <a
                                 href="/lecturer/login/"
-                                class="glow-button px-5 sm:px-6 lg:px-7 py-3 sm:py-4 rounded-2xl font-black text-sm sm:text-base bg-gradient-to-r from-purple-600 via-indigo-600 to-fuchsia-600 text-white flex items-center justify-center gap-2 sm:gap-3 touch-manipulation"
+                                class="glow-button btn-primary px-5 sm:px-6 lg:px-7 py-3 sm:py-4 rounded-2xl font-black text-sm sm:text-base bg-gradient-to-r from-purple-600 via-indigo-600 to-fuchsia-600 text-white flex items-center justify-center gap-2 sm:gap-3 touch-manipulation"
                             >
                                 <i class="fas fa-chalkboard-user text-base sm:text-lg"></i>
                                 Academic Login
                             </a>
                             <a
                                 href="/student/login/"
-                                class="px-5 sm:px-6 lg:px-7 py-3 sm:py-4 rounded-2xl font-black text-sm sm:text-base border border-white/20 bg-white/5 text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2 sm:gap-3 touch-manipulation"
+                                class="btn-secondary px-5 sm:px-6 lg:px-7 py-3 sm:py-4 rounded-2xl font-black text-sm sm:text-base border border-white/20 bg-white/5 text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2 sm:gap-3 touch-manipulation"
                             >
                                 <i class="fas fa-user-graduate text-base sm:text-lg"></i>
                                 Student Login
                             </a>
                             <a
                                 href="#contact"
-                                class="px-5 sm:px-6 lg:px-7 py-3 sm:py-4 rounded-2xl font-black text-sm sm:text-base text-indigo-300 hover:text-white transition-all flex items-center justify-center gap-2 touch-manipulation"
+                                class="btn-secondary px-5 sm:px-6 lg:px-7 py-3 sm:py-4 rounded-2xl font-black text-sm sm:text-base text-indigo-300 hover:text-white transition-all flex items-center justify-center gap-2 touch-manipulation"
                             >
                                 Talk to us <i class="fas fa-arrow-right text-xs sm:text-sm"></i>
                             </a>
@@ -1096,8 +1605,10 @@
             </div>
         </section>
 
+        <div class="section-divider"></div>
+
         <!-- Why ClassMillia — 4 honest value props -->
-        <section id="features" class="py-24 bg-gray-900/50 relative">
+        <section id="features" class="py-24 bg-slate-900/50 relative section-features">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
                     <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
@@ -1146,6 +1657,9 @@
                         <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
                             Create OBJ, True/False &amp; Fill-in-blank CBTs. Secure per-student exam sessions with auto-marking and randomized questions.
                         </p>
+                        <div class="mt-3 sm:mt-4 rounded-xl sm:rounded-2xl overflow-hidden">
+                            <img src="{% static 'images/Smart Classroom with Technology.png' %}" alt="Smart Classroom with Technology" class="w-full h-auto object-cover" loading="lazy">
+                        </div>
                     </div>
                     <div class="feature-card glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 scroll-reveal transition-all duration-300 border-l-4 border-l-emerald-500">
                         <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-3 sm:mb-5 text-emerald-300">
@@ -1160,9 +1674,11 @@
             </div>
         </section>
 
+        <div class="section-divider"></div>
+
         <!-- Platform / 5 Modules -->
-        <section id="platform" class="py-24 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-gray-900 via-[#160b3e] to-gray-900"></div>
+        <section id="platform" class="py-24 relative overflow-hidden section-platform">
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-900 via-[#1e3a5f] to-slate-900"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
                     <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
@@ -1245,13 +1761,18 @@
                             <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Email-domain based login (Academic / Student)</li>
                             <li class="flex gap-2 text-gray-300"><i class="fas fa-circle-check text-emerald-400 mt-0.5"></i>Per-portal views &amp; permissions</li>
                         </ul>
+                        <div class="mt-4 rounded-2xl overflow-hidden">
+                            <img src="{% static 'images/Modern Computer Lab.jfif' %}" alt="Modern Computer Lab" class="w-full h-auto object-cover" loading="lazy">
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <div class="section-divider"></div>
+
         <!-- Campus Solutions: Academic & Administrative Portals -->
-        <section id="stakeholders" class="py-24 bg-gray-900/50 relative">
+        <section id="stakeholders" class="py-24 bg-slate-900/50 relative section-stakeholders">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
                     <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
@@ -1327,14 +1848,19 @@
                                 <span>Clean, focused portal experience. Streamlined access to enrolled courses and assessments only.</span>
                             </li>
                         </ul>
+                        <div class="mt-4 rounded-2xl overflow-hidden">
+                            <img src="{% static 'images/Modern Campus Library.jpg' %}" alt="Modern Campus Library" class="w-full h-auto object-cover" loading="lazy">
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <div class="section-divider"></div>
+
         <!-- Reports & Exams (was "Accreditation", rebranded to match actual product) -->
-        <section id="reports" class="py-24 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#1a1052] to-[#2e1065]"></div>
+        <section id="reports" class="py-24 relative overflow-hidden section-reports">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#1e3a5f]"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
                     <div class="col-span-1 scroll-reveal order-2 lg:order-1">
@@ -1419,6 +1945,9 @@
                                     <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div class="h-full w-[99%] bg-gradient-to-r from-purple-400 via-indigo-400 to-sky-400 rounded-full"></div></div>
                                 </div>
                             </div>
+                            <div class="mt-6 rounded-2xl overflow-hidden">
+                                <img src="{% static 'images/studengts and scattered desk.jpg' %}" alt="Students studying" class="w-full h-auto object-cover" loading="lazy">
+                            </div>
                             <div class="mt-6 flex flex-wrap gap-2.5">
                                 <button class="flex-1 min-w-[120px] px-4 py-2.5 rounded-xl text-xs font-black border border-emerald-400/30 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20 transition-all flex items-center justify-center gap-2">
                                     <i class="fas fa-file-csv"></i>Download CSV
@@ -1433,8 +1962,10 @@
             </div>
         </section>
 
+        <div class="section-divider"></div>
+
         <!-- Stats section -->
-        <section class="py-16 bg-gray-900/50 border-y border-white/5">
+        <section class="py-16 bg-slate-900/50 border-y border-white/5">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     <div class="stat-card rounded-3xl p-6 scroll-reveal">
@@ -1461,8 +1992,10 @@
             </div>
         </section>
 
+        <div class="section-divider"></div>
+
         <!-- Pricing / Deployment (3 tiers, honest — no institutional hardcoding) -->
-        <section id="pricing" class="py-24 bg-gray-900 relative">
+        <section id="pricing" class="py-24 bg-slate-900 relative section-pricing">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
                     <div class="inline-block university-badge px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
@@ -1548,7 +2081,9 @@
             </div>
         </section>
 
-        <!-- How It Works (Lecturer → Student → Department) -->
+        <div class="section-divider"></div>
+
+        <!-- How It Works (Academic → Student → Department) -->
         <section class="py-24 bg-gray-900/50 relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16 scroll-reveal">
@@ -1592,9 +2127,11 @@
             </div>
         </section>
 
+        <div class="section-divider"></div>
+
         <!-- Contact / Demo Request Form (with real email & socials, no fake institutional roles) -->
-        <section id="contact" class="py-24 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-[#1a1052] via-[#2e1065] to-[#0f0c29]"></div>
+        <section id="contact" class="py-24 relative overflow-hidden section-contact">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#1e293b] via-[#1e3a5f] to-[#0f172a]"></div>
             <!-- University sunset background overlay -->
             <div class="absolute inset-0 opacity-10">
                 <img src="{% static 'images/university at sunset.jpg' %}" alt="University at sunset" class="w-full h-full object-cover hidden sm:block">
@@ -1640,10 +2177,11 @@
                                 <a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
                                     <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-slate-700 to-black flex items-center justify-center text-white shadow-lg shrink-0">
                                         <i class="fa-brands fa-x-twitter"></i>
+                                        <span class="sr-only">X (Twitter)</span>
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">X (Twitter)</div>
-                                        <div class="text-sm font-black text-white truncate group-hover:text-indigo-200 transition-colors">x.com/classmillia</div>
+                                        <div class="text-sm font-black text-white truncate group-hover:text-indigo-200 transition-colors">@classmillia</div>
                                     </div>
                                     <i class="fas fa-arrow-up-right-from-square text-gray-500 group-hover:text-white text-sm"></i>
                                 </a>
@@ -1653,7 +2191,7 @@
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="text-[10px] uppercase font-black tracking-wider text-gray-500">LinkedIn</div>
-                                        <div class="text-sm font-black text-white truncate group-hover:text-indigo-200 transition-colors">linkedin.com/company/djangopilot/</div>
+                                        <div class="text-sm font-black text-white truncate group-hover:text-indigo-200 transition-colors">linkedin.com/company/classmillia/</div>
                                     </div>
                                     <i class="fas fa-arrow-up-right-from-square text-gray-500 group-hover:text-white text-sm"></i>
                                 </a>
@@ -1683,18 +2221,28 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Right panel (form with mailto: action that sends to real classmillia@gmail.com) -->
+                    <!-- Right panel (form that sends to classmillia@gmail.com via Django backend) -->
                     <form
                         id="demo-form"
-                        action="mailto:classmillia@gmail.com"
+                        action="{% url 'handle_contact_form' %}"
                         method="post"
-                        enctype="text/plain"
                         class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-7 col-span-1 lg:col-span-3 scroll-reveal border border-indigo-400/15 shadow-2xl shadow-indigo-950/30"
                     >
+                        {% csrf_token %}
+                        {% if contact_success %}
+                        <div class="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 text-sm">
+                            <i class="fas fa-check-circle mr-2"></i>{{ contact_message }}
+                        </div>
+                        {% endif %}
+                        {% if contact_error %}
+                        <div class="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-200 text-sm">
+                            <i class="fas fa-exclamation-circle mr-2"></i>{{ contact_message }}
+                        </div>
+                        {% endif %}
                         <div class="flex items-center justify-between mb-4 sm:mb-6">
                             <div>
                                 <h3 class="text-lg sm:text-xl font-black">Get started with ClassMillia</h3>
-                                <p class="text-xs sm:text-sm text-gray-400 mt-1">We'll reply to classmillia@gmail.com within 1 business day.</p>
+                                <p class="text-xs sm:text-sm text-gray-400 mt-1">Your message will be sent to classmillia@gmail.com within 1 business day.</p>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
@@ -1761,13 +2309,13 @@
                         </div>
                         <button
                             type="submit"
-                            class="nav-cta w-full px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-white text-xs sm:text-sm transition-all flex items-center justify-center gap-2 sm:gap-3 touch-manipulation"
+                            class="nav-cta btn-primary w-full px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-white text-xs sm:text-sm transition-all flex items-center justify-center gap-2 sm:gap-3 touch-manipulation"
                         >
                             <i class="fas fa-paper-plane text-base sm:text-lg"></i>
                             Send to ClassMillia
                         </button>
                         <p class="text-[10px] sm:text-[11px] text-gray-500 mt-3 sm:mt-4 text-center">
-                            This opens your email client with your message pre-filled and addressed to <strong class="text-gray-300">classmillia@gmail.com</strong>.
+                            Your message will be sent directly to <strong class="text-gray-300">classmillia@gmail.com</strong>.
                         </p>
                     </form>
                 </div>
@@ -1775,7 +2323,7 @@
         </section>
 
         <!-- Footer (with real socials & no fake institutional hardcoded links) -->
-        <footer class="bg-gray-950 border-t border-white/5 pt-16 pb-8">
+        <footer class="bg-slate-950 border-t border-white/5 pt-16 pb-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-10">
                     <div>
@@ -1795,7 +2343,7 @@
                             <a href="mailto:classmillia@gmail.com" title="Email classmillia@gmail.com" class="h-10 w-10 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-gray-400 hover:text-rose-300">
                                 <i class="fas fa-envelope text-sm"></i>
                             </a>
-                            <a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" title="X / Twitter — x.com/classmillia" class="h-10 w-10 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-gray-400 hover:text-white">
+                            <a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" title="X / Twitter — @classmillia" class="h-10 w-10 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-gray-400 hover:text-white">
                                 <i class="fa-brands fa-x-twitter text-sm"></i>
                             </a>
                             <a href="https://www.linkedin.com/company/djangopilot/" target="_blank" rel="noopener noreferrer" title="LinkedIn — linkedin.com/company/djangopilot/" class="h-10 w-10 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-gray-400 hover:text-sky-300">
@@ -1827,7 +2375,7 @@
                         <h4 class="text-sm font-black mb-5 uppercase tracking-wider text-white">Legal &amp; Contact</h4>
                         <ul class="space-y-3 text-sm text-gray-400">
                             <li><a href="mailto:classmillia@gmail.com" class="hover:text-white transition-colors">classmillia@gmail.com</a></li>
-                            <li><a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">X / x.com/classmillia</a></li>
+                            <li><a href="https://x.com/classmillia" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">X / @classmillia</a></li>
                             <li><a href="https://www.linkedin.com/company/djangopilot/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">LinkedIn</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Terms</a></li>

@@ -11,6 +11,7 @@ from datetime import timezone as dt_timezone
 from functools import wraps
 
 import numpy as np
+from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -168,6 +169,56 @@ def serialize_question_for_attempt(question, randomize_options=False):
 def get_user_role(user):
     """Helper function to determine user role based on email domain."""
     return "student" if user.email.endswith("@run.edu.ng") else "lecturer"
+
+
+def handle_contact_form(request):
+    """Handle contact form submission and send email to classmillia@gmail.com"""
+    if request.method == "POST":
+        institution = request.POST.get("institution", "")
+        full_name = request.POST.get("full_name", "")
+        role = request.POST.get("role", "")
+        work_email = request.POST.get("work_email", "")
+        deployment = request.POST.get("deployment", "")
+        message = request.POST.get("message", "")
+
+        # Create email body
+        email_body = f"""
+New Contact Form Submission from ClassMillia Landing Page
+
+INSTITUTION: {institution}
+NAME: {full_name}
+ROLE: {role}
+EMAIL: {work_email}
+DEPLOYMENT PREFERENCE: {deployment}
+
+MESSAGE:
+{message}
+
+---
+Submitted from ClassMillia website
+"""
+
+        try:
+            # Send email to classmillia@gmail.com
+            send_mail(
+                subject=f"ClassMillia Contact Form - {institution} - {full_name}",
+                message=email_body,
+                from_email=settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else work_email,
+                recipient_list=["classmillia@gmail.com"],
+                fail_silently=False,
+            )
+            return render(request, "welcome_page.html", {
+                "contact_success": True,
+                "contact_message": "Thank you! Your message has been sent to classmillia@gmail.com. We'll reply within 1 business day."
+            })
+        except Exception as e:
+            logger.error(f"Error sending contact form email: {e}")
+            return render(request, "welcome_page.html", {
+                "contact_error": True,
+                "contact_message": "Sorry, there was an error sending your message. Please email us directly at classmillia@gmail.com"
+            })
+
+    return redirect("welcome_page")
 
 
 def custom_logout(request):

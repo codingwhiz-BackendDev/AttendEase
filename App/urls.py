@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("", views.welcome_page, name="welcome_page"),
+    path("contact/", views.handle_contact_form, name="handle_contact_form"),
     # Override default allauth login form BEFORE project-level allauth include.
     # Prevents direct access to username/password login; forces Google OAuth.
     path(
