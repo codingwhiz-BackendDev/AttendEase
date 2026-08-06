@@ -11,7 +11,7 @@ Disallow: /lecturer/
 Disallow: /student/
 
 # Sitemap location
-Sitemap: https://classmillia.com/sitemap.xml
+Sitemap: https://classmillia.onrender.com/sitemap.xml
 
 # Crawl delay (optional, adjust based on server capacity)
 Crawl-delay: 1

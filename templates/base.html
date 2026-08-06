@@ -9,9 +9,11 @@
         <meta name="description" content="{% block meta_description %}ClassMillia helps universities simplify attendance, learning management, assessments, and academic analytics with AI.{% endblock %}" />
         <meta name="keywords" content="ClassMillia, attendance management, university LMS, AI academic platform, geofence attendance, online assessments" />
         <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="{% block canonical_url %}https://classmillia.onrender.com{{ request.path }}{% endblock %}" />
         <!-- Open Graph -->
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="ClassMillia" />
+        <meta property="og:url" content="{% block og_url %}https://classmillia.onrender.com{{ request.path }}{% endblock %}" />
         <meta property="og:title" content="{% block og_title %}ClassMillia | AI-Powered Academic Management Platform{% endblock %}" />
         <meta property="og:description" content="{% block og_description %}ClassMillia helps universities simplify attendance, learning management, assessments, and academic analytics with AI.{% endblock %}" />
         <!-- Twitter Card -->
