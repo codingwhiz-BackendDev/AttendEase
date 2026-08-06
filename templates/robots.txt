@@ -1,0 +1,17 @@
+# ClassMillia Robots.txt
+# Allow all web crawlers to access the site
+
+User-agent: *
+Allow: /
+
+# Disallow specific paths if needed
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /lecturer/
+Disallow: /student/
+
+# Sitemap location
+Sitemap: https://classmillia.com/sitemap.xml
+
+# Crawl delay (optional, adjust based on server capacity)
+Crawl-delay: 1
