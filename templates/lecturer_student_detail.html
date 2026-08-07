@@ -137,7 +137,7 @@
                 <!-- Big attendance stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
                     <div class="bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-2xl p-4 border border-indigo-500/30">
-                        <p class="text-[10px] font-black uppercase tracking-wide text-indigo-400 mb-1">Sessions Held</p>
+                        <p class="text-[10px] font-black uppercase tracking-wide text-indigo-400 mb-1">Attendance Held</p>
                         <p class="text-3xl font-black text-indigo-300">{{ total_expired_scope_enrolled }}</p>
                         <p class="text-[10px] text-indigo-400 font-bold mt-0.5">Relevant to this view</p>
                     </div>
@@ -217,11 +217,11 @@
             <div>
                 <h3 class="text-lg font-black text-white flex items-center gap-2">
                     <i class="fas fa-clock-rotate-left text-indigo-400"></i>
-                    Session-by-Session Attendance History
+                    Attendance History
                 </h3>
                 <p class="text-xs text-gray-500 font-bold mt-0.5">
                     {% if scope_course %}Scoped to: {{ scope_course.course_code }} · {% endif %}
-                    {{ history|length }} session records
+                    {{ history|length }} attendance records
                 </p>
             </div>
             <div class="flex flex-wrap gap-1.5 text-[11px] font-black">
@@ -315,7 +315,7 @@
             </div>
             <h3 class="font-black text-gray-300 mb-1">No attendance history yet</h3>
             <p class="text-sm text-gray-500 max-w-md mx-auto">
-                Once you create attendance sessions and the student marks them (or misses them), they'll show up here with full GPS and face-verification data.
+                Once you create attendance records and the student marks them (or misses them), they'll show up here with full GPS and face-verification data.
             </p>
         </div>
         {% endif %}

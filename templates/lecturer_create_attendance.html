@@ -39,8 +39,8 @@
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
             <div class="mb-6 sm:mb-8">
-                <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Create Attendance Session</h1>
-                <p class="text-xs sm:text-sm text-gray-400">Set up a new attendance session with geofencing for your course</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Create Attendance</h1>
+                <p class="text-xs sm:text-sm text-gray-400">Set up a new attendance with geofencing for your course</p>
             </div>
 
             <!-- Main Card -->
@@ -142,9 +142,9 @@
 
                 <!-- Submit Button -->
                 <button type="submit" id="submit-btn" disabled class="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 focus:ring-4 focus:ring-indigo-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg">
-                    <i class="fas fa-plus-circle mr-2"></i>Create Attendance Session
+                    <i class="fas fa-plus-circle mr-2"></i>Create Attendance
                 </button>
-                <p id="submit-hint" class="text-center text-[10px] sm:text-xs text-gray-500">Allow location access above before creating a session.</p>
+                <p id="submit-hint" class="text-center text-[10px] sm:text-xs text-gray-500">Allow location access above before creating an attendance.</p>
             </form>
         </div>
     </div>
@@ -254,7 +254,7 @@
         // Desktop: auto-fetch on load (works without user gesture).
         // Mobile / PWA: require explicit tap so the browser shows the permission prompt.
         if (isMobileOrPWA()) {
-            setLocationStatus('idle', 'Tap the button below to allow location access for this session.');
+            setLocationStatus('idle', 'Tap the button below to allow location access for this attendance.');
             setSubmitReady(false);
         } else {
             setLocationStatus('loading', 'Fetching location...');
@@ -361,7 +361,7 @@
             const latEl = document.getElementById('latitude');
             const lngEl = document.getElementById('longitude');
             if (!latEl.value || !lngEl.value) {
-                alert('Location is required. Tap "Allow Location Access" and grant permission before creating the session.');
+                alert('Location is required. Tap "Allow Location Access" and grant permission before creating the attendance.');
                 e.preventDefault();
                 e.stopPropagation();
                 document.getElementById('enable-location-btn')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -412,7 +412,7 @@
                 '<ul class="list-disc ml-5 space-y-0.5 text-blue-200">' +
                     '<li>Pick start &amp; end times using <strong>your PC clock / timezone</strong>.</li>' +
                     '<li>Each input shows the equivalent <strong>Lagos/WAT (Africa/Lagos)</strong> time below it — double-check this matches your lecture hours.</li>' +
-                    '<li>Times are automatically converted to UTC before sending, so no Windows / OS timezone misconfiguration can corrupt the session window.</li>' +
+                    '<li>Times are automatically converted to UTC before sending, so no Windows / OS timezone misconfiguration can corrupt the attendance window.</li>' +
                 '</ul>' +
             '</div>';
         const timeSection = document.querySelector('#start_time_local').closest('.grid');

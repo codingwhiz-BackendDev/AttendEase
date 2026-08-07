@@ -93,7 +93,7 @@
                             >
                                 Live Mode
                             </p>
-                            <p class="text-indigo-400">Sessions auto-refresh</p>
+                            <p class="text-indigo-400">Attendance auto-refresh</p>
                         </div>
                     </div>
                     <div
@@ -292,7 +292,7 @@
                                 class="inline-flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-white text-indigo-700 rounded-xl font-black shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all text-sm sm:text-base"
                             >
                                 <i class="fas fa-chart-line"></i>
-                                {% if next_session.status_label == 'Active' %}Monitor Live{% else %}Open Session{% endif %}
+                                {% if next_session.status_label == 'Active' %}Monitor Live{% else %}Open Attendance{% endif %}
                             </a>
                             {% if next_session.status_label == 'Active' %}
                             <a
@@ -431,7 +431,7 @@
                     {{ total_marked_all }}
                 </p>
                 <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
-                    Across all sessions
+                    Across all attendance
                 </p>
             </div>
             <div
@@ -455,7 +455,7 @@
                     {{ active_count }}
                 </p>
                 <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
-                    Live sessions marking
+                    Live attendance marking
                 </p>
             </div>
             <div
@@ -477,7 +477,7 @@
                     {{ upcoming_count }}
                 </p>
                 <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
-                    Sessions scheduled
+                    Attendance scheduled
                 </p>
             </div>
         </div>
@@ -493,7 +493,7 @@
                 >
                     <h2 class="text-base sm:text-lg font-black text-white">
                         <i class="fas fa-calendar-alt text-indigo-400 mr-2"></i>
-                        All Sessions
+                        All Attendance
                     </h2>
                     <div class="flex items-center gap-2 flex-wrap">
                         <button
@@ -565,7 +565,7 @@
                                         <p
                                             class="text-[8px] sm:text-[10px] font-black text-gray-500 uppercase tracking-wider"
                                         >
-                                            Session #{{ class.id }}
+                                            Attendance #{{ class.id }}
                                         </p>
                                     </div>
                                     <div class="w-full rounded-xl border border-white/10 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 p-2.5 sm:p-3">
@@ -818,12 +818,12 @@
                         ></i>
                     </div>
                     <h3 class="font-black text-white text-lg sm:text-xl mb-2">
-                        No Sessions Yet
+                        No Attendance Yet
                     </h3>
                     <p
                         class="text-sm sm:text-base text-gray-400 max-w-sm mx-auto mb-4 sm:mb-6"
                     >
-                        Create your first attendance session to start tracking
+                        Create your first attendance to start tracking
                         student attendance with GPS geofencing and face
                         verification.
                     </p>
@@ -832,7 +832,7 @@
                         class="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm sm:text-base"
                     >
                         <i class="fas fa-plus-circle"></i>Create Your First
-                        Session
+                        Attendance
                     </a>
                 </div>
                 {% endif %}

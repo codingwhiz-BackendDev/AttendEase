@@ -23,6 +23,17 @@
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-10px); }
     }
+
+    /* Fix browser autofill forcing a white background on the search input */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: #ffffff;
+        transition: background-color 9999s ease-in-out 0s;
+        box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+    }
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -45,7 +56,7 @@
                 </h1>
                 <p class="text-xs sm:text-sm md:text-base text-gray-400 max-w-2xl">
                     Search available courses, assign them to your teaching profile,
-                    and keep your attendance session catalog organized.
+                    and keep your attendance catalog organized.
                 </p>
             </div>
             <div class="flex items-center gap-3 flex-wrap">
@@ -267,7 +278,7 @@
                         href="/lecturer/create-attendance/"
                         class="inline-flex items-center justify-center gap-1 sm:gap-2 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 px-3 sm:px-4 py-2 sm:py-3 text-[10px] sm:text-xs sm:text-sm font-black text-indigo-300 hover:bg-indigo-500/30 transition-all"
                     >
-                        <i class="fas fa-plus-circle"></i><span class="hidden sm:inline">Session</span>
+                        <i class="fas fa-plus-circle"></i><span class="hidden sm:inline">Attendance</span>
                     </a>
                     <form
                         method="POST"
@@ -311,7 +322,7 @@
             </h3>
             <p class="text-xs sm:text-sm text-gray-400 max-w-md mx-auto">
                 Search above and assign courses to your lecturer profile so you
-                can start creating attendance sessions.
+                can start creating attendance.
             </p>
         </div>
         {% endif %}

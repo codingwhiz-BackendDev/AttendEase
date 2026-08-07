@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -58,7 +58,7 @@
                 onclick="return confirmClose(event);"
                 class="inline-flex items-center gap-2 rounded-2xl bg-red-500/20 text-red-300 border border-red-500/30 px-4 py-2.5 hover:bg-red-500/30 transition-all font-bold text-sm"
             >
-                <i class="fas fa-times-circle"></i>Close Session Early
+                <i class="fas fa-times-circle"></i>Close Attendance Early
             </a>
             {% endif %}
             <a
@@ -139,7 +139,7 @@
                         <p
                             class="text-indigo-300 font-black text-xs uppercase tracking-wide mb-1 flex items-center gap-2"
                         >
-                            <i class="fas fa-stopwatch"></i>Session Time
+                            <i class="fas fa-stopwatch"></i>Attendance Time
                             Remaining
                         </p>
                         <div
@@ -245,7 +245,7 @@
                         class="text-lg font-black text-white flex items-center gap-2"
                     >
                         <i class="fas fa-map-marked-alt text-indigo-400"></i
-                        >Geofence Map & Session Context
+                        >Geofence Map & Attendance Context
                     </h2>
                     <p class="text-sm text-gray-400 mt-1">
                         Venue center, geofence radius, and the exact location
@@ -439,7 +439,7 @@
             else                { caption = "Session active â€” students are marking attendance"; cls = "text-emerald-400"; }
         } else {
             el.textContent = "00:00:00"; el.className = "text-red-400 font-black text-2xl font-mono tracking-tight";
-            cap.textContent = "Session ended"; cap.className = "text-xs text-red-400 mt-1"; return;
+            cap.textContent = "Attendance ended"; cap.className = "text-xs text-red-400 mt-1"; return;
         }
         const s = Math.floor(msLeft / 1000);
         el.textContent = pad(Math.floor(s/3600)) + ":" + pad(Math.floor((s%3600)/60)) + ":" + pad(s%60);
@@ -474,7 +474,7 @@
         L.marker([SESSION_LAT, SESSION_LON], { icon: hallIcon }).addTo(map)
             .bindPopup(`<div style="font-weight:800;color:#4f46e5;margin-bottom:4px">ðŸ« ${SESSION_HALL}</div>
                         <div style="font-size:11px;color:#6b7280">
-                          Session #{{ session.id }}<br>
+                          Attendance #{{ session.id }}<br>
                           {{ records.count }} student(s) checked in<br>
                           Radius: {{ session.radius }}m
                         </div>`)
