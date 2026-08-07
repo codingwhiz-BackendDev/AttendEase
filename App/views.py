@@ -430,7 +430,7 @@ def lecturer_dashboard(request):
     user_role = get_user_role(user)
 
     user_obj = User.objects.get(username=request.user)
-    lecturer = LecturerProfile.objects.get(user=user_obj)
+    lecturer, created = LecturerProfile.objects.get_or_create(user=user_obj)
     scheduled_lectures = AttendanceSession.objects.filter(lecturer=lecturer).order_by(
         "-start_time"
     )

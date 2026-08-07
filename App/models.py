@@ -42,11 +42,11 @@ class StudentProfile(models.Model):
 
 class LecturerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    staff_id = models.CharField(max_length=255, unique=True)
-    department = models.CharField(max_length=100)
-    academic_rank = models.CharField(max_length=50)
-    office_location = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=15)
+    staff_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    department = models.CharField(max_length=100, null=True, blank=True)
+    academic_rank = models.CharField(max_length=50, null=True, blank=True)
+    office_location = models.CharField(max_length=255, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
     courses_taught = models.ManyToManyField(
         "Course", related_name="lecturers"
     )  # Many-to-many relationship

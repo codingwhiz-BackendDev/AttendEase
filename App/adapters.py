@@ -18,27 +18,34 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             raise ValidationError("Only student (@run.edu.ng) and lecturer (@gmail.com) emails are allowed.")
         return email
 
-    def get_login_redirect_url(self, request):
-        """Redirect students and lecturers to their respective dashboards after login."""
+    def _ensure_profile_and_get_url(self, user):
+        """Ensure the correct profile exists, then return the dashboard URL.
+
+        Uses get_or_create so a duplicate/failed insert can never raise and
+        bounce the user back to the welcome page. Role is derived from the
+        email domain (@run.edu.ng = student, otherwise lecturer).
+        """
         from .models import StudentProfile, LecturerProfile
-        
-        user = request.user
-        user_role = "student" if user.email.endswith("@run.edu.ng") else "lecturer"
-        
-        # Auto-create profile if doesn't exist
-        with transaction.atomic():
-            if user_role == "student":
-                if not StudentProfile.objects.filter(student_name=user).exists():
-                    StudentProfile.objects.create(student_name=user)
-                    logger.info(f"Created StudentProfile for user {user.email}")
-                return reverse("student_dashboard")
-            elif user_role == "lecturer":
-                if not LecturerProfile.objects.filter(user=user).exists():
-                    LecturerProfile.objects.create(user=user)
-                    logger.info(f"Created LecturerProfile for user {user.email}")
-                return reverse("lecturer_dashboard")
-        
-        return reverse("welcome_page")  # Fallback
+
+        if user.email.endswith("@run.edu.ng"):
+            StudentProfile.objects.get_or_create(student_name=user)
+            logger.info(f"Ensured StudentProfile for user {user.email}")
+            return reverse("student_dashboard")
+
+        LecturerProfile.objects.get_or_create(user=user)
+        logger.info(f"Ensured LecturerProfile for user {user.email}")
+        return reverse("lecturer_dashboard")
+
+    def get_login_redirect_url(self, request):
+        """Runs on every returning login."""
+        return self._ensure_profile_and_get_url(request.user)
+
+    def get_signup_redirect_url(self, request):
+        """Runs on FIRST-TIME signup. allauth uses a separate redirect for
+        signup (ACCOUNT_SIGNUP_REDIRECT_URL, default '/'), which is why new
+        lecturers were landing on the welcome page instead of the dashboard.
+        """
+        return self._ensure_profile_and_get_url(request.user)
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
