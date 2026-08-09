@@ -259,6 +259,61 @@
         </div>
     </div>
 
+    {% if course_sessions %}
+    <div class="glass-card rounded-3xl shadow-sm border border-white/10 overflow-hidden mb-6">
+        <div class="flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-white/5 to-indigo-500/5 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-white tracking-wide">Attendance Sessions</h3>
+                    <p class="text-[11px] text-gray-500 font-bold">
+                        Every session on this course — created by you or a co-lecturer
+                    </p>
+                </div>
+            </div>
+            <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-black text-gray-300">
+                <i class="fas fa-calendar-check text-indigo-400"></i>{{ course_sessions_total }} total
+            </span>
+        </div>
+        <div class="divide-y divide-white/5 max-h-[420px] overflow-y-auto">
+            {% for s in course_sessions %}
+            <a href="/lecturer/session/{{ s.id }}/" class="flex items-center gap-4 px-5 py-4 hover:bg-white/5 transition-all group">
+                <div class="flex flex-col items-center justify-center w-14 shrink-0">
+                    <span class="text-[10px] font-black uppercase tracking-wider {% if s.status_color == 'emerald' %}text-emerald-400{% elif s.status_color == 'indigo' %}text-indigo-400{% else %}text-gray-500{% endif %}">
+                        {{ s.status_label }}
+                    </span>
+                    <span class="mt-1 w-2.5 h-2.5 rounded-full {% if s.status_color == 'emerald' %}bg-emerald-500 animate-pulse{% elif s.status_color == 'indigo' %}bg-indigo-500{% else %}bg-gray-600{% endif %}"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <p class="text-sm font-black text-white truncate">{{ s.date_label }}</p>
+                        <span class="text-[11px] text-gray-500 font-bold"><i class="far fa-clock mr-1"></i>{{ s.time_window }}</span>
+                    </div>
+                    <div class="flex items-center gap-3 mt-1 flex-wrap">
+                        <span class="text-[11px] text-gray-500 font-bold"><i class="fas fa-location-dot mr-1 text-gray-600"></i>{{ s.lecture_hall }}</span>
+                        <span class="text-[11px] text-emerald-400/80 font-bold"><i class="fas fa-user-check mr-1"></i>{{ s.attendance_count }} check-ins</span>
+                        {# ---- Fancy creator badge ---- #}
+                        {% if s.is_mine %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-indigo-500/25 to-purple-500/25 text-indigo-200 border border-indigo-400/30 shadow-sm">
+                            <i class="fas fa-user-check"></i>Created by you
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500/25 to-orange-500/25 text-amber-200 border border-amber-400/30 shadow-sm">
+                            <i class="fas fa-user-group"></i>{{ s.creator_name }}
+                            <span class="text-amber-400/70 font-bold">· co-lecturer</span>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-600 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <form method="GET" class="mb-6">
         <input type="hidden" name="course" value="{{ selected_course_id }}" />
         <div

@@ -301,6 +301,9 @@
                         <div class="min-w-0">
                             <p class="text-xs font-black text-indigo-400 uppercase tracking-wider mb-1">{{ s.course.course_code }}</p>
                             <h3 class="text-xl md:text-2xl font-black text-white leading-tight">{{ s.course.course_title }}</h3>
+                            <p class="mt-1 inline-flex items-center gap-1 text-xs font-bold {% if s.is_mine %}text-emerald-400{% else %}text-amber-400{% endif %}">
+                                <i class="fas fa-user-pen text-[10px]"></i>{% if s.is_mine %}Created by you{% else %}By {{ s.creator_name }}{% endif %}
+                            </p>
                         </div>
                         <div class="flex gap-2 shrink-0">
                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">

@@ -1746,7 +1746,12 @@ def student_attendance_detail(request):
 def lecturer_session_detail(request, pk):
     user_obj = User.objects.get(username=request.user)
     lecturer = get_object_or_404(LecturerProfile, user=user_obj)
-    session = get_object_or_404(AttendanceSession, id=pk, lecturer=lecturer)
+    # Any lecturer who teaches the course can view the session, not just its
+    # creator. Ownership is still tracked via session.lecturer for the badge.
+    session = get_object_or_404(
+        AttendanceSession, id=pk, course__in=lecturer.courses_taught.all()
+    )
+    annotate_session_creator(session, lecturer)
 
     # Annotate session status
     current_time = now()
@@ -1796,7 +1801,10 @@ def lecturer_session_detail(request, pk):
 def close_session_early(request, pk):
     user_obj = User.objects.get(username=request.user)
     lecturer = get_object_or_404(LecturerProfile, user=user_obj)
-    session = get_object_or_404(AttendanceSession, id=pk, lecturer=lecturer)
+    # Any lecturer teaching the course can close the session early.
+    session = get_object_or_404(
+        AttendanceSession, id=pk, course__in=lecturer.courses_taught.all()
+    )
 
     current_time = now()
     if session.start_time <= current_time < session.end_time:
@@ -1823,7 +1831,10 @@ def close_session_early(request, pk):
 def download_session_excel(request, pk):
     user_obj = User.objects.get(username=request.user)
     lecturer = get_object_or_404(LecturerProfile, user=user_obj)
-    session = get_object_or_404(AttendanceSession, id=pk, lecturer=lecturer)
+    # Any lecturer teaching the course can download the session report.
+    session = get_object_or_404(
+        AttendanceSession, id=pk, course__in=lecturer.courses_taught.all()
+    )
 
     # Generate/update spreadsheet
     csv_path = generate_session_csv(session)
@@ -1856,8 +1867,11 @@ def lecturer_reports(request):
     course_filter = (request.GET.get("course") or "").strip()
     page_number = request.GET.get("page") or "1"
 
+    # Include sessions for every course this lecturer teaches, so co-lecturers
+    # of the same course all see each other's sessions in reports.
+    taught_courses = lecturer.courses_taught.all()
     sessions_qs = (
-        AttendanceSession.objects.filter(lecturer=lecturer)
+        AttendanceSession.objects.filter(course__in=taught_courses)
         .select_related("course", "lecturer", "lecturer__user")
         .prefetch_related("records__student")
         .order_by("-start_time")
@@ -1927,6 +1941,7 @@ def lecturer_reports(request):
     sessions = list(page_obj.object_list)
 
     for s in sessions:
+        annotate_session_creator(s, lecturer)
         s.formatted_start = format_lagos_time(s.start_time)
         s.formatted_end = format_lagos_time(s.end_time)
         s.start_time_iso = s.start_time.isoformat()
@@ -3039,12 +3054,32 @@ def lecturer_course_roster(request):
             break
 
     if selected_course:
-        # All attendance sessions created by THIS lecturer for THIS course
+        # All attendance sessions for THIS course, regardless of which
+        # co-lecturer created them (a course may be taught by several lecturers).
         course_sessions = list(
-            AttendanceSession.objects.filter(
-                lecturer=lecturer, course=selected_course
-            ).order_by("-start_time")
+            AttendanceSession.objects.filter(course=selected_course)
+            .select_related("lecturer", "lecturer__user")
+            .order_by("-start_time")
         )
+        for s in course_sessions:
+            annotate_session_creator(s, lecturer)
+            # Display fields for the sessions panel (times shown in Lagos TZ)
+            start_local = localtime(s.start_time, timezone=get_default_timezone())
+            end_local = localtime(s.end_time, timezone=get_default_timezone())
+            s.date_label = start_local.strftime("%b %d, %Y")
+            s.time_window = (
+                f"{start_local.strftime('%H:%M')} – {end_local.strftime('%H:%M')}"
+            )
+            s.attendance_count = s.records.count()
+            if s.end_time < current_time:
+                s.status_label = "Held"
+                s.status_color = "gray"
+            elif s.start_time > current_time:
+                s.status_label = "Upcoming"
+                s.status_color = "indigo"
+            else:
+                s.status_label = "Active"
+                s.status_color = "emerald"
         course_sessions_all = course_sessions
         course_expired_sessions = sum(
             1 for s in course_sessions if s.end_time < current_time
@@ -3175,6 +3210,7 @@ def lecturer_course_roster(request):
         "total_enrolled": total_enrolled,
         "course_sessions_held": course_expired_sessions,
         "course_sessions_total": len(course_sessions_all),
+        "course_sessions": course_sessions_all,
         "course_total_present": total_present_all,
         "course_overall_pct": overall_pct,
         "good_count": good_count,
@@ -3213,10 +3249,12 @@ def lecturer_student_detail(request, student_user_id, course_id=None):
         scope_courses = list(lecturer.courses_taught.all())
         scope_course = None
 
-    # Sessions the lecturer created in scope courses
+    # All sessions in scope courses, regardless of which co-lecturer created
+    # them — a course may be taught by several lecturers, and every session
+    # counts toward the student's expected attendance.
     scope_sessions = list(
         AttendanceSession.objects.filter(
-            lecturer=lecturer, course__in=scope_courses
+            course__in=scope_courses
         ).order_by("-start_time")
     )
 

@@ -111,6 +111,20 @@
 
                 <div class="space-y-4 text-sm">
                     <div class="flex items-start gap-3">
+                        <i class="fas fa-chalkboard-user text-indigo-400 w-5 mt-0.5"></i>
+                        <div>
+                            <p class="text-white font-bold">Created By</p>
+                            <p class="text-gray-400">
+                                {% if session.is_mine %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold"><i class="fas fa-user-check"></i>You</span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold"><i class="fas fa-user-group"></i>{{ session.creator_name }}</span>
+                                <span class="ml-1 text-xs text-gray-500">(co-lecturer)</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
                         <i
                             class="fas fa-building text-indigo-400 w-5 mt-0.5"
                         ></i>

@@ -628,6 +628,12 @@
                                         >
                                             {{ class.course.course_title }}
                                         </h3>
+                                        <span
+                                            class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold border {% if class.is_mine %}bg-indigo-500/20 text-indigo-300 border-indigo-500/30{% else %}bg-amber-500/20 text-amber-300 border-amber-500/30{% endif %}"
+                                        >
+                                            <i class="fas {% if class.is_mine %}fa-user-check{% else %}fa-user-group{% endif %}"></i>
+                                            {% if class.is_mine %}Created by you{% else %}By {{ class.creator_label }}{% endif %}
+                                        </span>
                                     </div>
                                     <div
                                         class="flex items-center gap-2 shrink-0"
