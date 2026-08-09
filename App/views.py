@@ -442,8 +442,13 @@ def lecturer_dashboard(request):
 
     user_obj = User.objects.get(username=request.user)
     lecturer, created = LecturerProfile.objects.get_or_create(user=user_obj)
-    scheduled_lectures = AttendanceSession.objects.filter(lecturer=lecturer).order_by(
-        "-start_time"
+    # Show sessions for EVERY course this lecturer teaches, including those
+    # created by co-lecturers of the same course (not just this lecturer's own).
+    taught_courses = lecturer.courses_taught.all()
+    scheduled_lectures = (
+        AttendanceSession.objects.filter(course__in=taught_courses)
+        .select_related("course", "lecturer", "lecturer__user")
+        .order_by("-start_time")
     )
 
     # Annotate session status and calculate metrics
@@ -452,6 +457,7 @@ def lecturer_dashboard(request):
     upcoming_count = 0
     total_marked_all = 0
     for class_obj in scheduled_lectures:
+        annotate_session_creator(class_obj, lecturer)
         class_obj.marked_count = class_obj.records.count()
         class_obj.formatted_start = format_lagos_time(class_obj.start_time)
         class_obj.formatted_end = format_lagos_time(class_obj.end_time)
@@ -703,17 +709,34 @@ def create_course(request):
             messages.error(request, "Credit units must be a valid number.")
             return render(request, "create_course.html")
 
-        # Check if course code already exists
-        if Course.objects.filter(course_code=course_code).exists():
-            messages.error(request, f"Course with code '{course_code}' already exists.")
-            return render(request, "create_course.html")
+        # A course is uniquely identified by its code. If it already exists
+        # (created by another lecturer), we DON'T error out — instead we add
+        # this lecturer as a co-lecturer, since a course can be taught by
+        # multiple lecturers. We match by code first, then fall back to title.
+        existing_course = (
+            Course.objects.filter(course_code=course_code).first()
+            or Course.objects.filter(course_title__iexact=course_title).first()
+        )
 
-        # Check if course title already exists
-        if Course.objects.filter(course_title__iexact=course_title).exists():
-            messages.error(
-                request, f"Course with title '{course_title}' already exists."
-            )
-            return render(request, "create_course.html")
+        if existing_course:
+            if lecturer_profile.courses_taught.filter(id=existing_course.id).exists():
+                messages.info(
+                    request,
+                    f"You already teach '{existing_course.course_title}'. "
+                    "It's ready in your course list.",
+                )
+            else:
+                lecturer_profile.courses_taught.add(existing_course)
+                logger.info(
+                    f"Co-lecturer added: {existing_course.course_code} - "
+                    f"{existing_course.course_title} now also taught by {user.username}"
+                )
+                messages.success(
+                    request,
+                    f"'{existing_course.course_title}' already exists — "
+                    "you've been added as a co-lecturer!",
+                )
+            return redirect("lecturer_courses")
 
         # Create the course
         course = Course.objects.create(
@@ -776,6 +799,30 @@ def format_lagos_time(aware_dt):
         return local_dt.strftime("%Y-%m-%d %H:%M:%S (Lagos/WAT)")
     except Exception:
         return aware_dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def annotate_session_creator(session, current_lecturer):
+    """Attach creator info to a session for the multi-lecturer UI.
+
+    A course can be taught by several lecturers, but each AttendanceSession
+    records the lecturer who created it in `session.lecturer`. This marks
+    whether the viewing lecturer is that creator and provides a display label
+    so co-lecturers can tell who created each session.
+    """
+    creator_profile = session.lecturer
+    creator_user = creator_profile.user if creator_profile else None
+    session.creator_name = (
+        (creator_user.get_full_name() or creator_user.username)
+        if creator_user
+        else "Unknown"
+    )
+    session.is_mine = bool(
+        current_lecturer
+        and creator_profile
+        and creator_profile.id == current_lecturer.id
+    )
+    session.creator_label = "You" if session.is_mine else session.creator_name
+    return session
 
 
 def get_aware_datetime(dt_str):
