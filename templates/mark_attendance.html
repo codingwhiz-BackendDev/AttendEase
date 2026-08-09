@@ -246,6 +246,7 @@
     const HALL_LON       = {{ attendance_session.longitude|default:0|safe }};
     const ALLOWED_RADIUS = {{ attendance_session.radius|default:100|safe }};
     const SESSION_END_ISO   = "{{ attendance_session.end_time.isoformat|default:''|escapejs }}";
+    const LECTURE_HALL      = "{{ attendance_session.lecture_hall|default:'the lecture hall'|escapejs }}";
 
     let studentLat = null, studentLon = null;
 
@@ -270,7 +271,7 @@
         } else {
             inline.innerHTML = `<i class="fas fa-triangle-exclamation mr-1 text-red-400"></i><span class="text-red-300 font-bold">${dist.toFixed(0)}m · Move to hall</span>`;
             pill.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300';
-            pill.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>⚠ Outside zone — move to ${attendance_session.lecture_hall|default:'the lecture hall'|escapejs}`;
+            pill.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>⚠ Outside zone — move to ${LECTURE_HALL}`;
         }
 
         const barFill = document.getElementById('dist-bar-fill');

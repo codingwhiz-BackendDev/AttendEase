@@ -16,7 +16,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.core.files.base import ContentFile
 from django.core.paginator import EmptyPage, Paginator
 from django.db import transaction
 from django.db.models import Q
@@ -239,9 +238,21 @@ def get_face_app():
         try:
             import insightface
 
-            _face_app = insightface.app.FaceAnalysis(name="buffalo_l")
-            _face_app.prepare(ctx_id=0, det_size=(640, 640))
-            logger.info("InsightFace model loaded successfully")
+            # Explicitly pin the CPU provider. Render runs CPU-only, and newer
+            # onnxruntime raises (instead of silently falling back) when a GPU
+            # provider is requested but unavailable.
+            # allowed_modules limits the pack to what we actually use
+            # (face detection + recognition embedding), which cuts RAM/startup
+            # significantly vs. loading the full buffalo_l pack (genderage,
+            # 2d106 & 3d68 landmarks) — important on memory-limited hosts.
+            _face_app = insightface.app.FaceAnalysis(
+                name="buffalo_l",
+                providers=["CPUExecutionProvider"],
+                allowed_modules=["detection", "recognition"],
+            )
+            # ctx_id=-1 => CPU mode (ctx_id=0 targets GPU device 0).
+            _face_app.prepare(ctx_id=-1, det_size=(640, 640))
+            logger.info("InsightFace model loaded successfully in CPU mode")
         except Exception as e:
             logger.error(f"Error loading InsightFace model: {e}")
             raise
@@ -1248,28 +1259,22 @@ def mark_attendance(request, pk):
             temp_captured_path = temp_file.name
 
         try:
-            # Check if student has a profile image
-            if not student_profile.face_image:
+            # Student must have enrolled a face embedding in settings first.
+            if not student_profile.face_embedding:
                 messages.error(
-                    request, "No profile image found! Please upload your profile image."
+                    request,
+                    "No face enrolled! Please capture your face in settings first.",
                 )
                 return redirect("student_settings")
 
             try:
-                # Get face embeddings
-                logger.info(
-                    f"Processing profile image: {student_profile.face_image.path}"
+                # Stored enrollment embedding (from the DB) vs the freshly
+                # captured face. We only run the model on the captured image.
+                profile_embedding = np.array(
+                    student_profile.face_embedding, dtype=np.float32
                 )
-                profile_embedding = get_face_encoding(student_profile.face_image.path)
                 logger.info(f"Processing captured image: {temp_captured_path}")
                 captured_embedding = get_face_encoding(temp_captured_path)
-
-                if profile_embedding is None:
-                    messages.error(
-                        request,
-                        "Could not detect face in your profile image. Please upload a clear photo in settings.",
-                    )
-                    return redirect("student_settings")
 
                 if captured_embedding is None:
                     messages.error(
@@ -1397,21 +1402,42 @@ def student_settings(request):
         student.faculty = request.POST.get("faculty")
         student.year_of_study = request.POST.get("year_of_study")
 
-        # Check if a face image was uploaded
-        if "face_image" in request.FILES:
-            # Handle the face image upload
-            face_image = request.FILES["face_image"]
-            # If the image is being saved as a file, you may want to convert it to an acceptable format
-            # Here, we can use PIL to make sure it's in the correct format:
-            image = Image.open(face_image)
-            image = image.convert("RGB")  # Ensure it is in RGB format
-            # Save it back as a new image
-            face_image_io = io.BytesIO()
-            image.save(face_image_io, format="JPEG")
-            face_image_io.seek(0)
+        # Face enrollment: we compute the embedding from the captured image
+        # in memory and store ONLY the numeric vector. The photo is never saved.
+        if "captured_face" in request.FILES:
+            captured_face = request.FILES["captured_face"]
 
-            # Save the image in the model
-            student.face_image.save("face_image.jpg", ContentFile(face_image_io.read()))
+            # Normalise to RGB JPEG, then write to a temp file so InsightFace
+            # (which reads from a path) can extract the embedding.
+            image = Image.open(captured_face)
+            image = image.convert("RGB")
+            face_io = io.BytesIO()
+            image.save(face_io, format="JPEG")
+            face_io.seek(0)
+
+            temp_face_path = None
+            try:
+                with tempfile.NamedTemporaryFile(
+                    delete=False, suffix=".jpg"
+                ) as temp_file:
+                    temp_file.write(face_io.read())
+                    temp_face_path = temp_file.name
+
+                embedding = get_face_encoding(temp_face_path)
+
+                if embedding is None:
+                    messages.error(
+                        request,
+                        "We couldn't detect a clear face in your capture. "
+                        "Please retake in good lighting with your face centered.",
+                    )
+                    return redirect("student_settings")
+
+                # Store the embedding as a plain list of floats (JSON-safe).
+                student.face_embedding = [float(x) for x in embedding]
+            finally:
+                if temp_face_path and os.path.exists(temp_face_path):
+                    os.unlink(temp_face_path)
 
         student.save()
         messages.success(request, "Profile updated successfully!")
@@ -1644,8 +1670,7 @@ def student_attendance_detail(request):
         "student_full_name": user.get_full_name() or user.username,
         "first_initial": (user.get_full_name() or user.username or "?")[0].upper(),
         "email": user.email,
-        "has_face_image": bool(sp.face_image),
-        "face_image_url": sp.face_image.url if sp.face_image else None,
+        "has_face_image": bool(sp.face_embedding),
         "matric": sp.matric_number or "N/A",
         "department": sp.department or "N/A",
         "faculty": sp.faculty or "N/A",
@@ -3067,7 +3092,7 @@ def lecturer_course_roster(request):
                     "year_of_study": sp.year_of_study
                     if sp.year_of_study and sp.year_of_study != 100
                     else "N/A",
-                    "has_face_image": bool(sp.face_image),
+                    "has_face_image": bool(sp.face_embedding),
                     "present_count": present_count,
                     "absent_count": absent_count,
                     "attendance_pct": attendance_pct,
@@ -3281,8 +3306,7 @@ def lecturer_student_detail(request, student_user_id, course_id=None):
         if sp.year_of_study and sp.year_of_study != 100
         else "N/A",
         "email": target_user.email,
-        "has_face_image": bool(sp.face_image),
-        "face_image_url": sp.face_image.url if sp.face_image else None,
+        "has_face_image": bool(sp.face_embedding),
         "scope_course": scope_course,
         "per_course": per_course,
         "total_expired_scope_enrolled": total_expired_scope_enrolled,

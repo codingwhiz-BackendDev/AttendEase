@@ -28,7 +28,14 @@ class StudentProfile(models.Model):
     matric_number = models.CharField(max_length=255, null=True, default="")
     year_of_study = models.IntegerField(default=100, null=True)
     courses_enrolled = models.ManyToManyField(Course, related_name="students")
-    face_image = models.ImageField(upload_to="faces/", null=True, blank=True)
+    # Privacy-first: we store ONLY the face embedding (a numeric vector), never
+    # the raw photo. The captured image is processed in memory and discarded.
+    face_embedding = models.JSONField(null=True, blank=True)
+
+    @property
+    def has_face_data(self):
+        """True once the student has enrolled a face embedding."""
+        return bool(self.face_embedding)
 
     class Meta:
         indexes = [

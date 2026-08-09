@@ -69,8 +69,8 @@
                 <p class="text-[11px] font-black uppercase tracking-wide text-gray-400">
                     Face verification
                 </p>
-                <p class="text-sm font-black {% if student.face_image %}text-emerald-400{% else %}text-orange-400{% endif %}">
-                    {% if student.face_image %}Profile ready{% else %}Setup required{% endif %}
+                <p class="text-sm font-black {% if student.has_face_data %}text-emerald-400{% else %}text-orange-400{% endif %}">
+                    {% if student.has_face_data %}Profile ready{% else %}Setup required{% endif %}
                 </p>
             </div>
         </div>
@@ -118,8 +118,8 @@
                                 <p class="text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">
                                     Face verification status
                                 </p>
-                                <p class="mt-1 text-sm font-bold {% if student.face_image %}text-emerald-400{% else %}text-orange-400{% endif %}">
-                                    {% if student.face_image %}Ready for attendance{% else %}Setup required{% endif %}
+                                <p class="mt-1 text-sm font-bold {% if student.has_face_data %}text-emerald-400{% else %}text-orange-400{% endif %}">
+                                    {% if student.has_face_data %}Ready for attendance{% else %}Setup required{% endif %}
                                 </p>
                             </div>
                         </div>
@@ -178,7 +178,7 @@
                             </div>
                         </div>
                         <div class="flex items-start gap-3 rounded-2xl bg-white/5 px-4 py-3 border border-white/10">
-                            <i class="fas {% if student.face_image %}fa-circle-check text-emerald-400{% else %}fa-circle text-gray-600{% endif %} mt-0.5"></i>
+                            <i class="fas {% if student.has_face_data %}fa-circle-check text-emerald-400{% else %}fa-circle text-gray-600{% endif %} mt-0.5"></i>
                             <div>
                                 <p class="font-bold text-white">
                                     Face recognition photo
@@ -234,7 +234,7 @@
                             sessions can verify you securely.
                         </p>
 
-                        {% if student.face_image %}
+                        {% if student.has_face_data %}
                         <div class="rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 p-5">
                             <div class="flex items-center gap-4">
                                 <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg">
@@ -268,16 +268,36 @@
                                 </span>
                             </div>
                             <div class="relative w-full max-w-md mx-auto mb-4 overflow-hidden rounded-3xl border border-indigo-500/30 bg-gray-900 shadow-xl">
-                                <video id="webcam" autoplay class="w-full"></video>
-                                <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                <video id="webcam" autoplay playsinline class="w-full"></video>
+                                <img id="face-preview" class="hidden w-full" alt="Your captured face preview" />
+                                <div id="camera-guide" class="pointer-events-none absolute inset-0 flex items-center justify-center">
                                     <div class="h-48 w-48 rounded-full border-4 border-dashed border-indigo-400"></div>
+                                </div>
+                                <div id="preview-badge" class="hidden absolute top-3 left-3 rounded-full bg-emerald-500/90 px-3 py-1 text-xs font-black text-white shadow-lg">
+                                    <i class="fas fa-eye mr-1"></i>Preview — make sure it's clear
                                 </div>
                             </div>
                             <canvas id="canvas" class="hidden"></canvas>
+
+                            <!-- Capture (shown first) -->
                             <button type="button" id="capture-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 px-5 py-3.5 text-sm font-black text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg">
                                 <i class="fas fa-camera"></i>Capture Face Photo
                             </button>
-                            <input type="file" name="face_image" id="face_image" class="hidden" />
+
+                            <!-- Preview actions (shown after capture, before submit) -->
+                            <div id="preview-actions" class="hidden flex-col gap-3 sm:flex-row">
+                                <button type="button" id="retake-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-5 py-3.5 text-sm font-black text-white transition-all hover:-translate-y-0.5 hover:bg-white/10">
+                                    <i class="fas fa-rotate-left"></i>Retake
+                                </button>
+                                <button type="button" id="confirm-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-3.5 text-sm font-black text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                                    <i class="fas fa-check"></i>Looks good, use this
+                                </button>
+                            </div>
+                            <p id="confirm-hint" class="hidden mt-2 text-center text-xs font-bold text-emerald-400">
+                                <i class="fas fa-circle-check mr-1"></i>Face confirmed — click "Save Changes" below to finish.
+                            </p>
+
+                            <input type="file" name="captured_face" id="captured_face" class="hidden" />
                         </div>
                         {% endif %}
                     </div>
@@ -295,13 +315,22 @@
 <script>
     const video = document.getElementById("webcam");
     const canvas = document.getElementById("canvas");
+    const preview = document.getElementById("face-preview");
+    const cameraGuide = document.getElementById("camera-guide");
+    const previewBadge = document.getElementById("preview-badge");
     const captureBtn = document.getElementById("capture-btn");
-    const faceImageInput = document.getElementById("face_image");
+    const previewActions = document.getElementById("preview-actions");
+    const retakeBtn = document.getElementById("retake-btn");
+    const confirmBtn = document.getElementById("confirm-btn");
+    const confirmHint = document.getElementById("confirm-hint");
+    const faceInput = document.getElementById("captured_face");
 
     if (video) {
+        let pendingBlob = null;
+
         function startWebcam() {
             navigator.mediaDevices
-                .getUserMedia({ video: true })
+                .getUserMedia({ video: { facingMode: "user" } })
                 .then((stream) => {
                     video.srcObject = stream;
                 })
@@ -314,10 +343,37 @@
                 });
         }
 
+        // Show the live camera, hide the frozen preview.
+        function showCameraMode() {
+            pendingBlob = null;
+            faceInput.value = "";
+            preview.classList.add("hidden");
+            previewBadge.classList.add("hidden");
+            previewActions.classList.add("hidden");
+            previewActions.classList.remove("flex");
+            confirmHint.classList.add("hidden");
+            video.classList.remove("hidden");
+            cameraGuide.classList.remove("hidden");
+            captureBtn.classList.remove("hidden");
+        }
+
+        // Freeze the shot so the student can review it BEFORE submitting.
+        function showPreviewMode(blobUrl) {
+            preview.src = blobUrl;
+            preview.classList.remove("hidden");
+            previewBadge.classList.remove("hidden");
+            video.classList.add("hidden");
+            cameraGuide.classList.add("hidden");
+            captureBtn.classList.add("hidden");
+            previewActions.classList.remove("hidden");
+            previewActions.classList.add("flex");
+        }
+
         if (video.srcObject === null) {
             startWebcam();
         }
 
+        // 1) Capture -> take a still and enter preview mode (not yet submitted).
         captureBtn.addEventListener("click", function () {
             const context = canvas.getContext("2d");
             canvas.width = video.videoWidth;
@@ -325,20 +381,43 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob((blob) => {
-                const file = new File([blob], "captured_face.jpg", {
-                    type: "image/jpeg",
-                });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                faceImageInput.files = dataTransfer.files;
-
-                Swal.fire({
-                    icon: "success",
-                    title: "Face captured",
-                    text: 'Click "Save Changes" to finish updating your profile.',
-                });
-            }, "image/jpeg");
+                pendingBlob = blob;
+                showPreviewMode(URL.createObjectURL(blob));
+            }, "image/jpeg", 0.92);
         });
+
+        // 2) Retake -> discard and go back to the live camera.
+        retakeBtn.addEventListener("click", showCameraMode);
+
+        // 3) Confirm -> only now attach the file so it will be submitted.
+        confirmBtn.addEventListener("click", function () {
+            if (!pendingBlob) return;
+            const file = new File([pendingBlob], "captured_face.jpg", {
+                type: "image/jpeg",
+            });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            faceInput.files = dataTransfer.files;
+
+            previewActions.classList.add("hidden");
+            previewActions.classList.remove("flex");
+            confirmHint.classList.remove("hidden");
+        });
+
+        // Safety net: block saving if a face was captured but not confirmed.
+        const settingsForm = faceInput.closest("form");
+        if (settingsForm) {
+            settingsForm.addEventListener("submit", function (e) {
+                if (pendingBlob && !faceInput.files.length) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: "info",
+                        title: "Confirm your face first",
+                        text: 'Tap "Looks good, use this" to confirm your preview, or "Retake" to try again.',
+                    });
+                }
+            });
+        }
     }
 </script>
 {% endblock content %}
