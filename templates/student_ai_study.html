@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% block title %}AI Study | ClassMillia{% endblock %}
+{% block content %}
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    .card-hover { transition: all 0.28s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 22px 48px rgba(99,102,241,0.18); }
+    @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    .orb-1 { animation: floaty 8s ease-in-out infinite; }
+    .orb-2 { animation: floaty 10s ease-in-out infinite; animation-delay: 2s; }
+    .tool-card { transition: all 0.2s ease; }
+    .tool-card:hover { transform: translateY(-4px); border-color: rgba(139,92,246,0.5); }
+    .tool-card.active { border-color: rgba(139,92,246,0.8); background: rgba(139,92,246,0.12); }
+    .flip-card { perspective: 1000px; }
+    .flip-inner { transition: transform 0.6s; transform-style: preserve-3d; position: relative; }
+    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+    .flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .flip-back { transform: rotateY(180deg); position: absolute; inset: 0; }
+    .chat-scroll::-webkit-scrollbar { width: 6px; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 999px; }
+</style>
+
+<div class="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950">
+    <div class="pointer-events-none fixed inset-0 overflow-hidden">
+        <div class="orb-1 absolute -left-24 top-24 h-96 w-96 rounded-full bg-fuchsia-500 opacity-20 blur-3xl"></div>
+        <div class="orb-2 absolute -right-24 top-96 h-[26rem] w-[26rem] rounded-full bg-indigo-500 opacity-15 blur-3xl"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+
+        <!-- Header -->
+        <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white shadow-lg shadow-fuchsia-900/40">
+                    <i class="fas fa-robot text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight text-white sm:text-3xl">AI Study</h1>
+                    <p class="mt-1 max-w-xl text-sm text-white/60">
+                        Learn from your lecturer's own materials. Ask questions, generate quizzes, make flashcards, and practice — grounded in your course.
+                    </p>
+                </div>
+            </div>
+            <span class="inline-flex items-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-xs font-black text-amber-200">
+                <i class="fas fa-flask"></i> Preview — AI model not connected yet
+            </span>
+        </div>
+
+        {% if courses %}
+        <!-- Course selector -->
+        <div class="mb-6 rounded-3xl border border-white/10 glass-card p-2">
+            <div class="flex items-center gap-2 overflow-x-auto sidebar-scroll pb-1">
+                {% for c in courses %}
+                <a href="?course={{ c.id }}"
+                   class="shrink-0 rounded-2xl px-4 py-2.5 text-sm font-black transition-all {% if c.id == selected_course_id %}bg-gradient-to-r from-fuchsia-500 to-indigo-600 text-white shadow-md{% else %}text-white/60 hover:bg-white/10 hover:text-white{% endif %}">
+                    <span class="inline-flex items-center gap-1.5">
+                        <span>{{ c.course_code }}</span>
+                        <span class="hidden opacity-80 md:inline">· {{ c.course_title|truncatechars:26 }}</span>
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <!-- LEFT: Course materials -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="rounded-3xl border border-white/10 glass-card p-5">
+                    <div class="mb-4 flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300"><i class="fas fa-book-open"></i></div>
+                        <div>
+                            <h2 class="text-base font-black text-white">Course Materials</h2>
+                            <p class="text-[11px] font-semibold text-white/50">{{ selected_course.course_code }}</p>
+                        </div>
+                    </div>
+                    {% if materials %}
+                    <div class="space-y-2">
+                        {% for m in materials %}
+                        <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 card-hover">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-300"><i class="fas fa-file"></i></div>
+                            <p class="min-w-0 flex-1 truncate text-sm font-bold text-white">{{ m.title }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="space-y-2 opacity-70">
+                        <p class="mb-2 text-[11px] font-black uppercase tracking-wider text-white/40">Sample (once your lecturer uploads)</p>
+                        <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-500/20 text-rose-300"><i class="fas fa-file-pdf"></i></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-bold text-white">Week 1 Notes</p>
+                                <p class="text-[10px] text-white/45">Course PDF</p>
+                            </div>
+                            <input type="radio" name="matpick" class="h-4 w-4 accent-fuchsia-500" checked>
+                        </div>
+                        <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300"><i class="fas fa-file-powerpoint"></i></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-bold text-white">Lecture Slides</p>
+                                <p class="text-[10px] text-white/45">Slides</p>
+                            </div>
+                            <input type="radio" name="matpick" class="h-4 w-4 accent-fuchsia-500">
+                        </div>
+                        <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-300"><i class="fas fa-clipboard-question"></i></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-bold text-white">2023 Past Questions</p>
+                                <p class="text-[10px] text-white/45">Past Questions</p>
+                            </div>
+                            <input type="radio" name="matpick" class="h-4 w-4 accent-fuchsia-500">
+                        </div>
+                    </div>
+                    <div class="mt-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-4 text-center">
+                        <i class="fas fa-inbox mb-1 text-lg text-white/40"></i>
+                        <p class="text-xs text-white/50">No materials uploaded yet for this course.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Study plan teaser -->
+                <div class="rounded-3xl border border-fuchsia-400/20 bg-gradient-to-br from-fuchsia-500/10 to-indigo-500/10 p-5">
+                    <div class="mb-2 flex items-center gap-2 text-fuchsia-200">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <p class="text-xs font-black uppercase tracking-wide">Your study plan</p>
+                    </div>
+                    <p class="text-xs text-white/60">Personalized revision schedule built from your materials, upcoming assessments &amp; practice performance.</p>
+                    <div class="mt-3 space-y-2 text-xs">
+                        <div class="flex items-center gap-2 rounded-xl bg-white/5 p-2.5"><span class="font-black text-white/80">Mon</span><span class="text-white/60">Trees — 30 min · 10 flashcards</span></div>
+                        <div class="flex items-center gap-2 rounded-xl bg-white/5 p-2.5"><span class="font-black text-white/80">Tue</span><span class="text-white/60">Graphs — 15 practice Qs</span></div>
+                    </div>
+                    <button disabled class="mt-3 w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-white/50">Coming soon</button>
+                </div>
+            </div>
+
+            <!-- RIGHT: AI tools + workspace -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Tool grid -->
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <button data-tool="ask" class="tool-card active rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300"><i class="fas fa-comments"></i></div>
+                        <p class="text-sm font-black text-white">Ask AI</p>
+                        <p class="text-[11px] text-white/50">Questions on the material</p>
+                    </button>
+                    <button data-tool="summarize" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-sky-500/20 text-sky-300"><i class="fas fa-align-left"></i></div>
+                        <p class="text-sm font-black text-white">Summarize</p>
+                        <p class="text-[11px] text-white/50">Key points, fast</p>
+                    </button>
+                    <button data-tool="explain" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300"><i class="fas fa-lightbulb"></i></div>
+                        <p class="text-sm font-black text-white">Explain</p>
+                        <p class="text-[11px] text-white/50">In simple terms</p>
+                    </button>
+                    <button data-tool="quiz" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300"><i class="fas fa-list-check"></i></div>
+                        <p class="text-sm font-black text-white">Quiz</p>
+                        <p class="text-[11px] text-white/50">Generate MCQs</p>
+                    </button>
+                    <button data-tool="flashcards" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-fuchsia-500/20 text-fuchsia-300"><i class="fas fa-clone"></i></div>
+                        <p class="text-sm font-black text-white">Flashcards</p>
+                        <p class="text-[11px] text-white/50">Flip to reveal</p>
+                    </button>
+                    <button data-tool="practice" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/20 text-rose-300"><i class="fas fa-dumbbell"></i></div>
+                        <p class="text-sm font-black text-white">Practice</p>
+                        <p class="text-[11px] text-white/50">One Q at a time</p>
+                    </button>
+                </div>
+                <!-- Workspace -->
+                <div class="rounded-3xl border border-white/10 glass-card p-5 sm:p-6">
+                    <!-- Source pill -->
+                    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1.5 text-[11px] font-black text-emerald-200">
+                            <i class="fas fa-shield-halved"></i> Answers grounded in {{ selected_course.course_code }} materials
+                        </div>
+                        <div id="toolTitle" class="text-sm font-black text-white/80">Ask AI</div>
+                    </div>
+
+                    <!-- ASK AI -->
+                    <section data-panel="ask" class="ai-panel">
+                        <div id="chatLog" class="chat-scroll mb-4 max-h-80 space-y-4 overflow-y-auto pr-1">
+                            <div class="flex gap-3">
+                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white text-xs"><i class="fas fa-robot"></i></div>
+                                <div class="rounded-2xl rounded-tl-sm bg-white/8 px-4 py-3 text-sm text-white/80">
+                                    Hi! Ask me anything about <b>{{ selected_course.course_code }}</b>. Try one of the suggestions below.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 flex flex-wrap gap-2">
+                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white">Explain this topic simply</button>
+                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white">10 questions from chapters 2–4</button>
+                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white">Most important concepts to revise</button>
+                        </div>
+                        <form id="chatForm" class="flex items-end gap-2">
+                            <textarea id="chatInput" rows="1" placeholder="Ask about your course material…"
+                                class="max-h-32 flex-1 resize-none rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"></textarea>
+                            <button type="submit" class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-fuchsia-500 to-indigo-600 text-white shadow-lg transition-all hover:-translate-y-0.5">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </section>
+
+                    <!-- SUMMARIZE -->
+                    <section data-panel="summarize" class="ai-panel hidden">
+                        <p class="mb-3 text-sm text-white/60">Get a clean, structured summary of a chapter or the whole document.</p>
+                        <div class="mb-3 flex flex-wrap gap-2">
+                            <input type="text" placeholder="e.g. Chapter 4" class="flex-1 rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-sky-500">
+                            <button class="run-ai rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-align-left mr-2"></i>Summarize</button>
+                        </div>
+                        <div class="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-5 text-sm text-white/50">
+                            <p class="mb-2 font-black text-white/70">Summary will appear here</p>
+                            <ul class="list-inside list-disc space-y-1">
+                                <li>Concise bullet points of key concepts</li>
+                                <li>Important definitions &amp; formulas</li>
+                                <li>What to focus on for revision</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- EXPLAIN -->
+                    <section data-panel="explain" class="ai-panel hidden">
+                        <p class="mb-3 text-sm text-white/60">Paste a concept or pick a topic and get a plain-English explanation with examples.</p>
+                        <textarea rows="2" placeholder="e.g. Explain the difference between a stack and a queue"
+                            class="mb-3 w-full resize-none rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-emerald-500"></textarea>
+                        <button class="run-ai rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-lightbulb mr-2"></i>Explain simply</button>
+                        <div class="mt-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-5 text-sm text-white/50">Explanation with analogies &amp; examples will appear here.</div>
+                    </section>
+
+                    <!-- QUIZ -->
+                    <section data-panel="quiz" class="ai-panel hidden">
+                        <div class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            <div>
+                                <label class="mb-1 block text-[11px] font-black uppercase tracking-wider text-white/50"># Questions</label>
+                                <select class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-white outline-none focus:border-amber-500">
+                                    <option>5</option><option selected>10</option><option>20</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[11px] font-black uppercase tracking-wider text-white/50">Difficulty</label>
+                                <select class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-white outline-none focus:border-amber-500">
+                                    <option>Easy</option><option selected>Medium</option><option>Hard</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2 sm:col-span-1">
+                                <label class="mb-1 block text-[11px] font-black uppercase tracking-wider text-white/50">Topics</label>
+                                <input type="text" placeholder="Chapters 3–5" class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-white outline-none placeholder:text-white/30 focus:border-amber-500">
+                            </div>
+                        </div>
+                        <button class="run-ai mb-4 w-full rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-list-check mr-2"></i>Generate quiz</button>
+                        <!-- Sample question -->
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <p class="mb-3 text-sm font-black text-white"><span class="text-amber-300">Q1.</span> Which structure follows Last-In-First-Out (LIFO)?</p>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white/70 hover:bg-white/10"><input type="radio" name="q1" class="accent-amber-500"> Queue</label>
+                                <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white/70 hover:bg-white/10"><input type="radio" name="q1" class="accent-amber-500"> Stack</label>
+                                <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white/70 hover:bg-white/10"><input type="radio" name="q1" class="accent-amber-500"> Linked List</label>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-center text-[11px] text-white/40">Sample preview — real questions generate from your materials.</p>
+                    </section>
+
+                    <!-- FLASHCARDS -->
+                    <section data-panel="flashcards" class="ai-panel hidden">
+                        <p class="mb-4 text-sm text-white/60">Tap a card to flip. Generated from your course material.</p>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div class="flip-card h-40 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                                <div class="flip-inner h-full w-full">
+                                    <div class="flip-face flex h-full w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-500/15 to-indigo-500/15 p-4 text-center">
+                                        <p class="text-[10px] font-black uppercase tracking-wider text-fuchsia-300">Question</p>
+                                        <p class="mt-2 text-sm font-bold text-white">What is a binary tree?</p>
+                                        <p class="mt-2 text-[10px] text-white/40">Tap to flip</p>
+                                    </div>
+                                    <div class="flip-face flip-back flex h-full w-full flex-col items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-center">
+                                        <p class="text-[10px] font-black uppercase tracking-wider text-emerald-300">Answer</p>
+                                        <p class="mt-2 text-sm text-white/80">A tree where each node has at most two children.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flip-card h-40 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                                <div class="flip-inner h-full w-full">
+                                    <div class="flip-face flex h-full w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-500/15 to-indigo-500/15 p-4 text-center">
+                                        <p class="text-[10px] font-black uppercase tracking-wider text-fuchsia-300">Question</p>
+                                        <p class="mt-2 text-sm font-bold text-white">Time complexity of binary search?</p>
+                                        <p class="mt-2 text-[10px] text-white/40">Tap to flip</p>
+                                    </div>
+                                    <div class="flip-face flip-back flex h-full w-full flex-col items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-center">
+                                        <p class="text-[10px] font-black uppercase tracking-wider text-emerald-300">Answer</p>
+                                        <p class="mt-2 text-sm text-white/80">O(log n)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="run-ai mt-4 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-indigo-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-clone mr-2"></i>Generate more flashcards</button>
+                    </section>
+
+                    <!-- PRACTICE -->
+                    <section data-panel="practice" class="ai-panel hidden">
+                        <div class="mb-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-white/70">
+                            <i class="fas fa-circle-info mr-1 text-rose-300"></i> Practice mode asks one question at a time. Answer, then the AI evaluates you and explains what you missed. Answers stay hidden until you respond.
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+                            <p class="mb-1 text-[11px] font-black uppercase tracking-wider text-white/40">Question 1 of 10</p>
+                            <p class="mb-4 text-base font-bold text-white">Explain, in your own words, why we use a hash table.</p>
+                            <textarea rows="3" placeholder="Type your answer…" class="mb-3 w-full resize-none rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-rose-500"></textarea>
+                            <div class="flex items-center justify-between">
+                                <button class="run-ai rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-check mr-2"></i>Submit answer</button>
+                                <button class="rounded-2xl border border-white/10 px-4 py-3 text-sm font-bold text-white/50 hover:bg-white/10">Skip</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- No courses -->
+        <div class="rounded-3xl border border-white/10 glass-card p-14 text-center">
+            <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-fuchsia-500/20 to-indigo-500/20 text-fuchsia-300">
+                <i class="fas fa-robot text-4xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white">Enroll in a course to start</h2>
+            <p class="mx-auto mt-2 max-w-md text-white/50">
+                Once you're enrolled and your lecturer uploads materials, AI Study unlocks here — Q&amp;A, quizzes, flashcards and practice, all from your course.
+            </p>
+            <a href="/student_courses" class="mt-5 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-fuchsia-500 to-indigo-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5">
+                <i class="fas fa-book"></i>Browse courses
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    (function () {
+        // Tool switching
+        var toolButtons = document.querySelectorAll(".tool-card");
+        var panels = document.querySelectorAll(".ai-panel");
+        var toolTitle = document.getElementById("toolTitle");
+        var labels = { ask: "Ask AI", summarize: "Summarize", explain: "Explain", quiz: "Quiz Generator", flashcards: "Flashcards", practice: "Practice Mode" };
+
+        toolButtons.forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var tool = btn.getAttribute("data-tool");
+                toolButtons.forEach(function (b) { b.classList.remove("active"); });
+                btn.classList.add("active");
+                panels.forEach(function (p) {
+                    p.classList.toggle("hidden", p.getAttribute("data-panel") !== tool);
+                });
+                if (toolTitle) toolTitle.textContent = labels[tool] || "AI Study";
+            });
+        });
+
+        // Preview notice for any AI action button
+        function previewNotice() {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: "info",
+                    title: "AI coming soon",
+                    text: "This is a UI preview. Connect an AI model to enable live answers, quizzes and flashcards.",
+                    confirmButtonColor: "#7c3aed",
+                });
+            } else {
+                alert("UI preview — AI model not connected yet.");
+            }
+        }
+        document.querySelectorAll(".run-ai").forEach(function (b) {
+            b.addEventListener("click", function (e) { e.preventDefault(); previewNotice(); });
+        });
+
+        // Ask AI chat (echo + preview reply)
+        var chatForm = document.getElementById("chatForm");
+        var chatInput = document.getElementById("chatInput");
+        var chatLog = document.getElementById("chatLog");
+
+        function addMsg(role, text) {
+            var wrap = document.createElement("div");
+            wrap.className = "flex gap-3" + (role === "user" ? " flex-row-reverse" : "");
+            var avatar = '<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ' +
+                (role === "user" ? "bg-white/15 text-white" : "bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white") +
+                ' text-xs"><i class="fas ' + (role === "user" ? "fa-user" : "fa-robot") + '"></i></div>';
+            var bubble = '<div class="rounded-2xl ' + (role === "user" ? "rounded-tr-sm bg-indigo-500/25" : "rounded-tl-sm bg-white/8") +
+                ' px-4 py-3 text-sm text-white/85 max-w-[80%]">' + text + "</div>";
+            wrap.innerHTML = avatar + bubble;
+            chatLog.appendChild(wrap);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function send(text) {
+            if (!text.trim()) return;
+            addMsg("user", text.replace(/</g, "&lt;"));
+            chatInput.value = "";
+            setTimeout(function () {
+                addMsg("ai", '<span class="text-white/60"><i class="fas fa-circle-info mr-1 text-amber-300"></i>Preview mode — once an AI model is connected, I\'ll answer this using your course materials.</span>');
+            }, 350);
+        }
+
+        if (chatForm) {
+            chatForm.addEventListener("submit", function (e) { e.preventDefault(); send(chatInput.value); });
+            chatInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(chatInput.value); }
+            });
+        }
+        document.querySelectorAll(".suggestion").forEach(function (s) {
+            s.addEventListener("click", function () { send(s.textContent.trim()); });
+        });
+    })();
+</script>
+{% endblock content %}
+
+ 

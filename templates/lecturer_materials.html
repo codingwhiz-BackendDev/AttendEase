@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% block title %}Course Materials | ClassMillia{% endblock %}
+{% block content %}
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    .card-hover { transition: all 0.28s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 22px 48px rgba(99,102,241,0.18); }
+    @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    .orb-1 { animation: floaty 8s ease-in-out infinite; }
+    .orb-2 { animation: floaty 10s ease-in-out infinite; animation-delay: 2s; }
+    .dropzone { transition: all 0.2s ease; }
+    .dropzone.dragover { border-color: rgba(139,92,246,0.7); background: rgba(139,92,246,0.10); transform: scale(1.01); }
+    .cat-pill { transition: all 0.18s ease; }
+    .cat-pill:hover { transform: translateY(-2px); }
+</style>
+
+<div class="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950">
+    <div class="pointer-events-none fixed inset-0 overflow-hidden">
+        <div class="orb-1 absolute -left-24 top-24 h-96 w-96 rounded-full bg-indigo-500 opacity-20 blur-3xl"></div>
+        <div class="orb-2 absolute -right-24 top-96 h-[26rem] w-[26rem] rounded-full bg-fuchsia-500 opacity-15 blur-3xl"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+
+        <!-- Header -->
+        <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-900/40">
+                    <i class="fas fa-folder-open text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight text-white sm:text-3xl">Course Materials</h1>
+                    <p class="mt-1 max-w-xl text-sm text-white/60">
+                        Upload PDFs, notes, slides &amp; past questions. Enrolled students get instant access — and soon, AI grounded in your material.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-xs font-black text-amber-200">
+                    <i class="fas fa-flask"></i> Preview — AI backend coming soon
+                </span>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="rounded-2xl px-4 py-3 {% if message.tags == 'success' %}bg-emerald-500/20 text-emerald-200 border border-emerald-500/30{% elif message.tags == 'error' %}bg-red-500/20 text-red-200 border border-red-500/30{% elif message.tags == 'warning' %}bg-yellow-500/20 text-yellow-200 border border-yellow-500/30{% else %}bg-blue-500/20 text-blue-200 border border-blue-500/30{% endif %}">
+                <div class="flex items-center gap-2">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                    <span class="text-sm font-semibold">{{ message }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if courses %}
+        <!-- Course selector -->
+        <div class="mb-6 rounded-3xl border border-white/10 glass-card p-2">
+            <div class="flex items-center gap-2 overflow-x-auto sidebar-scroll pb-1">
+                {% for c in courses %}
+                <a href="?course={{ c.id }}"
+                   class="shrink-0 rounded-2xl px-4 py-2.5 text-sm font-black transition-all {% if c.id == selected_course_id %}bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md{% else %}text-white/60 hover:bg-white/10 hover:text-white{% endif %}">
+                    <span class="inline-flex items-center gap-1.5">
+                        <span>{{ c.course_code }}</span>
+                        <span class="hidden opacity-80 md:inline">· {{ c.course_title|truncatechars:26 }}</span>
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <!-- LEFT: Upload -->
+            <div class="lg:col-span-1">
+                <div class="rounded-3xl border border-white/10 glass-card p-5 sm:p-6">
+                    <div class="mb-4 flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-black text-white">Upload material</h2>
+                            <p class="text-[11px] font-semibold text-white/50">
+                                to <span class="text-indigo-300">{{ selected_course.course_code }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="/lecturer/materials/?course={{ selected_course_id }}" enctype="multipart/form-data" id="uploadForm" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="course" value="{{ selected_course_id }}">
+
+                        <!-- Title -->
+                        <div>
+                            <label class="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-white/50">Title</label>
+                            <input type="text" name="title" required placeholder="e.g. Week 3 — Linked Lists"
+                                class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none placeholder:text-white/30 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
+                        </div>
+
+                        <!-- Category -->
+                        <div>
+                            <label class="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-white/50">Category</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                {% for cat in material_categories %}
+                                <label class="cat-pill cursor-pointer">
+                                    <input type="radio" name="category" value="{{ cat.key }}" class="peer sr-only" {% if forloop.first %}checked{% endif %}>
+                                    <div class="flex items-center gap-2 rounded-2xl border-2 border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-white/70 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/15 peer-checked:text-white">
+                                        <i class="fas {{ cat.icon }} text-{{ cat.color }}-300"></i>
+                                        <span class="truncate">{{ cat.label }}</span>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Week / tag -->
+                        <div>
+                            <label class="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-white/50">Topic / week <span class="text-white/30">(optional)</span></label>
+                            <input type="text" name="topic" placeholder="e.g. Chapter 2, Week 4"
+                                class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none placeholder:text-white/30 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
+                        </div>
+
+                        <!-- Dropzone -->
+                        <div>
+                            <label class="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-white/50">File</label>
+                            <label id="dropzone" class="dropzone flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/5 px-4 py-8 text-center">
+                                <i class="fas fa-file-arrow-up mb-2 text-2xl text-indigo-300"></i>
+                                <p class="text-sm font-bold text-white">Drop a file or <span class="text-indigo-300 underline">browse</span></p>
+                                <p class="mt-1 text-[11px] text-white/40">PDF, DOCX, PPTX, images · up to 25MB</p>
+                                <p id="fileName" class="mt-2 hidden max-w-full truncate rounded-lg bg-indigo-500/20 px-3 py-1 text-xs font-bold text-indigo-200"></p>
+                                <input type="file" name="file" id="fileInput" class="sr-only" accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.txt">
+                            </label>
+                        </div>
+
+                        <!-- AI toggle -->
+                        <label class="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                            <input type="checkbox" name="ai_index" checked class="mt-0.5 h-4 w-4 accent-indigo-500">
+                            <span class="text-xs text-white/70">
+                                <span class="font-black text-white">Make available to AI Study</span><br>
+                                Let enrolled students ask questions, quiz &amp; summarize from this file.
+                            </span>
+                        </label>
+
+                        <button type="submit"
+                            class="w-full rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-3.5 text-sm font-black text-white shadow-lg shadow-indigo-900/40 transition-all hover:-translate-y-0.5 hover:shadow-xl">
+                            <i class="fas fa-cloud-arrow-up mr-2"></i>Upload to {{ selected_course.course_code }}
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Access note -->
+                <div class="mt-4 rounded-3xl border border-emerald-400/20 bg-emerald-400/5 p-4">
+                    <div class="flex items-center gap-2 text-emerald-300">
+                        <i class="fas fa-lock"></i>
+                        <p class="text-xs font-black uppercase tracking-wide">Private to your class</p>
+                    </div>
+                    <p class="mt-1.5 text-xs text-white/60">
+                        Only students enrolled in <span class="font-bold text-white">{{ selected_course.course_code }}</span> can view or download these materials.
+                    </p>
+                </div>
+            </div>
+
+            <!-- RIGHT: Materials list -->
+            <div class="lg:col-span-2">
+                <div class="rounded-3xl border border-white/10 glass-card p-5 sm:p-6">
+                    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-black text-white">{{ selected_course.course_title }}</h2>
+                                <p class="text-[11px] font-semibold text-white/50">{{ selected_course.course_code }} · Uploaded materials</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 overflow-x-auto">
+                            <button class="rounded-full bg-white/10 px-3 py-1.5 text-[11px] font-black text-white">All</button>
+                            {% for cat in material_categories %}
+                            <button class="rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-bold text-white/50 hover:bg-white/10 hover:text-white">
+                                <i class="fas {{ cat.icon }} mr-1 text-{{ cat.color }}-300"></i>{{ cat.label }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if materials %}
+                    <div class="space-y-3">
+                        {% for m in materials %}
+                        <div class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 card-hover">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-black text-white">{{ m.title }}</p>
+                                <p class="text-[11px] text-white/50">{{ m.category }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Empty state (with sample preview cards) -->
+                    <div class="mb-5 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-8 text-center">
+                        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-300">
+                            <i class="fas fa-folder-open text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-black text-white">No materials yet</h3>
+                        <p class="mx-auto mt-1 max-w-sm text-sm text-white/50">
+                            Upload your first file on the left. Here's how it'll look once you do:
+                        </p>
+                    </div>
+
+                    <p class="mb-2 text-[11px] font-black uppercase tracking-wider text-white/40">Preview layout</p>
+                    <div class="space-y-3 opacity-60">
+                        <!-- Sample 1 -->
+                        <div class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-500/20 text-rose-300"><i class="fas fa-file-pdf"></i></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-black text-white">Week 1 — Introduction to Data Structures</p>
+                                <div class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-white/50">
+                                    <span class="rounded-full bg-rose-500/15 px-2 py-0.5 font-bold text-rose-200">Course PDF</span>
+                                    <span><i class="far fa-clock mr-1"></i>2.4 MB</span>
+                                    <span class="inline-flex items-center gap-1 text-emerald-300"><i class="fas fa-robot"></i>AI-ready</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-white/40">
+                                <i class="fas fa-download"></i><i class="fas fa-trash-can"></i>
+                            </div>
+                        </div>
+                        <!-- Sample 2 -->
+                        <div class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300"><i class="fas fa-file-powerpoint"></i></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-black text-white">Lecture Slides — Stacks &amp; Queues</p>
+                                <div class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-white/50">
+                                    <span class="rounded-full bg-amber-500/15 px-2 py-0.5 font-bold text-amber-200">Slides</span>
+                                    <span>5.1 MB</span>
+                                    <span class="inline-flex items-center gap-1 text-emerald-300"><i class="fas fa-robot"></i>AI-ready</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-white/40"><i class="fas fa-download"></i><i class="fas fa-trash-can"></i></div>
+                        </div>
+                        <!-- Sample 3 -->
+                        <div class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300"><i class="fas fa-clipboard-question"></i></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-black text-white">2023 Past Questions</p>
+                                <div class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-white/50">
+                                    <span class="rounded-full bg-emerald-500/15 px-2 py-0.5 font-bold text-emerald-200">Past Questions</span>
+                                    <span>820 KB</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-white/40"><i class="fas fa-download"></i><i class="fas fa-trash-can"></i></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- No courses -->
+        <div class="rounded-3xl border border-white/10 glass-card p-14 text-center">
+            <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-300">
+                <i class="fas fa-book text-4xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white">No courses yet</h2>
+            <p class="mx-auto mt-2 max-w-md text-white/50">
+                Add a course to your lecturer profile first, then come back to upload materials for your students.
+            </p>
+            <a href="/lecturer_courses" class="mt-5 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5">
+                <i class="fas fa-plus"></i>Add a course
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    (function () {
+        var dz = document.getElementById("dropzone");
+        var input = document.getElementById("fileInput");
+        var nameTag = document.getElementById("fileName");
+        if (!dz || !input) return;
+
+        function showName() {
+            if (input.files && input.files.length) {
+                nameTag.textContent = input.files[0].name;
+                nameTag.classList.remove("hidden");
+            }
+        }
+        input.addEventListener("change", showName);
+
+        ["dragenter", "dragover"].forEach(function (ev) {
+            dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add("dragover"); });
+        });
+        ["dragleave", "drop"].forEach(function (ev) {
+            dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove("dragover"); });
+        });
+        dz.addEventListener("drop", function (e) {
+            if (e.dataTransfer && e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                showName();
+            }
+        });
+    })();
+</script>
+{% endblock content %}

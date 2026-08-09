@@ -192,6 +192,24 @@
                             </div>
                         </a>
                         <a
+                            href="/student/ai-study/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student/ai-study/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-robot w-5 text-center {% if request.path == '/student/ai-study/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <div class="flex-1">
+                                <p class="flex items-center gap-2">AI Study
+                                    <span class="rounded-full bg-gradient-to-r from-fuchsia-500 to-indigo-500 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-white shadow-sm">New</span>
+                                </p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/student/ai-study/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Materials, Q&amp;A, quizzes, flashcards
+                                </p>
+                            </div>
+                        </a>
+                        <a
                             href="/student/settings/"
                             class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/student/settings/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
                         >
@@ -274,6 +292,24 @@
                                 class="fas fa-users-rectangle w-5 text-center {% if request.path == '/lecturer/roster/' %}text-indigo-600{% endif %}"
                             ></i>
                             <span>Course Roster</span>
+                        </a>
+                        <a
+                            href="/lecturer/materials/"
+                            class="group flex items-center gap-3 rounded-2xl px-4 py-3.5 font-semibold transition-all {% if request.path == '/lecturer/materials/' %}bg-white text-indigo-900 shadow-xl shadow-indigo-950/20{% else %}text-white/72 hover:bg-white/10 hover:text-white{% endif %}"
+                        >
+                            <i
+                                class="fas fa-folder-open w-5 text-center {% if request.path == '/lecturer/materials/' %}text-indigo-600{% endif %}"
+                            ></i>
+                            <div class="flex-1">
+                                <p class="flex items-center gap-2">Course Materials
+                                    <span class="rounded-full bg-gradient-to-r from-fuchsia-500 to-indigo-500 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-white shadow-sm">New</span>
+                                </p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/lecturer/materials/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Upload notes, slides &amp; past questions
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/lecturer_courses"

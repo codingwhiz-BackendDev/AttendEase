@@ -1856,6 +1856,99 @@ def download_session_excel(request, pk):
         return redirect("lecturer_session_detail", pk=pk)
 
 
+# ========== COURSE MATERIALS + AI STUDY (UI preview) ==========
+# NOTE: The AI model, file storage, text extraction and RAG pipeline are not
+# wired yet — these views render the full interface so the workflow can be
+# reviewed. Actions show a friendly "preview mode" notice instead of persisting.
+MATERIAL_CATEGORIES = [
+    {"key": "pdf", "label": "Course PDF", "icon": "fa-file-pdf", "color": "rose"},
+    {"key": "notes", "label": "Lecture Notes", "icon": "fa-book-open", "color": "indigo"},
+    {"key": "slides", "label": "Slides", "icon": "fa-file-powerpoint", "color": "amber"},
+    {
+        "key": "past_questions",
+        "label": "Past Questions",
+        "icon": "fa-clipboard-question",
+        "color": "emerald",
+    },
+    {"key": "study", "label": "Study Material", "icon": "fa-paperclip", "color": "sky"},
+]
+
+
+def _pick_selected_course(courses, raw_id):
+    """Resolve the selected course from a list + raw GET value (first as default)."""
+    selected_id = None
+    if raw_id:
+        try:
+            selected_id = int(raw_id)
+        except (ValueError, TypeError):
+            selected_id = None
+    if selected_id is None and courses:
+        selected_id = courses[0].id
+    selected = next((c for c in courses if c.id == selected_id), None)
+    return selected, selected_id
+
+
+@lecturer_required
+def lecturer_materials(request):
+    """Lecturer hub to upload & manage course materials (UI preview)."""
+    user_obj = User.objects.get(username=request.user)
+    lecturer = get_object_or_404(LecturerProfile, user=user_obj)
+    courses = sorted(lecturer.courses_taught.all(), key=lambda c: c.course_code)
+
+    selected_course, selected_course_id = _pick_selected_course(
+        courses, request.GET.get("course")
+    )
+
+    if request.method == "POST":
+        messages.info(
+            request,
+            "Preview mode — the materials & AI backend isn't connected yet, "
+            "so this upload wasn't saved.",
+        )
+        target = "/lecturer/materials/"
+        if selected_course_id:
+            target += f"?course={selected_course_id}"
+        return redirect(target)
+
+    context = {
+        "user_role": "lecturer",
+        "lecturer": lecturer,
+        "courses": courses,
+        "selected_course": selected_course,
+        "selected_course_id": selected_course_id,
+        "material_categories": MATERIAL_CATEGORIES,
+        "materials": [],  # backend not wired yet
+    }
+    return render(request, "lecturer_materials.html", context)
+
+
+@student_required
+def student_ai_study(request):
+    """Student AI Study hub — course materials + AI study tools (UI preview)."""
+    user_obj = User.objects.get(username=request.user)
+    try:
+        student_profile = StudentProfile.objects.get(student_name=user_obj)
+    except StudentProfile.DoesNotExist:
+        student_profile = StudentProfile.objects.create(student_name=user_obj)
+
+    courses = sorted(
+        student_profile.courses_enrolled.all(), key=lambda c: c.course_code
+    )
+    selected_course, selected_course_id = _pick_selected_course(
+        courses, request.GET.get("course")
+    )
+
+    context = {
+        "user_role": "student",
+        "student_profile": student_profile,
+        "courses": courses,
+        "selected_course": selected_course,
+        "selected_course_id": selected_course_id,
+        "materials": [],  # backend not wired yet
+    }
+    return render(request, "student_ai_study.html", context)
+
+
 # ========== LECTURER REPORTS HUB (/reports) ==========
 @lecturer_required
 def lecturer_reports(request):

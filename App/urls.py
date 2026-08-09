@@ -135,6 +135,12 @@ urlpatterns = [
         "lecturer/roster/", views.lecturer_course_roster, name="lecturer_course_roster"
     ),
     path(
+        "lecturer/materials/", views.lecturer_materials, name="lecturer_materials"
+    ),
+    path(
+        "student/ai-study/", views.student_ai_study, name="student_ai_study"
+    ),
+    path(
         "lecturer/student/<int:student_user_id>/",
         views.lecturer_student_detail,
         name="lecturer_student_detail",
