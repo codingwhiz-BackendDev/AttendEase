@@ -43,16 +43,16 @@
     .btn-outline-purple:hover { background:rgba(139,92,246,0.2); border-color:#8b5cf6; }
     .btn-danger { border:1.5px solid rgba(239,68,68,0.3); background:rgba(30, 27, 75, 0.4); color:#fca5a5; transition:all 0.2s ease; }
     .btn-danger:hover { background:rgba(239,68,68,0.2); border-color:#ef4444; }
-    .status-live { background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.15)); color:#047857; border-color:rgba(16,185,129,0.3); }
-    .status-upcoming { background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(124,58,237,0.15)); color:#6d28d9; border-color:rgba(139,92,246,0.3); }
-    .status-closed { background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(220,38,38,0.15)); color:#b91c1c; border-color:rgba(239,68,68,0.3); }
-    .status-draft { background:linear-gradient(135deg,rgba(107,114,128,0.12),rgba(75,85,99,0.15)); color:#374151; border-color:rgba(107,114,128,0.3); }
-    .type-badge { background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(192,132,252,0.15)); color:#7e22ce; border-color:rgba(168,85,247,0.3); }
-    .q-type-chip-mcq { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
-    .q-type-chip-tf { background:rgba(99,102,241,0.1); color:#4338ca; border-color:rgba(99,102,241,0.3); }
-    .q-type-chip-fb { background:rgba(59,130,246,0.1); color:#1d4ed8; border-color:rgba(59,130,246,0.3); }
-    .q-type-chip-sa { background:rgba(245,158,11,0.1); color:#92400e; border-color:rgba(245,158,11,0.3); }
-    .q-type-chip-essay { background:rgba(168,85,247,0.12); color:#7e22ce; border-color:rgba(168,85,247,0.35); }
+    .status-live { background:linear-gradient(135deg,rgba(16,185,129,0.3),rgba(5,150,105,0.4)); color:#34d399; border-color:rgba(16,185,129,0.5); }
+    .status-upcoming { background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(124,58,237,0.4)); color:#a78bfa; border-color:rgba(139,92,246,0.5); }
+    .status-closed { background:linear-gradient(135deg,rgba(239,68,68,0.3),rgba(220,38,38,0.4)); color:#f87171; border-color:rgba(239,68,68,0.5); }
+    .status-draft { background:linear-gradient(135deg,rgba(107,114,128,0.3),rgba(75,85,99,0.4)); color:#9ca3af; border-color:rgba(107,114,128,0.5); }
+    .type-badge { background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(192,132,252,0.4)); color:#c4b5fd; border-color:rgba(168,85,247,0.5); }
+    .q-type-chip-mcq { background:rgba(16,185,129,0.3); color:#34d399; border-color:rgba(16,185,129,0.5); }
+    .q-type-chip-tf { background:rgba(99,102,241,0.3); color:#818cf8; border-color:rgba(99,102,241,0.5); }
+    .q-type-chip-fb { background:rgba(59,130,246,0.3); color:#60a5fa; border-color:rgba(59,130,246,0.5); }
+    .q-type-chip-sa { background:rgba(245,158,11,0.3); color:#fbbf24; border-color:rgba(245,158,11,0.5); }
+    .q-type-chip-essay { background:rgba(168,85,247,0.3); color:#c4b5fd; border-color:rgba(168,85,247,0.5); }
     .question-item { background:linear-gradient(180deg,rgba(139,92,246,0.02) 0%,#ffffff 100%); border:1px solid rgba(118,75,162,0.12); transition:all 0.2s ease; }
     .question-item:hover { border-color:rgba(139,92,246,0.35); box-shadow:0 6px 20px rgba(102,126,234,0.1); }
     .correct-opt { background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.35) !important; color:#047857; }
@@ -171,9 +171,9 @@
             <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">Avg Score</p>
             <p class="mt-3 text-2xl md:text-3xl font-black bg-gradient-to-br from-emerald-600 to-teal-700 bg-clip-text text-transparent">{{ stats.avg_score }}</p>
             <p class="mt-3 text-xs font-bold text-gray-500">
-                {% if stats.avg_pct >= 70 %}<span class="score-good"><i class="fas fa-arrow-trend-up"></i> {{ stats.avg_pct }}% strong</span>
+                {% if stats.avg_pct >= 70 %}<span class="score-good"><i class="fas fa-arrow-up"></i> {{ stats.avg_pct }}% strong</span>
                 {% elif stats.avg_pct >= 50 %}<span class="score-mid"><i class="fas fa-minus"></i> {{ stats.avg_pct }}%</span>
-                {% else %}<span class="score-bad"><i class="fas fa-arrow-trend-down"></i> {{ stats.avg_pct }}%</span>{% endif %}
+                {% else %}<span class="score-bad"><i class="fas fa-arrow-down"></i> {{ stats.avg_pct }}%</span>{% endif %}
             </p>
         </div>
         <div class="stat-card rounded-3xl p-5">
@@ -243,7 +243,7 @@
                             {% elif qt == 'fill_blank' %}q-type-chip-fb
                             {% elif qt == 'short_answer' %}q-type-chip-sa
                             {% elif qt == 'essay' %}q-type-chip-essay{% endif %}">
-                            <i class="fas {% if qt == 'mcq' %}fa-list{% elif qt == 'true_false' %}fa-check-double{% elif qt == 'fill_blank' %}fa-pen-line{% elif qt == 'short_answer' %}fa-memo-circle-info{% elif qt == 'essay' %}fa-feather-pointed{% endif %} mr-1"></i>
+                            <i class="fas {% if qt == 'mcq' %}fa-list{% elif qt == 'true_false' %}fa-check{% elif qt == 'fill_blank' %}fa-pen{% elif qt == 'short_answer' %}fa-file-lines{% elif qt == 'essay' %}fa-file-alt{% endif %} mr-1"></i>
                             {{ q.get_question_type_display }}
                         </span>
                         {% endwith %}
@@ -252,7 +252,7 @@
                         </span>
                         {% if q.manual_grading_required %}
                         <span class="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700 border border-amber-200">
-                            <i class="fas fa-memo-circle-check mr-1"></i>Manual
+                            <i class="fas fa-check mr-1"></i>Manual
                         </span>
                         {% endif %}
                     </div>
@@ -270,7 +270,7 @@
                     </div>
                     {% elif q.accepted_answers %}
                     <div class="mt-4 rounded-xl bg-white p-4 text-sm border border-blue-200 text-blue-900">
-                        <p class="font-black mb-2 text-[11px] uppercase tracking-wider text-blue-700"><i class="fas fa-spell-check mr-1.5"></i>Accepted answers</p>
+                        <p class="font-black mb-2 text-[11px] uppercase tracking-wider text-blue-700"><i class="fas fa-check mr-1.5"></i>Accepted answers</p>
                         <div class="whitespace-pre-line font-semibold">{{ q.accepted_answers }}</div>
                     </div>
                     {% endif %}
@@ -283,7 +283,7 @@
             {% if per_question %}
             <div class="mt-8">
                 <h3 class="text-lg font-black bg-gradient-to-r from-purple-800 to-indigo-800 bg-clip-text text-transparent mb-4 flex items-center gap-2">
-                    <i class="fas fa-chart-simple text-purple-600"></i>Per-question performance
+                    <i class="fas fa-chart-bar text-purple-600"></i>Per-question performance
                 </h3>
                 <div class="space-y-3">
                     {% for pq in per_question %}
@@ -333,7 +333,7 @@
 
             <div class="purple-card rounded-3xl p-6 shadow-sm">
                 <h3 class="text-lg font-black text-purple-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-memo-circle-check text-amber-500"></i>Manual grading queue
+                    <i class="fas fa-tasks text-purple-600"></i>Manual grading queue
                     <span class="ml-auto rounded-full bg-amber-100 text-amber-800 px-3 py-1 text-xs font-black border border-amber-200">{{ pending_manual_count }}</span>
                 </h3>
                 {% if pending_manual %}
@@ -343,7 +343,7 @@
                     <div class="grad-queue-item rounded-2xl p-4">
                         <div class="flex items-center justify-between mb-2">
                             <p class="text-xs font-black uppercase tracking-wider text-amber-700">
-                                <i class="fas fa-user-graduate mr-1"></i>{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}
+                                <i class="fas fa-user mr-1"></i>{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}
                             </p>
                             <span class="rounded-full bg-white/80 border border-amber-200 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-amber-800">
                                 {{ item.question.get_question_type_display }}
@@ -375,7 +375,7 @@
                 {% else %}
                 <div class="text-center py-8">
                     <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200">
-                        <i class="fas fa-sparkles text-xl"></i>
+                        <i class="fas fa-star text-xl"></i>
                     </div>
                     <p class="text-sm text-gray-600 font-bold">All caught up!</p>
                     <p class="text-xs text-gray-500 mt-1 font-semibold">No essay or short-answer responses waiting.</p>
@@ -461,7 +461,7 @@
                                 {% if a.status == 'graded' %}border-emerald-200 bg-emerald-50 text-emerald-800
                                 {% elif a.status == 'submitted' %}border-amber-200 bg-amber-50 text-amber-800
                                 {% else %}border-indigo-200 bg-indigo-50 text-indigo-800{% endif %}">
-                                {% if a.status == 'graded' %}<i class="fas fa-check-double mr-1"></i>{% elif a.status == 'submitted' %}<i class="fas fa-hourglass-half mr-1 animate-pulse"></i>{% endif %}
+                                {% if a.status == 'graded' %}<i class="fas fa-check mr-1"></i>{% elif a.status == 'submitted' %}<i class="fas fa-clock mr-1 animate-pulse"></i>{% endif %}
                                 {{ a.get_status_display }}
                             </span>
                         </td>
