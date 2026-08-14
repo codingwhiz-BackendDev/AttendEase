@@ -405,6 +405,34 @@
         var courseCode = "{{ selected_course.course_code }}";
         var chatHistory = [];
         
+        // Load material coverage on page load
+        function loadMaterialCoverage() {
+            fetch("/api/ai/material-coverage/?course_code=" + courseCode)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.coverage.total_materials > 0) {
+                        var materialsDiv = document.querySelector('.white-card');
+                        if (materialsDiv) {
+                            var coverageHtml = '<div class="mt-3 pt-3 border-t border-white/10">';
+                            coverageHtml += '<p class="text-[10px] text-emerald-300"><i class="fas fa-database mr-1"></i>AI has processed ' + data.coverage.total_materials + ' materials</p>';
+                            coverageHtml += '<div class="mt-2 space-y-1">';
+                            data.coverage.materials.forEach(function(mat) {
+                                coverageHtml += '<div class="text-[10px] text-white/40">';
+                                coverageHtml += '<span class="text-white/60">' + mat.title + '</span> ';
+                                coverageHtml += '<span class="text-white/30">(' + mat.key_concepts.slice(0, 3).join(', ') + ')</span>';
+                                coverageHtml += '</div>';
+                            });
+                            coverageHtml += '</div></div>';
+                            materialsDiv.innerHTML += coverageHtml;
+                        }
+                    }
+                })
+                .catch(error => console.log('Could not load material coverage'));
+        }
+        
+        // Load material coverage
+        loadMaterialCoverage();
+        
         // Tool switching
         var toolButtons = document.querySelectorAll(".tool-card");
         var panels = document.querySelectorAll(".ai-panel");
@@ -720,8 +748,12 @@
                     html += '<label class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white/70 hover:bg-white/10"><input type="radio" name="q' + idx + '" class="accent-amber-500"> ' + opt + '</label>';
                 });
                 html += '</div>';
-                html += '<button class="mt-3 text-xs text-white/50 hover:text-white reveal-answer" data-answer="' + q.correct_answer + '" data-explanation="' + q.explanation.replace(/"/g, '&quot;') + '"><i class="fas fa-eye mr-1"></i>Show answer</button>';
-                html += '<div class="hidden mt-2 text-xs text-emerald-300 answer-reveal"><strong>Correct:</strong> ' + q.options[q.correct_answer] + '<br><em>' + q.explanation + '</em></div>';
+                html += '<button class="mt-3 text-xs text-white/50 hover:text-white reveal-answer" data-answer="' + q.correct_answer + '" data-explanation="' + q.explanation.replace(/"/g, '&quot;') + '" data-source="' + (q.source_material || 'Course Materials') + '"><i class="fas fa-eye mr-1"></i>Show answer</button>';
+                html += '<div class="hidden mt-2 text-xs text-emerald-300 answer-reveal">';
+                html += '<strong>Correct:</strong> ' + q.options[q.correct_answer] + '<br>';
+                html += '<em>' + q.explanation + '</em><br>';
+                html += '<span class="text-white/40 mt-1"><i class="fas fa-book-open mr-1"></i>Source: ' + (q.source_material || 'Course Materials') + '</span>';
+                html += '</div>';
                 html += '</div>';
             });
             
@@ -779,13 +811,16 @@
                 html += '<div class="flip-card h-40 cursor-pointer" onclick="this.classList.toggle(\'flipped\')">';
                 html += '<div class="flip-inner h-full w-full">';
                 html += '<div class="flip-face flex h-full w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-500/15 to-indigo-500/15 p-4 text-center">';
-                html += '<p class="text-[10px] font-black uppercase tracking-wider text-fuchsia-300">Question</p>';
-                html += '<p class="mt-2 text-sm font-bold text-white">' + card.question + '</p>';
+                html += '<p class="text-[10px] font-black uppercase tracking-wider text-fuchsia-300">' + (card.type || 'Question') + '</p>';
+                html += '<p class="mt-2 text-sm font-bold text-white">' + card.front + '</p>';
                 html += '<p class="mt-2 text-[10px] text-white/40">Tap to flip</p>';
                 html += '</div>';
                 html += '<div class="flip-face flip-back flex h-full w-full flex-col items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-center">';
                 html += '<p class="text-[10px] font-black uppercase tracking-wider text-emerald-300">Answer</p>';
-                html += '<p class="mt-2 text-sm text-white/80">' + card.answer + '</p>';
+                html += '<p class="mt-2 text-sm text-white/80">' + card.back + '</p>';
+                if (card.source_material) {
+                    html += '<p class="mt-1 text-[9px] text-white/40"><i class="fas fa-book-open mr-1"></i>' + card.source_material + '</p>';
+                }
                 html += '</div>';
                 html += '</div>';
                 html += '</div>';

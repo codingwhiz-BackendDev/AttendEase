@@ -24,8 +24,184 @@ import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
 import faiss
 import sympy as sp
+import pypdf
+import docx
+from io import BytesIO
 
 logger = logging.getLogger(__name__)
+
+
+class DocumentProcessor:
+    """Deep document understanding and extraction"""
+    
+    @staticmethod
+    def extract_text_from_pdf(file_path: str) -> str:
+        """Extract text from PDF with structure preservation"""
+        try:
+            with open(file_path, 'rb') as file:
+                pdf_reader = pypdf.PdfReader(file)
+                text = ""
+                
+                for page_num, page in enumerate(pdf_reader.pages):
+                    page_text = page.extract_text()
+                    text += f"\n\n=== Page {page_num + 1} ===\n{page_text}"
+                
+                return text
+        except Exception as e:
+            logger.error(f"PDF extraction error: {str(e)}")
+            return ""
+    
+    @staticmethod
+    def extract_text_from_docx(file_path: str) -> str:
+        """Extract text from DOCX with structure preservation"""
+        try:
+            doc = docx.Document(file_path)
+            text = ""
+            
+            # Extract paragraphs
+            for para in doc.paragraphs:
+                if para.text.strip():
+                    text += para.text + "\n\n"
+            
+            # Extract tables
+            for table in doc.tables:
+                text += "\n=== Table ===\n"
+                for row in table.rows:
+                    row_text = " | ".join([cell.text for cell in row.cells])
+                    text += row_text + "\n"
+                text += "\n"
+            
+            return text
+        except Exception as e:
+            logger.error(f"DOCX extraction error: {str(e)}")
+            return ""
+    
+    @staticmethod
+    def extract_key_concepts(text: str) -> List[Dict]:
+        """Extract key concepts, definitions, and formulas from text"""
+        concepts = []
+        
+        # Extract definitions (common patterns)
+        definition_patterns = [
+            r'([A-Z][a-zA-Z\s]+)\s+(?:is|refers to|means|can be defined as)\s+([^.]+)\.',
+            r'([A-Z][a-zA-Z\s]+):\s+([^.]+)\.',
+            r'Definition:\s+([^.]+)\.?\s*([A-Z][a-zA-Z\s]+)'
+        ]
+        
+        for pattern in definition_patterns:
+            matches = re.finditer(pattern, text)
+            for match in matches:
+                concepts.append({
+                    'type': 'definition',
+                    'term': match.group(1).strip(),
+                    'definition': match.group(2).strip() if len(match.groups()) > 1 else match.group(1).strip()
+                })
+        
+        # Extract formulas/mathematical expressions
+        formula_patterns = [
+            r'([A-Z][a-z]+\s*[=≤≥≠<>]+[^.]+\.?)',
+            r'\\[([^\\]+)\\]',  # LaTeX formulas
+            r'\$([^$]+)\$'  # Inline LaTeX
+        ]
+        
+        for pattern in formula_patterns:
+            matches = re.finditer(pattern, text)
+            for match in matches:
+                concepts.append({
+                    'type': 'formula',
+                    'expression': match.group(1).strip()
+                })
+        
+        # Extract important terms (capitalized words in context)
+        term_pattern = r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b'
+        matches = re.findall(term_pattern, text)
+        term_counts = {}
+        for term in matches:
+            if len(term) > 3:  # Filter short words
+                term_counts[term] = term_counts.get(term, 0) + 1
+        
+        # Most frequent terms are likely key concepts
+        for term, count in sorted(term_counts.items(), key=lambda x: x[1], reverse=True)[:20]:
+            if count >= 2:  # Appears at least twice
+                concepts.append({
+                    'type': 'key_term',
+                    'term': term,
+                    'frequency': count
+                })
+        
+        return concepts
+    
+    @staticmethod
+    def extract_sections(text: str) -> List[Dict]:
+        """Extract document sections and headings"""
+        sections = []
+        lines = text.split('\n')
+        current_section = None
+        
+        for line in lines:
+            # Detect headings (all caps, or ending with colon, or numbered)
+            if line.strip().isupper() and len(line.strip()) < 100:
+                if current_section:
+                    sections.append(current_section)
+                current_section = {
+                    'heading': line.strip(),
+                    'content': ''
+                }
+            elif re.match(r'^\d+\.?\s+[A-Z]', line.strip()):
+                if current_section:
+                    sections.append(current_section)
+                current_section = {
+                    'heading': line.strip(),
+                    'content': ''
+                }
+            elif line.strip().endswith(':') and len(line.strip()) < 100:
+                if current_section:
+                    sections.append(current_section)
+                current_section = {
+                    'heading': line.strip(),
+                    'content': ''
+                }
+            elif current_section:
+                current_section['content'] += line + '\n'
+        
+        if current_section:
+            sections.append(current_section)
+        
+        return sections
+    
+    @staticmethod
+    def generate_document_summary(text: str) -> Dict:
+        """Generate a comprehensive summary of the document"""
+        concepts = DocumentProcessor.extract_key_concepts(text)
+        sections = DocumentProcessor.extract_sections(text)
+        
+        key_terms = [c.get('term') for c in concepts if c.get('type') == 'key_term'][:10]
+        definitions = [c for c in concepts if c.get('type') == 'definition'][:5]
+        formulas = [c.get('expression', '') for c in concepts if c.get('type') == 'formula'][:5]
+        
+        return {
+            'total_concepts': len(concepts),
+            'key_terms': key_terms,
+            'definitions': definitions,
+            'formulas': formulas,
+            'sections': [s.get('heading', '') for s in sections],
+            'sections_count': len(sections)
+        }
+    
+    @staticmethod
+    def process_material(material) -> str:
+        """Process a course material and extract its content"""
+        if material.content and material.content.strip():
+            return material.content
+        
+        if material.file:
+            file_path = material.file.path
+            if file_path.endswith('.pdf'):
+                return DocumentProcessor.extract_text_from_pdf(file_path)
+            elif file_path.endswith('.docx'):
+                return DocumentProcessor.extract_text_from_docx(file_path)
+        
+        return ""
 
 
 class SubjectClassifier:
@@ -34,7 +210,7 @@ class SubjectClassifier:
     SUBJECT_DOMAINS = {
         'mathematics': ['math', 'calculus', 'algebra', 'geometry', 'statistics', 'probability', 'linear algebra'],
         'physics': ['physics', 'mechanics', 'thermodynamics', 'electromagnetism', 'quantum', 'optics'],
-        'chemistry': ['chemistry', 'organic', 'inorganic', 'biochemistry', 'chemical'],
+        'chemistry': ['chemistry', 'organic', 'induction', 'inorganic', 'biochemistry', 'chemical'],
         'biology': ['biology', 'genetics', 'ecology', 'microbiology', 'anatomy', 'physiology'],
         'computer_science': ['programming', 'coding', 'algorithm', 'data structure', 'software', 'ai', 'machine learning'],
         'engineering': ['engineering', 'civil', 'mechanical', 'electrical', 'chemical', 'software'],
@@ -497,6 +673,7 @@ class UniversalSmartTutor:
         self.research_assistant = ResearchAssistant()
         self.debate_facilitator = DebateFacilitator()
         self.project_guide = ProjectBasedLearningGuide()
+        self.document_processor = DocumentProcessor()
         
         # Vector store and chunker
         from App.smart_ai import DocumentChunker, VectorStore
@@ -524,7 +701,7 @@ class UniversalSmartTutor:
         self._load_course_materials()
     
     def _load_course_materials(self):
-        """Load and index course materials"""
+        """Load and deeply understand course materials"""
         try:
             from App.models import Course, CourseMaterial
             course = Course.objects.get(course_code=self.course_code)
@@ -532,20 +709,34 @@ class UniversalSmartTutor:
             
             all_chunks = []
             for material in materials:
-                if material.content:
+                # Process material to extract content
+                content = self.document_processor.process_material(material)
+                
+                if content:
+                    # Generate document summary
+                    summary = self.document_processor.generate_document_summary(content)
+                    self.document_summaries[material.id] = {
+                        'title': material.title,
+                        'type': material.material_type,
+                        'summary': summary
+                    }
+                    
+                    # Chunk the content with enhanced metadata
                     chunks = self.chunker.chunk_text(
-                        material.content,
+                        content,
                         metadata={
                             'material_id': material.id,
                             'title': material.title,
-                            'type': material.material_type
+                            'type': material.material_type,
+                            'key_concepts': summary['key_terms'][:5]
                         }
                     )
                     all_chunks.extend(chunks)
             
             if all_chunks:
                 self.vector_store.add_chunks(all_chunks)
-                logger.info(f"Loaded {len(all_chunks)} chunks for {self.course_code}")
+                logger.info(f"Loaded {len(all_chunks)} chunks from {len(materials)} materials for {self.course_code}")
+                logger.info(f"Document summaries: {len(self.document_summaries)} materials processed")
             
         except Exception as e:
             logger.error(f"Error loading materials: {str(e)}")
@@ -835,6 +1026,146 @@ Try solving a similar problem to reinforce your understanding."""
         """Suggest project-based learning"""
         domain, _ = self.subject_classifier.classify_subject(concept)
         return self.project_guide.suggest_project(concept, domain, difficulty)
+    
+    def generate_deep_quiz(self, num_questions: int, difficulty: str, topics: str = "") -> Dict:
+        """Generate quiz based on DEEP understanding of course materials"""
+        # Get document summaries to understand content structure
+        material_summaries = list(self.document_summaries.values())
+        
+        # Build context about available materials
+        materials_context = ""
+        for summary in material_summaries:
+            materials_context += f"\nMaterial: {summary['title']}\n"
+            materials_context += f"Type: {summary['type']}\n"
+            materials_context += f"Key Concepts: {', '.join(summary['summary']['key_terms'])}\n"
+            materials_context += f"Definitions: {len(summary['summary']['definitions'])}\n"
+            materials_context += f"Formulas: {len(summary['summary']['formulas'])}\n"
+            materials_context += f"Sections: {', '.join(summary['summary']['sections'][:5])}\n"
+        
+        prompt = f"""Generate {num_questions} multiple-choice questions based on the ACTUAL course materials provided below.
+
+AVAILABLE MATERIALS:
+{materials_context if materials_context else "No materials available yet"}
+
+TOPICS TO COVER: {topics if topics else "All key concepts from materials"}
+DIFFICULTY: {difficulty}
+
+CRITICAL REQUIREMENTS:
+1. Questions MUST be based on the actual content in the materials
+2. Use the specific definitions, formulas, and concepts found in the materials
+3. Reference the specific material source in explanations
+4. Test understanding, not just memorization
+5. Include questions that require application of concepts
+6. Make options plausible but clearly wrong
+7. Provide detailed explanations citing the material
+
+Format each question as JSON:
+{{
+    "question": "Question text from materials",
+    "options": ["A", "B", "C", "D"],
+    "correct_answer": 0,
+    "explanation": "Detailed explanation with material reference [From: Material Name]",
+    "source_material": "Name of material this question comes from",
+    "key_concept": "Which concept this tests",
+    "difficulty": "easy/medium/hard"
+}}
+
+Return the entire quiz as a JSON array of questions.
+Questions should be challenging and test deep understanding of the material."""
+        
+        try:
+            response = self.model.generate_content(prompt)
+            quiz_json = self._extract_json(response.text)
+            return quiz_json if quiz_json else {"error": "Could not parse quiz JSON"}
+        except Exception as e:
+            logger.error(f"Deep quiz generation error: {str(e)}")
+            return {"error": str(e)}
+    
+    def generate_deep_flashcards(self, num_cards: int, topics: str = "") -> Dict:
+        """Generate flashcards based on DEEP understanding of course materials"""
+        # Get document summaries to understand content structure
+        material_summaries = list(self.document_summaries.values())
+        
+        # Build context about available materials
+        materials_context = ""
+        for summary in material_summaries:
+            materials_context += f"\nMaterial: {summary['title']}\n"
+            materials_context += f"Key Terms: {', '.join(summary['summary']['key_terms'])}\n"
+            if summary['summary']['definitions']:
+                materials_context += f"Available Definitions: {', '.join([d['term'] for d in summary['summary']['definitions']])}\n"
+        
+        prompt = f"""Generate {num_cards} flashcards based on the ACTUAL course materials provided below.
+
+AVAILABLE MATERIALS:
+{materials_context if materials_context else "No materials available yet"}
+
+TOPICS TO COVER: {topics if topics else "All key concepts from materials"}
+
+CRITICAL REQUIREMENTS:
+1. Flashcards MUST be based on actual content in the materials
+2. Use the specific definitions and concepts found in the materials
+3. Front should be a key term, concept, or question from materials
+4. Back should be the exact definition or explanation from materials
+5. Include the material source
+6. Make terms specific to the course content
+7. Include both definitions and concept explanations
+
+Format each flashcard as JSON:
+{{
+    "front": "Term or question from materials",
+    "back": "Definition or answer from materials",
+    "source_material": "Name of material",
+    "type": "definition/concept/formula/example",
+    "key_concept": "Which concept this reinforces"
+}}
+
+Return the entire set as a JSON array of flashcards.
+Flashcards should test the most important concepts from the materials."""
+        
+        try:
+            response = self.model.generate_content(prompt)
+            flashcards_json = self._extract_json(response.text)
+            return flashcards_json if flashcards_json else {"error": "Could not parse flashcards JSON"}
+        except Exception as e:
+            logger.error(f"Deep flashcard generation error: {str(e)}")
+            return {"error": str(e)}
+    
+    def get_material_coverage(self) -> Dict:
+        """Get information about what materials are available"""
+        return {
+            'total_materials': len(self.document_summaries),
+            'materials': [
+                {
+                    'title': s['title'],
+                    'type': s['type'],
+                    'key_concepts': s['summary']['key_terms'],
+                    'has_definitions': len(s['summary']['definitions']) > 0,
+                    'has_formulas': len(s['summary']['formulas']) > 0,
+                    'sections': s['summary']['sections_count']
+                }
+                for s in self.document_summaries.values()
+            ]
+        }
+    
+    def _extract_json(self, text: str) -> List:
+        """Extract JSON array from response"""
+        json_match = re.search(r'\[.*\]', text, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except:
+                pass
+        return []
+    
+    def _extract_json_object(self, text: str) -> Dict:
+        """Extract JSON object from response"""
+        json_match = re.search(r'\{.*\}', text, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except:
+                pass
+        return {}
 
 
 # Singleton tutor instances

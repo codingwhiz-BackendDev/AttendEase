@@ -183,6 +183,9 @@ urlpatterns = [
         "api/ai/project/", views.ai_project_suggester, name="ai_project_suggester"
     ),
     path(
+        "api/ai/material-coverage/", views.ai_material_coverage, name="ai_material_coverage"
+    ),
+    path(
         "lecturer/student/<int:student_user_id>/",
         views.lecturer_student_detail,
         name="lecturer_student_detail",

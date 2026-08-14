@@ -2107,7 +2107,7 @@ def ai_explain(request):
 
 @student_required
 def ai_generate_quiz(request):
-    """AI Quiz Generator endpoint"""
+    """Deep AI Quiz Generator endpoint - based on actual materials"""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
     
@@ -2118,33 +2118,26 @@ def ai_generate_quiz(request):
         topics = data.get('topics', '').strip()
         course_code = data.get('course_code', '')
         
-        # Get materials context
-        materials_text = ""
-        if course_code:
-            from App.models import Course, CourseMaterial
-            try:
-                course = Course.objects.get(course_code=course_code)
-                materials = CourseMaterial.objects.filter(course=course)
-                materials_text = get_materials_text(materials)
-            except Course.DoesNotExist:
-                pass
+        # Get universal tutor
+        student_id = str(request.user.id)
+        tutor = get_universal_tutor(course_code, student_id)
         
-        assistant = AIStudyAssistant()
-        quiz, success = assistant.generate_quiz(num_questions, difficulty, topics, course_code, materials_text)
+        # Generate deep quiz based on materials
+        quiz = tutor.generate_deep_quiz(num_questions, difficulty, topics)
         
-        if success:
-            return JsonResponse({'quiz': quiz, 'success': True})
-        else:
-            return JsonResponse({'error': quiz.get('error', 'Unknown error'), 'success': False}, status=500)
+        if 'error' in quiz:
+            return JsonResponse({'error': quiz['error'], 'success': False}, status=500)
+        
+        return JsonResponse({'quiz': quiz, 'success': True})
             
     except Exception as e:
-        logger.error(f"AI Quiz error: {str(e)}")
+        logger.error(f"Deep AI Quiz error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
 @student_required
 def ai_generate_flashcards(request):
-    """AI Flashcard Generator endpoint"""
+    """Deep AI Flashcard Generator endpoint - based on actual materials"""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
     
@@ -2154,27 +2147,20 @@ def ai_generate_flashcards(request):
         topics = data.get('topics', '').strip()
         course_code = data.get('course_code', '')
         
-        # Get materials context
-        materials_text = ""
-        if course_code:
-            from App.models import Course, CourseMaterial
-            try:
-                course = Course.objects.get(course_code=course_code)
-                materials = CourseMaterial.objects.filter(course=course)
-                materials_text = get_materials_text(materials)
-            except Course.DoesNotExist:
-                pass
+        # Get universal tutor
+        student_id = str(request.user.id)
+        tutor = get_universal_tutor(course_code, student_id)
         
-        assistant = AIStudyAssistant()
-        flashcards, success = assistant.generate_flashcards(num_cards, topics, course_code, materials_text)
+        # Generate deep flashcards based on materials
+        flashcards = tutor.generate_deep_flashcards(num_cards, topics)
         
-        if success:
-            return JsonResponse({'flashcards': flashcards, 'success': True})
-        else:
-            return JsonResponse({'error': flashcards.get('error', 'Unknown error'), 'success': False}, status=500)
+        if 'error' in flashcards:
+            return JsonResponse({'error': flashcards['error'], 'success': False}, status=500)
+        
+        return JsonResponse({'flashcards': flashcards, 'success': True})
             
     except Exception as e:
-        logger.error(f"AI Flashcards error: {str(e)}")
+        logger.error(f"Deep AI Flashcards error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
@@ -2377,6 +2363,30 @@ def ai_project_suggester(request):
             
     except Exception as e:
         logger.error(f"AI Project error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_material_coverage(request):
+    """Get information about what materials are available for AI"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'GET required'}, status=405)
+    
+    try:
+        course_code = request.GET.get('course_code', '')
+        
+        if not course_code:
+            return JsonResponse({'error': 'Course code required'}, status=400)
+        
+        student_id = str(request.user.id)
+        tutor = get_universal_tutor(course_code, student_id)
+        
+        coverage = tutor.get_material_coverage()
+        
+        return JsonResponse({'coverage': coverage, 'success': True})
+            
+    except Exception as e:
+        logger.error(f"AI Material Coverage error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
