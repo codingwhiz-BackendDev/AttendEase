@@ -25,9 +25,10 @@
     }
 
     .white-card {
-        background: #ffffff;
-        border: 1px solid rgba(226, 232, 240, 0.5);
-        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+        background: rgba(30, 27, 75, 0.4);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.4);
     }
 
     .gradient-text {
@@ -83,24 +84,49 @@
     .input-field {
         border: 1.5px solid rgba(148, 163, 184, 0.35);
         transition: all 0.2s ease;
-        background: #fafbff;
+        background: rgba(30, 27, 75, 0.6);
+        color: white;
     }
     .input-field:focus {
         border-color: #8b5cf6;
         box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
         outline: none;
-        background: white;
+        background: rgba(30, 27, 75, 0.8);
+    }
+    .input-field::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* Style all input and textarea elements globally */
+    input, textarea, select {
+        background: rgba(30, 27, 75, 0.6) !important;
+        color: white !important;
+        border-color: rgba(148, 163, 184, 0.35) !important;
+    }
+    input:focus, textarea:focus, select:focus {
+        background: rgba(30, 27, 75, 0.8) !important;
+        border-color: #8b5cf6 !important;
+    }
+    input::placeholder, textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* Fix option text in dropdowns */
+    option {
+        background: #1e1b4b !important;
+        color: white !important;
     }
 
     .question-card {
-        background: white;
-        border: 1px solid rgba(226, 232, 240, 0.7);
-        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        background: rgba(30, 27, 75, 0.4);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.3);
         transition: all 0.2s ease;
     }
     .question-card:hover {
         border-color: rgba(139, 92, 246, 0.45);
-        box-shadow: 0 10px 32px rgba(139, 92, 246, 0.12);
+        box-shadow: 0 10px 32px rgba(139, 92, 246, 0.2);
     }
 
     .option-row {

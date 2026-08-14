@@ -27,11 +27,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-k)g1y2#@at#=mu0-=q$s1s&w)j2c3%c8#0x-pa4yvdi9s^(6&^')
 
-DEBUG = False
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+# Allow hosts - localhost for dev, proper domain for production
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+else:
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://accounts.google.com').split(',')
+# CSRF trusted origins - HTTPS only in production
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+else:
+    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://accounts.google.com').split(',')
 
 
 
@@ -48,7 +56,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'django_csp',
 ]
    
  
@@ -106,17 +113,24 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
     'django.middleware.common.BrokenLinkEmailsMiddleware',
-    'django_csp.middleware.CSPMiddleware',
 ]
 
 # Session settings (optional, but recommended)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
-SESSION_COOKIE_SECURE = True  # Set to True in production
-CSRF_COOKIE_SECURE = True  # Set to True in production
+
+# Development settings (local)
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = 'Lax'
+# Production settings (Render)
+else:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
-SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
 CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
-SESSION_COOKIE_SAMESITE = 'Strict'  # Enhanced CSRF protection
 
 
 ROOT_URLCONF = 'AttendEase.urls'
@@ -216,23 +230,34 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
-SECURE_SSL_REDIRECT = True  # Enforce HTTPS in production
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+
+# Development settings (local)
+if DEBUG:
+    SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+# Production settings (Render)
+else:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # Content Security Policy (CSP) for additional security
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'",)  # Allow inline scripts for assessment functionality
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",)  # Allow inline styles
-CSP_IMG_SRC = ("'self'", "data:", "https:",)  # Allow data URIs and HTTPS images
-CSP_CONNECT_SRC = ("'self'",)  # Allow AJAX to same origin
-CSP_FONT_SRC = ("'self'",)  # Allow fonts from same origin
-CSP_FRAME_ANCESTORS = ("'none'",)  # Prevent framing
-CSP_FORM_ACTION = ("'self'",)  # Restrict form submissions
-CSP_BASE_URI = ("'self'",)
-CSP_FRAME_SRC = ("'none'",)  # No iframes for security
-CSP_REPORT_ONLY = False  # Enforce CSP in production
+# Note: CSP middleware temporarily disabled due to import issues
+# To enable: pip install django-csp and add to INSTALLED_APPS and MIDDLEWARE
+# CSP_DEFAULT_SRC = ("'self'",)
+# CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'",)  # Allow inline scripts for assessment functionality
+# CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",)  # Allow inline styles
+# CSP_IMG_SRC = ("'self'", "data:", "https:",)  # Allow data URIs and HTTPS images
+# CSP_CONNECT_SRC = ("'self'",)  # Allow AJAX to same origin
+# CSP_FONT_SRC = ("'self'",)  # Allow fonts from same origin
+# CSP_FRAME_ANCESTORS = ("'none'",)  # Prevent framing
+# CSP_FORM_ACTION = ("'self'",)  # Restrict form submissions
+# CSP_BASE_URI = ("'self'",)
+# CSP_FRAME_SRC = ("'none'",)  # No iframes for security
+# CSP_REPORT_ONLY = False  # Enforce CSP in production
 
 # Configure logging
 LOGGING = {

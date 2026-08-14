@@ -27,21 +27,22 @@
     }
     .btn-outline-light:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.45); }
     .white-card {
-        background: #ffffff;
-        border: 1px solid rgba(226, 232, 240, 0.6);
-        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+        background: rgba(30, 27, 75, 0.4);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.3);
         transition: all 0.25s ease;
     }
-    .white-card:hover { border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 16px 44px rgba(139, 92, 246, 0.18); }
-    .purple-card { background:#ffffff; border:1px solid rgba(118,75,162,0.2); box-shadow:0 8px 32px rgba(15, 23, 42, 0.08); }
-    .stat-card { background:linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.03) 100%); border:1px solid rgba(118,75,162,0.15); box-shadow:0 2px 12px rgba(102,126,234,0.06); transition:all 0.25s ease; }
-    .stat-card:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(102,126,234,0.15); border-color:rgba(139,92,246,0.35); }
+    .white-card:hover { border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 16px 44px rgba(139, 92, 246, 0.25); }
+    .purple-card { background:rgba(30, 27, 75, 0.4); backdrop-filter:blur(12px); border:1px solid rgba(118,75,162,0.3); box-shadow:0 8px 32px rgba(15, 23, 42, 0.15); }
+    .stat-card { background:linear-gradient(180deg,rgba(30, 27, 75, 0.4) 0%,rgba(139,92,246,0.1) 100%); border:1px solid rgba(118,75,162,0.3); box-shadow:0 2px 12px rgba(102,126,234,0.1); transition:all 0.25s ease; }
+    .stat-card:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(102,126,234,0.2); border-color:rgba(139,92,246,0.45); }
     .btn-purple { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); box-shadow:0 8px 24px rgba(102,126,234,0.25); transition:all 0.25s ease; }
     .btn-purple:hover { transform:translateY(-1px); box-shadow:0 12px 32px rgba(102,126,234,0.35); }
-    .btn-outline-purple { border:1.5px solid rgba(118,75,162,0.3); background:white; color:#6d28d9; transition:all 0.2s ease; }
-    .btn-outline-purple:hover { background:rgba(139,92,246,0.06); border-color:#8b5cf6; }
-    .btn-danger { border:1.5px solid rgba(239,68,68,0.3); background:white; color:#dc2626; transition:all 0.2s ease; }
-    .btn-danger:hover { background:rgba(239,68,68,0.06); border-color:#ef4444; }
+    .btn-outline-purple { border:1.5px solid rgba(118,75,162,0.3); background:rgba(30, 27, 75, 0.4); color:#c4b5fd; transition:all 0.2s ease; }
+    .btn-outline-purple:hover { background:rgba(139,92,246,0.2); border-color:#8b5cf6; }
+    .btn-danger { border:1.5px solid rgba(239,68,68,0.3); background:rgba(30, 27, 75, 0.4); color:#fca5a5; transition:all 0.2s ease; }
+    .btn-danger:hover { background:rgba(239,68,68,0.2); border-color:#ef4444; }
     .status-live { background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.15)); color:#047857; border-color:rgba(16,185,129,0.3); }
     .status-upcoming { background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(124,58,237,0.15)); color:#6d28d9; border-color:rgba(139,92,246,0.3); }
     .status-closed { background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(220,38,38,0.15)); color:#b91c1c; border-color:rgba(239,68,68,0.3); }
@@ -56,8 +57,9 @@
     .question-item:hover { border-color:rgba(139,92,246,0.35); box-shadow:0 6px 20px rgba(102,126,234,0.1); }
     .correct-opt { background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.35) !important; color:#047857; }
     .grad-queue-item { background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(245,158,11,0.1)); border-color:rgba(251,191,36,0.4); }
-    .purple-input { border:2px solid rgba(118,75,162,0.15); transition:all 0.2s ease; }
-    .purple-input:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,0.1); outline:none; }
+    .purple-input { border:2px solid rgba(118,75,162,0.15); transition:all 0.2s ease; background: rgba(30, 27, 75, 0.6); color: white; }
+    .purple-input:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,0.1); outline:none; background: rgba(30, 27, 75, 0.8); }
+    .purple-input::placeholder { color: rgba(255, 255, 255, 0.5); }
     .bar-track { background:rgba(139,92,246,0.1); border-radius:999px; overflow:hidden; }
     .bar-fill { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 0.6s ease; }
     .score-good { color:#047857; }
@@ -67,6 +69,26 @@
     .grade-btn:hover { transform:translateY(-1px); box-shadow:0 12px 28px rgba(245,158,11,0.35); }
     .progress-ring { position:relative; display:flex; align-items:center; justify-content:center; }
     .delete-confirm { background:linear-gradient(135deg,#fecaca 0%,#fecdd3 100%); border-color:#f87171; }
+    
+    /* Style all input and textarea elements globally */
+    input, textarea, select {
+        background: rgba(30, 27, 75, 0.6) !important;
+        color: white !important;
+        border-color: rgba(148, 163, 184, 0.35) !important;
+    }
+    input:focus, textarea:focus, select:focus {
+        background: rgba(30, 27, 75, 0.8) !important;
+        border-color: #8b5cf6 !important;
+    }
+    input::placeholder, textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* Fix option text in dropdowns */
+    option {
+        background: #1e1b4b !important;
+        color: white !important;
+    }
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 relative overflow-hidden">

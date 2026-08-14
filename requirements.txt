@@ -14,4 +14,4 @@ cryptography>=42.0.0
 requests>=2.31.0
 psycopg2-binary>=2.9.9
 dj-database-url>=2.1.0
-django-csp>=3.7
+django-csp>=4.0
