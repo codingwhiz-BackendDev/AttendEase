@@ -8,7 +8,7 @@ import os
 import tempfile
 from datetime import datetime
 from datetime import timezone as dt_timezone
-from App.smart_ai import get_smart_tutor
+from App.smart_ai import get_ultimate_tutor
 from functools import wraps
 from collections import defaultdict
 
@@ -1988,7 +1988,7 @@ def student_ai_study(request):
 
 @student_required
 def ai_chat(request):
-    """Smart AI Chat endpoint with RAG and learning memory"""
+    """Ultimate AI Chat endpoint with advanced teaching capabilities"""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
     
@@ -2000,11 +2000,11 @@ def ai_chat(request):
         if not question:
             return JsonResponse({'error': 'Question required'}, status=400)
         
-        # Get smart tutor
+        # Get ultimate tutor
         student_id = str(request.user.id)
-        tutor = get_smart_tutor(course_code, student_id)
+        tutor = get_ultimate_tutor(course_code, student_id)
         
-        # Get teaching response
+        # Get ultimate teaching response
         result = tutor.teach(question)
         
         if 'error' in result:
@@ -2015,11 +2015,15 @@ def ai_chat(request):
             'citations': result.get('citations', []),
             'confidence': result.get('confidence', 0.5),
             'context_used': result.get('context_used', 0),
+            'strategy': result.get('strategy', 'balanced'),
+            'request_type': result.get('request_type', 'general'),
+            'topic': result.get('topic', 'general'),
+            'learning_state': result.get('learning_state', {}),
             'success': True
         })
             
     except Exception as e:
-        logger.error(f"Smart AI Chat error: {str(e)}")
+        logger.error(f"Ultimate AI Chat error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
@@ -2233,6 +2237,65 @@ def ai_evaluate_answer(request):
             
     except Exception as e:
         logger.error(f"AI Evaluate Answer error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_generate_diagram(request):
+    """Generate visual diagrams for concepts"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        concept = data.get('concept', '').strip()
+        course_code = data.get('course_code', '')
+        
+        if not concept:
+            return JsonResponse({'error': 'Concept required'}, status=400)
+        
+        student_id = str(request.user.id)
+        tutor = get_ultimate_tutor(course_code, student_id)
+        
+        diagram = tutor.create_concept_diagram(concept)
+        
+        if diagram.get('success'):
+            return JsonResponse({'diagram': diagram, 'success': True})
+        else:
+            return JsonResponse({'error': diagram.get('error', 'Unknown error'), 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Diagram error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_interactive_practice(request):
+    """Generate interactive practice with guided hints"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        topic = data.get('topic', '').strip()
+        difficulty = data.get('difficulty', 'medium')
+        course_code = data.get('course_code', '')
+        
+        if not topic:
+            return JsonResponse({'error': 'Topic required'}, status=400)
+        
+        student_id = str(request.user.id)
+        tutor = get_ultimate_tutor(course_code, student_id)
+        
+        practice = tutor.generate_interactive_practice(topic, difficulty)
+        
+        if practice:
+            return JsonResponse({'practice': practice, 'success': True})
+        else:
+            return JsonResponse({'error': 'Failed to generate practice', 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Interactive Practice error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 

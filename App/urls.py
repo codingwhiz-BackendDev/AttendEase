@@ -168,6 +168,12 @@ urlpatterns = [
         "api/ai/practice/evaluate/", views.ai_evaluate_answer, name="ai_evaluate_answer"
     ),
     path(
+        "api/ai/diagram/", views.ai_generate_diagram, name="ai_generate_diagram"
+    ),
+    path(
+        "api/ai/interactive-practice/", views.ai_interactive_practice, name="ai_interactive_practice"
+    ),
+    path(
         "lecturer/student/<int:student_user_id>/",
         views.lecturer_student_detail,
         name="lecturer_student_detail",

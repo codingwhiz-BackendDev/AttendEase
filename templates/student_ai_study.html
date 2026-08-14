@@ -420,12 +420,36 @@
                 if (data.success) {
                     var responseHtml = data.response;
                     
+                    // Add teaching strategy indicator
+                    if (data.strategy) {
+                        var strategyLabels = {
+                            'socratic': '🎓 Socratic Method',
+                            'analogy': '💡 Analogies',
+                            'first_principles': '🔬 First Principles',
+                            'real_world': '🌍 Real-World Applications',
+                            'balanced': '⚖️ Balanced Approach'
+                        };
+                        responseHtml = '<div class="mb-2 text-[10px] text-fuchsia-300"><i class="fas fa-chess mr-1"></i>' + (strategyLabels[data.strategy] || data.strategy) + '</div>' + responseHtml;
+                    }
+                    
+                    // Add request type indicator
+                    if (data.request_type && data.request_type !== 'general') {
+                        var typeLabels = {
+                            'math': '📐 Mathematical',
+                            'diagram': '📊 Visual/Diagram',
+                            'explanation': '📚 Explanation',
+                            'problem': '🔧 Problem Solving',
+                            'conceptual': '🧠 Conceptual'
+                        };
+                        responseHtml = '<div class="mb-1 text-[10px] text-sky-300"><i class="fas fa-tag mr-1"></i>' + (typeLabels[data.request_type] || data.request_type) + '</div>' + responseHtml;
+                    }
+                    
                     // Add citations if available
                     if (data.citations && data.citations.length > 0) {
-                        responseHtml += '<div class="mt-2 pt-2 border-t border-white/10">';
-                        responseHtml += '<p class="text-[10px] text-white/40">Sources: ';
+                        responseHtml += '<div class="mt-3 pt-2 border-t border-white/10">';
+                        responseHtml += '<p class="text-[10px] text-white/40"><i class="fas fa-book-open mr-1"></i>Sources: ';
                         data.citations.forEach(function(cit) {
-                            responseHtml += '<span class="inline-flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded-full mx-1"><i class="fas fa-book-open text-[8px]"></i>' + cit + '</span>';
+                            responseHtml += '<span class="inline-flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded-full mx-1">' + cit + '</span>';
                         });
                         responseHtml += '</p></div>';
                     }
@@ -434,6 +458,22 @@
                     if (data.confidence !== undefined) {
                         var confidenceColor = data.confidence >= 0.8 ? 'text-emerald-300' : data.confidence >= 0.5 ? 'text-amber-300' : 'text-rose-300';
                         responseHtml += '<div class="mt-1 text-[10px] ' + confidenceColor + '"><i class="fas fa-signal mr-1"></i>Confidence: ' + Math.round(data.confidence * 100) + '%</div>';
+                    }
+                    
+                    // Add learning state if available
+                    if (data.learning_state) {
+                        var mastered = data.learning_state.mastered || [];
+                        var struggling = data.learning_state.struggling || [];
+                        if (mastered.length > 0 || struggling.length > 0) {
+                            responseHtml += '<div class="mt-2 text-[10px] text-white/30">';
+                            if (mastered.length > 0) {
+                                responseHtml += '<span class="text-emerald-400">✓ Mastered: ' + mastered.slice(0, 3).join(', ') + '</span> ';
+                            }
+                            if (struggling.length > 0) {
+                                responseHtml += '<span class="text-amber-400">⚠ Focus: ' + struggling.slice(0, 3).join(', ') + '</span>';
+                            }
+                            responseHtml += '</div>';
+                        }
                     }
                     
                     addMsg("ai", responseHtml);
