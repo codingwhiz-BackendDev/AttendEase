@@ -4,6 +4,17 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <!-- Immediate preloader script - runs before any content renders -->
+        <script>
+            (function() {
+                // Hide everything immediately to prevent flash
+                document.documentElement.style.opacity = '0';
+                document.documentElement.style.visibility = 'hidden';
+                document.documentElement.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)';
+            })();
+        </script>
+        
         <title>{% block title %}ClassMillia | AI-Powered Academic Management Platform{% endblock %}</title>
         <!-- SEO -->
         <meta name="description" content="{% block meta_description %}ClassMillia helps universities simplify attendance, learning management, assessments, and academic analytics with AI.{% endblock %}" />
@@ -23,12 +34,10 @@
         <!-- PWA Manifest -->
         <link rel="manifest" href="/static/manifest.json" />
         <meta name="theme-color" content="#667eea" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-            name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent"
-        />
-        <meta name="apple-mobile-web-app-title" content="ClassMillia - Smart Classroom" />
+        <!-- Apple mobile web app tags disabled to prevent status bar text flash -->
+        <!-- <meta name="apple-mobile-web-app-capable" content="yes" /> -->
+        <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> -->
+        <!-- <meta name="apple-mobile-web-app-title" content="ClassMillia" /> -->
         <!-- Favicon using your custom logo -->
         <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg" />
         <link rel="apple-touch-icon" href="/static/icons/logo.svg" />
@@ -78,9 +87,63 @@
                 background: rgba(255, 255, 255, 0.18);
                 border-radius: 999px;
             }
+            
+            /* Preloader to prevent flash of content */
+            #preloader {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 999999;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+            #preloader.hidden {
+                opacity: 0;
+                visibility: hidden;
+            }
+            .loader {
+                width: 48px;
+                height: 48px;
+                border: 4px solid rgba(139, 92, 246, 0.2);
+                border-top-color: #8b5cf6;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            /* Hide body and content until loaded to prevent flash */
+            body {
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            body.loaded {
+                opacity: 1;
+            }
+            
+            /* Hide all content initially */
+            body > *:not(#preloader) {
+                opacity: 0 !important;
+                visibility: hidden;
+            }
+            body.loaded > *:not(#preloader) {
+                opacity: 1 !important;
+                visibility: visible;
+            }
         </style>
     </head>
     <body class="app-shell min-h-screen text-gray-100">
+        <!-- Preloader -->
+        <div id="preloader">
+            <div class="loader"></div>
+        </div>
+        
         {% block sidebar %}
         <div
             id="mobileSidebarBackdrop"
@@ -148,7 +211,14 @@
                             <i
                                 class="fas fa-home w-5 text-center {% if request.path == '/student/dashboard/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Dashboard</span>
+                            <div class="flex-1">
+                                <p>Dashboard</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/student/dashboard/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Overview and quick access
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/student_courses"
@@ -157,7 +227,14 @@
                             <i
                                 class="fas fa-book w-5 text-center {% if request.path == '/student_courses' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Courses</span>
+                            <div class="flex-1">
+                                <p>Courses</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/student_courses' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Enrolled courses and materials
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/student/view-attendance/"
@@ -216,7 +293,14 @@
                             <i
                                 class="fas fa-cog w-5 text-center {% if request.path == '/student/settings/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Settings</span>
+                            <div class="flex-1">
+                                <p>Settings</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/student/settings/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Preferences and account config
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/student/profile/"
@@ -225,7 +309,14 @@
                             <i
                                 class="fas fa-user w-5 text-center {% if request.path == '/student/profile/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Profile</span>
+                            <div class="flex-1">
+                                <p>Profile</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/student/profile/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Personal info and face data
+                                </p>
+                            </div>
                         </a>
                     </div>
                     {% else %}
@@ -250,7 +341,14 @@
                             <i
                                 class="fas fa-home w-5 text-center {% if request.path == '/lecturer/dashboard/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Dashboard</span>
+                            <div class="flex-1">
+                                <p>Dashboard</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/lecturer/dashboard/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Overview and session management
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/reports/"
@@ -291,7 +389,14 @@
                             <i
                                 class="fas fa-users-rectangle w-5 text-center {% if request.path == '/lecturer/roster/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Course Roster</span>
+                            <div class="flex-1">
+                                <p>Course Roster</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/lecturer/roster/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Student lists and enrollment
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/lecturer/materials/"
@@ -318,7 +423,14 @@
                             <i
                                 class="fas fa-book w-5 text-center {% if request.path == '/lecturer_courses' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Courses</span>
+                            <div class="flex-1">
+                                <p>Courses</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/lecturer_courses' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Manage courses and content
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/lecturer/create-attendance/"
@@ -327,7 +439,14 @@
                             <i
                                 class="fas fa-plus-circle w-5 text-center {% if request.path == '/lecturer/create-attendance/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>New Attendance</span>
+                            <div class="flex-1">
+                                <p>New Attendance</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/lecturer/create-attendance/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Create attendance sessions
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/lecturer/settings/"
@@ -336,7 +455,14 @@
                             <i
                                 class="fas fa-cog w-5 text-center {% if request.path == '/lecturer/settings/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Settings</span>
+                            <div class="flex-1">
+                                <p>Settings</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/lecturer/settings/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Account and system config
+                                </p>
+                            </div>
                         </a>
                         <a
                             href="/lecturer/profile/"
@@ -345,7 +471,14 @@
                             <i
                                 class="fas fa-user w-5 text-center {% if request.path == '/lecturer/profile/' %}text-indigo-600{% endif %}"
                             ></i>
-                            <span>Profile</span>
+                            <div class="flex-1">
+                                <p>Profile</p>
+                                <p
+                                    class="text-[11px] font-medium {% if request.path == '/lecturer/profile/' %}text-indigo-500{% else %}text-white/45{% endif %}"
+                                >
+                                    Personal information
+                                </p>
+                            </div>
                         </a>
                     </div>
                     {% endif %}
@@ -597,6 +730,43 @@
                     }
                 }, 2000);
             }
+        </script>
+        
+        <!-- Preloader Removal Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Show document first
+                document.documentElement.style.opacity = '1';
+                document.documentElement.style.visibility = 'visible';
+                
+                // Hide preloader when DOM is ready
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.classList.add('hidden');
+                    
+                    // Show body with fade-in effect
+                    document.body.classList.add('loaded');
+                    
+                    // Remove preloader from DOM after transition
+                    setTimeout(() => {
+                        preloader.remove();
+                    }, 300);
+                }
+            });
+            
+            // Fallback: ensure body is visible even if something goes wrong
+            window.addEventListener('load', function() {
+                document.documentElement.style.opacity = '1';
+                document.documentElement.style.visibility = 'visible';
+                document.body.classList.add('loaded');
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.classList.add('hidden');
+                    setTimeout(() => {
+                        preloader.remove();
+                    }, 300);
+                }
+            });
         </script>
     </body>
 </html>
