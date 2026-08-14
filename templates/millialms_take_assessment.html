@@ -416,6 +416,26 @@
     const AC_ATTEMPT_ID = {{ attempt_id }};
     const AC_TIME_LIMIT = {{ assessment.time_limit_minutes|default:"null" }};
 
+    // ── State ─────────────────────────────────────────────────────────────────
+    let acCount        = 0;
+    let acSubmitting   = false;
+    let acOverlayOpen  = false;   // true while warning overlay is visible
+    let acFSExiting    = false;   // debounce flag for fullscreen exit
+    let acDevOpen      = false;   // last known devtools state
+
+    // ── DOM refs ─────────────────────────────────────────────────────────────
+    const warnOverlay  = document.getElementById('ac-warn-overlay');
+    const finalOverlay = document.getElementById('ac-final-overlay');
+    const warnMsg      = document.getElementById('ac-warn-msg');
+    const warnCountEl  = document.getElementById('ac-warn-count-text');
+    const vcountEl     = document.getElementById('ac-vcount');
+    const strip        = document.getElementById('ac-status-strip');
+    const dismissBtn   = document.getElementById('ac-dismiss-btn');
+    const submitBtn    = document.getElementById('submitBtn');
+    const cancelBtn    = document.getElementById('cancelBtn');
+    const form         = document.getElementById('assessmentForm');
+    const fsBtnStrip   = document.getElementById('ac-fs-btn');
+
     // ── CSP-compatible nonce for inline scripts (if applicable) ───────────────
     // This ensures our security monitoring works even with strict CSP
 
@@ -513,26 +533,6 @@
             }
         };
     })();
-
-    // ── State ─────────────────────────────────────────────────────────────────
-    let acCount        = 0;
-    let acSubmitting   = false;
-    let acOverlayOpen  = false;   // true while warning overlay is visible
-    let acFSExiting    = false;   // debounce flag for fullscreen exit
-    let acDevOpen      = false;   // last known devtools state
-
-    // ── DOM refs ─────────────────────────────────────────────────────────────
-    const warnOverlay  = document.getElementById('ac-warn-overlay');
-    const finalOverlay = document.getElementById('ac-final-overlay');
-    const warnMsg      = document.getElementById('ac-warn-msg');
-    const warnCountEl  = document.getElementById('ac-warn-count-text');
-    const vcountEl     = document.getElementById('ac-vcount');
-    const strip        = document.getElementById('ac-status-strip');
-    const dismissBtn   = document.getElementById('ac-dismiss-btn');
-    const submitBtn    = document.getElementById('submitBtn');
-    const cancelBtn    = document.getElementById('cancelBtn');
-    const form         = document.getElementById('assessmentForm');
-    const fsBtnStrip   = document.getElementById('ac-fs-btn');
 
     // ── Violation labels ──────────────────────────────────────────────────────
     const AC_LABELS = {

@@ -57,7 +57,8 @@ _RATE_LIMIT_MAX_REQUESTS = 10  # max requests per window
 
 def _check_rate_limit(identifier):
     """Check if identifier has exceeded rate limit."""
-    now = datetime.now()
+    from django.utils.timezone import now as django_now
+    now = django_now()
     # Clean old entries
     _violation_rate_limiter[identifier] = [
         ts for ts in _violation_rate_limiter[identifier] 

@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-k)g1y2#@at#=mu0-=q$s1s&w)j2c3%c8#0x-pa4yvdi9s^(6&^')
 
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
@@ -111,11 +111,12 @@ MIDDLEWARE = [
 
 # Session settings (optional, but recommended)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
-SESSION_COOKIE_SECURE = not True  # Set to True in production
-CSRF_COOKIE_SECURE = not True  # Set to True in production
+SESSION_COOKIE_SECURE = True  # Set to True in production
+CSRF_COOKIE_SECURE = True  # Set to True in production
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
 SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
 CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
+SESSION_COOKIE_SAMESITE = 'Strict'  # Enhanced CSRF protection
 
 
 ROOT_URLCONF = 'AttendEase.urls'
@@ -215,7 +216,10 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
-SECURE_SSL_REDIRECT = not DEBUG  # Enforce HTTPS in production
+SECURE_SSL_REDIRECT = True  # Enforce HTTPS in production
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Content Security Policy (CSP) for additional security
 CSP_DEFAULT_SRC = ("'self'",)
