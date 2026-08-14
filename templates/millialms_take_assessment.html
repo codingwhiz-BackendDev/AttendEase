@@ -25,14 +25,12 @@
         border-color: rgba(139, 92, 246, 0.35);
         box-shadow: 0 16px 44px rgba(139, 92, 246, 0.18);
     }
-
     .btn-primary {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
         transition: all 0.25s ease;
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(102, 126, 234, 0.5); }
-
     .btn-outline-light {
         border: 1.5px solid rgba(255, 255, 255, 0.25);
         background: rgba(255, 255, 255, 0.04);
@@ -40,8 +38,7 @@
         transition: all 0.2s ease;
     }
     .btn-outline-light:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.45); }
-</style>
-<style>
+
     .purple-card { background:#ffffff; border:1px solid rgba(118,75,162,0.15); box-shadow:0 4px 20px rgba(102,126,234,0.08); }
     .question-card {
         background: linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.02) 100%);
@@ -97,7 +94,158 @@
     }
     .progress-bar-track { background:rgba(139,92,246,0.1); border-radius:999px; overflow:hidden; }
     .progress-bar-fill { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 0.6s ease; }
+
+    /* ── Anti-cheat UI ── */
+    #ac-warn-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(15, 10, 30, 0.92);
+        backdrop-filter: blur(8px);
+        align-items: center;
+        justify-content: center;
+    }
+    #ac-warn-overlay.show { display: flex; }
+    .ac-warn-box {
+        background: #fff;
+        border-radius: 28px;
+        padding: 2.5rem 2.75rem;
+        max-width: 440px;
+        width: 92%;
+        text-align: center;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+        animation: acPop 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes acPop {
+        from { transform: scale(0.82); opacity: 0; }
+        to   { transform: scale(1);    opacity: 1; }
+    }
+    .ac-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .ac-title { font-size: 1.35rem; font-weight: 900; color: #1e1b4b; margin-bottom: 0.5rem; }
+    .ac-msg   { font-size: 0.9rem;  font-weight: 600; color: #4b5563; line-height: 1.6; }
+    .ac-count-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        margin-top: 1rem;
+        background: linear-gradient(135deg,rgba(239,68,68,0.1),rgba(220,38,38,0.15));
+        border: 1px solid rgba(239,68,68,0.3);
+        color: #b91c1c;
+        border-radius: 999px;
+        padding: 0.45rem 1.1rem;
+        font-size: 0.78rem;
+        font-weight: 900;
+    }
+    .ac-dismiss-btn {
+        margin-top: 1.4rem;
+        display: inline-flex; align-items: center; gap: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 0.7rem 2rem;
+        font-size: 0.88rem;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 0 8px 22px rgba(102,126,234,0.35);
+        transition: all 0.2s ease;
+    }
+    .ac-dismiss-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(102,126,234,0.45); }
+
+    /* final auto-submit overlay (no dismiss button) */
+    #ac-final-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: rgba(15, 10, 30, 0.97);
+        backdrop-filter: blur(10px);
+        align-items: center;
+        justify-content: center;
+    }
+    #ac-final-overlay.show { display: flex; }
+    .ac-final-box {
+        background: #fff;
+        border-radius: 28px;
+        padding: 2.75rem 3rem;
+        max-width: 460px;
+        width: 92%;
+        text-align: center;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+        animation: acPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    /* violation counter strip */
+    #ac-status-strip {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 9000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 6px 16px;
+        background: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
+        font-size: 0.72rem;
+        font-weight: 900;
+        color: rgba(255,255,255,0.82);
+        letter-spacing: 0.06em;
+        transition: background 0.4s ease;
+        user-select: none;
+    }
+    #ac-status-strip.warn  { background: linear-gradient(90deg, #92400e 0%, #b45309 100%); }
+    #ac-status-strip.danger{ background: linear-gradient(90deg, #7f1d1d 0%, #b91c1c 100%); }
+    #ac-vcount { font-size: 0.82rem; }
+
+    /* push page content below the strip */
+    body { padding-top: 34px; }
 </style>
+
+{# ── Anti-cheat warning overlay (dismissible, shown per violation 1 & 2) ── #}
+<div id="ac-warn-overlay" role="dialog" aria-modal="true" aria-labelledby="ac-warn-title">
+    <div class="ac-warn-box">
+        <div class="ac-icon">⚠️</div>
+        <div class="ac-title" id="ac-warn-title">Academic Integrity Warning</div>
+        <div class="ac-msg" id="ac-warn-msg">
+            A suspicious action was detected. This incident has been recorded.
+        </div>
+        <div class="ac-count-badge">
+            <i class="fas fa-triangle-exclamation"></i>
+            <span id="ac-warn-count-text">Violation 1 of 3</span>
+        </div>
+        <div>
+            <button class="ac-dismiss-btn" onclick="acDismissWarn()">
+                <i class="fas fa-arrow-right"></i> Return to assessment
+            </button>
+        </div>
+    </div>
+</div>
+
+{# ── Final auto-submit overlay (shown when threshold crossed) ── #}
+<div id="ac-final-overlay" role="alertdialog" aria-modal="true" aria-labelledby="ac-final-title">
+    <div class="ac-final-box">
+        <div class="ac-icon">🚨</div>
+        <div class="ac-title" id="ac-final-title" style="color:#991b1b;">Assessment Terminated</div>
+        <div class="ac-msg">
+            Multiple integrity violations were detected. Your current answers are being submitted automatically and your lecturer has been notified.
+        </div>
+        <div class="ac-count-badge" style="margin-top:1.2rem;">
+            <i class="fas fa-flag"></i> Attempt flagged for review
+        </div>
+        <div style="margin-top:1.4rem; font-size:0.78rem; color:#6b7280; font-weight:700;">
+            <i class="fas fa-spinner fa-spin mr-1"></i> Submitting your assessment…
+        </div>
+    </div>
+</div>
+
+{# ── Fixed violation status strip ── #}
+<div id="ac-status-strip">
+    <i class="fas fa-shield-halved"></i>
+    <span>INTEGRITY MONITORING ACTIVE</span>
+    <span style="opacity:0.4;">·</span>
+    <span id="ac-vcount">0 violation(s)</span>
+    <span style="opacity:0.4;">·</span>
+    <span>Max 3 allowed</span>
+</div>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 relative overflow-hidden">
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
@@ -122,7 +270,8 @@
         <div class="flex flex-wrap gap-3">
             {% if assessment.time_limit_minutes %}
             <div class="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3 shadow-sm text-sm font-black text-amber-900 flex items-center gap-2">
-                <i class="fas fa-stopwatch text-lg"></i>{{ assessment.time_limit_minutes }} min limit
+                <i class="fas fa-stopwatch text-lg"></i>
+                <span id="timerDisplay">{{ assessment.time_limit_minutes }}:00</span>
             </div>
             {% endif %}
             <div class="rounded-2xl border border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-3 shadow-sm text-sm font-bold text-purple-800 flex items-center gap-2">
@@ -142,10 +291,12 @@
     {% endif %}
 
     <div class="rounded-3xl notice-banner border px-5 py-4 text-sm shadow-sm flex items-start gap-3">
-        <i class="fas fa-memo-circle-check text-xl mt-0.5 flex-shrink-0"></i>
+        <i class="fas fa-shield-check text-xl mt-0.5 flex-shrink-0"></i>
         <div class="font-bold leading-relaxed">
-            {{ essay_reminder }}
-            &nbsp;Objective questions (MCQ, True/False, Fill-in-blank) auto-grade immediately on submit.
+            <strong>This assessment is monitored.</strong>
+            Switching tabs, copying text, right-clicking, opening DevTools, or leaving fullscreen will be logged as violations.
+            After <strong>3 violations</strong> your attempt is auto-submitted and flagged for your lecturer.
+            &nbsp;{{ essay_reminder }}
         </div>
     </div>
 
@@ -162,6 +313,8 @@
 
     <form method="post" class="space-y-5 md:space-y-6" id="assessmentForm">
         {% csrf_token %}
+        {# Hidden field carries the attempt id once the attempt is started — populated by JS after first violation report #}
+        <input type="hidden" name="ac_attempt_id" id="ac_attempt_id" value="">
         {% for item in questions %}
         <div class="question-card rounded-3xl p-5 md:p-6 shadow-sm" data-question>
             <div class="flex flex-wrap items-start gap-3 mb-4 md:mb-5">
@@ -255,7 +408,7 @@
                         <a href="{% url 'millialms_student_assessment_detail' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-5 py-3 text-sm font-black">
                             <i class="fas fa-arrow-left"></i>Cancel
                         </a>
-                        <button type="submit" onclick="return confirmSubmit();" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3 text-sm font-black text-white">
+                        <button type="submit" id="submitBtn" onclick="return confirmSubmit();" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3 text-sm font-black text-white">
                             <i class="fas fa-paper-plane"></i>Submit Assessment
                         </button>
                     </div>
@@ -268,38 +421,369 @@
 </div>
 
 <script>
-function confirmSubmit() {
-    const total = document.querySelectorAll('[data-question]').length;
-    let answered = 0;
-    document.querySelectorAll('[data-question]').forEach(q => {
-        const radios = q.querySelectorAll('input[type="radio"]');
-        const textareas = q.querySelectorAll('textarea[data-input]');
-        let done = false;
-        if (radios.length) {
-            q.querySelectorAll('input[type="radio"]:checked').forEach(() => { done = true; });
+// ============================================================
+//  Configuration — injected from Django template context
+// ============================================================
+const AC_REPORT_URL  = "{% url 'millialms_report_violation' attempt_id=0 %}".replace('/0/', '/ATTEMPT_ID/');
+const AC_CSRF        = document.querySelector('[name=csrfmiddlewaretoken]').value;
+const AC_MAX         = 3;           // must match VIOLATION_FLAG_THRESHOLD in views.py
+const AC_TIME_LIMIT  = {{ assessment.time_limit_minutes|default:"null" }};  // minutes or null
+const AC_ASSESS_ID   = {{ assessment.id }};
+
+// ============================================================
+//  State
+// ============================================================
+let acViolationCount  = 0;
+let acAttemptId       = null;   // set once the first attempt record exists (on first violation or after POST)
+let acAutoSubmitting  = false;
+let acLastType        = '';
+let acInitialized     = false;
+
+// ============================================================
+//  Violation messages by type
+// ============================================================
+const AC_MESSAGES = {
+    tab_switch:      'You switched tabs or minimised the window.',
+    blur:            'The assessment window lost focus.',
+    copy:            'You tried to copy text from the assessment.',
+    cut:             'You tried to cut text from the assessment.',
+    paste:           'You tried to paste text into the assessment.',
+    devtools:        'Developer Tools were opened.',
+    fullscreen_exit: 'You exited fullscreen mode.',
+    right_click:     'You right-clicked inside the assessment.',
+    context_menu:    'The context menu was opened.',
+    print_screen:    'A screenshot shortcut was detected.',
+    print_attempt:   'A print shortcut was detected.',
+};
+
+// ============================================================
+//  Report a violation to the backend
+// ============================================================
+async function acReport(type, detail = '') {
+    if (acAutoSubmitting) return;
+
+    acViolationCount++;
+    acLastType = type;
+    acUpdateStrip();
+
+    // If we have an attempt id (mid-attempt AJAX violations) report to backend.
+    // If not (test hasn't been submitted yet / first violation before any POST),
+    // we still show the warning UI — the violation will also be stored server-side
+    // once the form is finally submitted via the hidden field approach.
+    if (acAttemptId) {
+        try {
+            const url = AC_REPORT_URL.replace('ATTEMPT_ID', acAttemptId);
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': AC_CSRF,
+                },
+                body: JSON.stringify({ type, detail }),
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                acViolationCount = data.violation_count;
+                acUpdateStrip();
+                if (data.auto_submit && !acAutoSubmitting) {
+                    acTriggerAutoSubmit();
+                    return;
+                }
+            }
+        } catch (e) {
+            // Network error — still show the local warning
         }
-        textareas.forEach(t => { if (t.value.trim().length > 0) done = true; });
-        if (done) answered++;
-    });
-    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
-    let msg = `You've answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nSubmit this attempt now? You cannot change answers after submitting.`;
-    if (answered < total) {
-        msg = `⚠ You've only answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nUnanswered questions earn 0 points. Are you sure you want to submit anyway?`;
     }
-    return confirm(msg);
+
+    if (acViolationCount >= AC_MAX && !acAutoSubmitting) {
+        acTriggerAutoSubmit();
+    } else {
+        acShowWarn(type);
+    }
 }
 
+// ============================================================
+//  Update the status strip
+// ============================================================
+function acUpdateStrip() {
+    const strip  = document.getElementById('ac-status-strip');
+    const vcount = document.getElementById('ac-vcount');
+    if (vcount) vcount.textContent = acViolationCount + ' violation(s)';
+    if (strip) {
+        strip.classList.remove('warn', 'danger');
+        if (acViolationCount >= AC_MAX)       strip.classList.add('danger');
+        else if (acViolationCount >= AC_MAX - 1) strip.classList.add('warn');
+    }
+}
+
+// ============================================================
+//  Show dismissible warning overlay
+// ============================================================
+function acShowWarn(type) {
+    const overlay = document.getElementById('ac-warn-overlay');
+    const msg     = document.getElementById('ac-warn-msg');
+    const countEl = document.getElementById('ac-warn-count-text');
+    if (!overlay) return;
+    if (msg) {
+        msg.textContent = AC_MESSAGES[type] || 'A suspicious action was detected. This incident has been recorded.';
+    }
+    if (countEl) {
+        countEl.textContent = 'Violation ' + acViolationCount + ' of ' + AC_MAX;
+    }
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function acDismissWarn() {
+    const overlay = document.getElementById('ac-warn-overlay');
+    if (overlay) overlay.classList.remove('show');
+    document.body.style.overflow = '';
+    // Re-request fullscreen after each dismiss
+    acRequestFullscreen();
+}
+
+// ============================================================
+//  Auto-submit when threshold reached
+// ============================================================
+function acTriggerAutoSubmit() {
+    if (acAutoSubmitting) return;
+    acAutoSubmitting = true;
+
+    // Show the final overlay (no dismiss button — cannot close)
+    const finalOverlay = document.getElementById('ac-final-overlay');
+    if (finalOverlay) finalOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    // Remove the onclick confirm guard so the form submits without the dialog
+    const btn = document.getElementById('submitBtn');
+    if (btn) btn.removeAttribute('onclick');
+
+    // Small delay so the overlay renders before the page navigates
+    setTimeout(() => {
+        const form = document.getElementById('assessmentForm');
+        if (form) form.submit();
+    }, 1800);
+}
+
+// ============================================================
+//  Fullscreen helpers
+// ============================================================
+function acRequestFullscreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen)            el.requestFullscreen().catch(() => {});
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.mozRequestFullScreen)    el.mozRequestFullScreen();
+    else if (el.msRequestFullscreen)     el.msRequestFullscreen();
+}
+
+function acIsFullscreen() {
+    return !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+    );
+}
+
+// ============================================================
+//  DevTools detection (size heuristic — best effort)
+// ============================================================
+let _devToolsOpen = false;
+function acCheckDevTools() {
+    const threshold = 160;
+    const widthDiff  = window.outerWidth  - window.innerWidth;
+    const heightDiff = window.outerHeight - window.innerHeight;
+    const open = widthDiff > threshold || heightDiff > threshold;
+    if (open && !_devToolsOpen) {
+        _devToolsOpen = true;
+        acReport('devtools', `outer:${window.outerWidth}x${window.outerHeight} inner:${window.innerWidth}x${window.innerHeight}`);
+    } else if (!open) {
+        _devToolsOpen = false;
+    }
+}
+
+// ============================================================
+//  Attach all anti-cheat listeners
+// ============================================================
+function acInit() {
+    if (acInitialized) return;
+    acInitialized = true;
+
+    // 1. Tab switch / window minimise
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) acReport('tab_switch');
+    });
+
+    // 2. Window blur (split-screen, alt-tab, click outside)
+    window.addEventListener('blur', () => {
+        // Small delay to avoid false positives from modal dialogs
+        setTimeout(() => {
+            if (!document.hasFocus()) acReport('blur');
+        }, 200);
+    });
+
+    // 3. Copy / cut — block AND log
+    document.addEventListener('copy', (e) => {
+        e.preventDefault();
+        acReport('copy');
+    });
+    document.addEventListener('cut', (e) => {
+        e.preventDefault();
+        acReport('cut');
+    });
+
+    // 4. Paste — block to prevent pasting AI answers
+    document.addEventListener('paste', (e) => {
+        // Allow paste only inside textareas that are answer inputs
+        if (e.target && e.target.matches('textarea[data-input]')) return;
+        e.preventDefault();
+        acReport('paste');
+    });
+
+    // 5. Right-click / context menu
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        acReport('right_click');
+    });
+
+    // 6. Keyboard shortcut blocking
+    document.addEventListener('keydown', (e) => {
+        const key  = e.key.toLowerCase();
+        const ctrl = e.ctrlKey || e.metaKey;
+        const shift = e.shiftKey;
+
+        // DevTools shortcuts
+        if (key === 'f12') {
+            e.preventDefault();
+            acReport('devtools', 'F12');
+            return;
+        }
+        if (ctrl && shift && ['i','j','c'].includes(key)) {
+            e.preventDefault();
+            acReport('devtools', `Ctrl+Shift+${key.toUpperCase()}`);
+            return;
+        }
+        // Copy / cut / paste
+        if (ctrl && key === 'c') { e.preventDefault(); acReport('copy', 'Ctrl+C'); return; }
+        if (ctrl && key === 'x') { e.preventDefault(); acReport('cut', 'Ctrl+X'); return; }
+        if (ctrl && key === 'v') {
+            // Allow paste only in answer textareas
+            if (e.target && e.target.matches('textarea[data-input]')) return;
+            e.preventDefault();
+            acReport('paste', 'Ctrl+V');
+            return;
+        }
+        // Print shortcut
+        if (ctrl && key === 'p') {
+            e.preventDefault();
+            acReport('print_attempt', 'Ctrl+P');
+            return;
+        }
+        // Print screen / snapshot
+        if (key === 'printscreen') {
+            acReport('print_screen', 'PrintScreen');
+            return;
+        }
+        // View source
+        if (ctrl && key === 'u') {
+            e.preventDefault();
+            acReport('devtools', 'Ctrl+U');
+            return;
+        }
+        // Select all — allow within textareas but block page-level
+        if (ctrl && key === 'a' && !(e.target && e.target.matches('textarea[data-input], input'))) {
+            e.preventDefault();
+        }
+    });
+
+    // 7. Fullscreen exit detection
+    document.addEventListener('fullscreenchange',       acOnFSChange);
+    document.addEventListener('webkitfullscreenchange', acOnFSChange);
+    document.addEventListener('mozfullscreenchange',    acOnFSChange);
+    document.addEventListener('MSFullscreenChange',     acOnFSChange);
+
+    // 8. DevTools size polling (every 1.5 s)
+    setInterval(acCheckDevTools, 1500);
+
+    // 9. Block drag-and-drop (could be used to exfiltrate question text)
+    document.addEventListener('dragstart', (e) => e.preventDefault());
+    document.addEventListener('drop',      (e) => e.preventDefault());
+
+    // 10. Block print via media
+    window.addEventListener('beforeprint', (e) => {
+        acReport('print_attempt', 'beforeprint');
+    });
+}
+
+let _fsExitReported = false;
+function acOnFSChange() {
+    if (!acIsFullscreen()) {
+        // Only log once per exit event (the same exit fires multiple vendor events)
+        if (!_fsExitReported) {
+            _fsExitReported = true;
+            acReport('fullscreen_exit');
+            setTimeout(() => { _fsExitReported = false; }, 1000);
+        }
+    }
+}
+
+// ============================================================
+//  Fullscreen entry prompt on page load
+// ============================================================
+function acShowFullscreenPrompt() {
+    // We use a small non-blocking banner rather than blocking the user
+    // from starting — browsers require a user gesture for fullscreen.
+    const strip = document.getElementById('ac-status-strip');
+    if (strip && !acIsFullscreen()) {
+        strip.innerHTML += ' <button onclick="acRequestFullscreen();this.remove();" style="margin-left:12px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;border-radius:8px;padding:2px 12px;font-size:0.72rem;font-weight:900;cursor:pointer;">Enter Fullscreen</button>';
+    }
+}
+
+// ============================================================
+//  Countdown timer
+// ============================================================
+{% if assessment.time_limit_minutes %}
+(function startTimer() {
+    const totalSeconds = AC_TIME_LIMIT * 60;
+    let remaining = totalSeconds;
+    const display = document.getElementById('timerDisplay');
+
+    const tick = setInterval(() => {
+        remaining--;
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        if (display) {
+            display.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+        }
+        // Colour the timer red in the last 60 s
+        if (remaining <= 60 && display) {
+            display.closest('.rounded-2xl').style.background = 'linear-gradient(135deg,#fef2f2,#fee2e2)';
+            display.closest('.rounded-2xl').style.borderColor = '#fca5a5';
+            display.closest('.rounded-2xl').style.color = '#991b1b';
+        }
+        if (remaining <= 0) {
+            clearInterval(tick);
+            // Time up — auto-submit silently
+            const btn = document.getElementById('submitBtn');
+            if (btn) btn.removeAttribute('onclick');
+            const form = document.getElementById('assessmentForm');
+            if (form) form.submit();
+        }
+    }, 1000);
+})();
+{% endif %}
+
+// ============================================================
+//  Progress bar
+// ============================================================
 function updateProgress() {
     const cards = document.querySelectorAll('[data-question]');
     const total = cards.length;
     let answered = 0;
     cards.forEach(q => {
         const radio = q.querySelector('input[type="radio"]:checked');
-        const text = q.querySelector('textarea[data-input]');
-        let ok = false;
-        if (radio) ok = true;
-        if (text && text.value.trim().length > 0) ok = true;
-        if (ok) answered++;
+        const text  = q.querySelector('textarea[data-input]');
+        if (radio || (text && text.value.trim().length > 0)) answered++;
     });
     const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
     const bar = document.getElementById('progressBar');
@@ -309,7 +793,35 @@ function updateProgress() {
 }
 
 document.getElementById('assessmentForm').addEventListener('change', updateProgress);
-document.getElementById('assessmentForm').addEventListener('input', updateProgress);
+document.getElementById('assessmentForm').addEventListener('input',  updateProgress);
 updateProgress();
+
+// ============================================================
+//  Submit confirmation
+// ============================================================
+function confirmSubmit() {
+    if (acAutoSubmitting) return true;   // already auto-submitting, don't interrupt
+    const total = document.querySelectorAll('[data-question]').length;
+    let answered = 0;
+    document.querySelectorAll('[data-question]').forEach(q => {
+        const radio = q.querySelector('input[type="radio"]:checked');
+        const text  = q.querySelector('textarea[data-input]');
+        if (radio || (text && text.value.trim().length > 0)) answered++;
+    });
+    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+    let msg = `You've answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nSubmit this attempt now? You cannot change answers after submitting.`;
+    if (answered < total) {
+        msg = `⚠ You've only answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nUnanswered questions earn 0 points. Are you sure you want to submit anyway?`;
+    }
+    return confirm(msg);
+}
+
+// ============================================================
+//  Boot
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    acInit();
+    acShowFullscreenPrompt();
+});
 </script>
 {% endblock content %}

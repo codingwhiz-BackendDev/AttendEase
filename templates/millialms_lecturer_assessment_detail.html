@@ -371,7 +371,33 @@
                 </h2>
                 <p class="text-sm text-gray-500 mt-0.5 font-medium">{{ stats.attempt_count }} total · {{ stats.graded_count }} graded · {{ stats.pending_grading_count }} pending</p>
             </div>
+            {# Flagged attempts badge in header #}
+            {% with flagged_count=attempts|length %}
+            {% for a in attempts %}{% if a.flagged %}{% comment %}count handled below{% endcomment %}{% endif %}{% endfor %}
+            {% endwith %}
         </div>
+
+        {# ── Flagged attempts alert banner ── #}
+        {% with flagged_attempts=attempts %}
+        {% for a in attempts %}{% if a.flagged %}
+        {% if forloop.first %}
+        <div class="mx-6 mt-5 rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50 to-red-50 px-5 py-4 flex items-start gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-600 border border-rose-200">
+                <i class="fas fa-flag text-base"></i>
+            </div>
+            <div>
+                <p class="text-sm font-black text-rose-800">
+                    <i class="fas fa-triangle-exclamation mr-1.5"></i>Flagged attempt{{ attempts|length|pluralize }} detected
+                </p>
+                <p class="text-xs font-bold text-rose-700 mt-1 leading-relaxed">
+                    One or more students exceeded the violation threshold during this assessment. Rows highlighted in red contain detailed violation logs. Review them before finalising grades.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}{% endfor %}
+        {% endwith %}
+
         {% if attempts %}
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -381,6 +407,11 @@
                         <th class="p-4 text-left font-black">Attempt</th>
                         <th class="p-4 text-left font-black">Status</th>
                         <th class="p-4 text-left font-black">Submitted (Lagos)</th>
+                        <th class="p-4 text-left font-black">
+                            <span class="flex items-center gap-1">
+                                <i class="fas fa-shield-halved text-rose-500"></i>Integrity
+                            </span>
+                        </th>
                         <th class="p-4 text-left font-black">Auto</th>
                         <th class="p-4 text-left font-black">Manual</th>
                         <th class="p-4 text-left font-black">Total</th>
@@ -390,7 +421,7 @@
                 <tbody class="divide-y divide-purple-100/60">
                     {% for a in attempts %}
                     {% with pct=0 %}
-                    <tr class="hover:bg-purple-50/40 transition-colors">
+                    <tr class="hover:bg-purple-50/40 transition-colors {% if a.flagged %}bg-rose-50/40{% endif %}">
                         <td class="p-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-black text-xs shadow-sm">
@@ -413,6 +444,52 @@
                             </span>
                         </td>
                         <td class="p-4 text-gray-700 font-semibold">{% if a.submitted_at %}{{ a.submitted_at }}{% else %}<span class="text-gray-400">—</span>{% endif %}</td>
+
+                        {# ── Integrity / anti-cheat column ── #}
+                        <td class="p-4">
+                            {% if a.flagged %}
+                                {# Flagged: show red badge + violation count + expandable log #}
+                                <div class="flex flex-col gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-black border border-rose-300 bg-rose-50 text-rose-700">
+                                        <i class="fas fa-flag text-[10px]"></i>Flagged
+                                    </span>
+                                    <span class="text-[11px] font-bold text-rose-600">
+                                        {{ a.violation_count }} violation{{ a.violation_count|pluralize }}
+                                    </span>
+                                    {% if a.violation_log %}
+                                    <button type="button"
+                                        onclick="toggleViolationLog(this)"
+                                        data-log="{{ a.violation_log_json }}"
+                                        class="text-[10px] font-black text-rose-500 underline underline-offset-2 text-left hover:text-rose-700 transition-colors">
+                                        View log
+                                    </button>
+                                    <div class="ac-log-panel hidden mt-1 rounded-xl border border-rose-200 bg-white p-2.5 text-[10px] font-mono text-gray-700 max-h-40 overflow-y-auto space-y-1 shadow-sm"></div>
+                                    {% endif %}
+                                </div>
+                            {% elif a.violation_count > 0 %}
+                                {# Has violations but not yet flagged (below threshold) #}
+                                <div class="flex flex-col gap-1">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-black border border-amber-300 bg-amber-50 text-amber-700">
+                                        <i class="fas fa-triangle-exclamation text-[10px]"></i>{{ a.violation_count }} warn
+                                    </span>
+                                    {% if a.violation_log %}
+                                    <button type="button"
+                                        onclick="toggleViolationLog(this)"
+                                        data-log="{{ a.violation_log_json }}"
+                                        class="text-[10px] font-black text-amber-600 underline underline-offset-2 text-left hover:text-amber-800 transition-colors">
+                                        View log
+                                    </button>
+                                    <div class="ac-log-panel hidden mt-1 rounded-xl border border-amber-200 bg-white p-2.5 text-[10px] font-mono text-gray-700 max-h-40 overflow-y-auto space-y-1 shadow-sm"></div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                {# Clean — no violations #}
+                                <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-black border border-emerald-200 bg-emerald-50 text-emerald-700">
+                                    <i class="fas fa-shield-check text-[10px]"></i>Clean
+                                </span>
+                            {% endif %}
+                        </td>
+
                         <td class="p-4 font-black text-gray-800">{{ a.auto_score }}</td>
                         <td class="p-4 font-black {% if a.manual_score > 0 %}text-amber-700{% else %}text-gray-400{% endif %}">{{ a.manual_score }}</td>
                         <td class="p-4 font-black text-purple-700 text-base">{{ a.total_score }}<span class="text-xs text-gray-500"> / {{ a.total_possible_score }}</span></td>
@@ -450,6 +527,43 @@
 <script>
 function confirmDelete() {
     return confirm("Delete this assessment permanently? This removes all questions, attempts, and results and can't be undone.");
+}
+
+// ── Violation log expand/collapse ──
+function toggleViolationLog(btn) {
+    const panel = btn.nextElementSibling;
+    if (!panel || !panel.classList.contains('ac-log-panel')) return;
+
+    if (!panel.classList.contains('hidden')) {
+        panel.classList.add('hidden');
+        btn.textContent = 'View log';
+        return;
+    }
+
+    // Parse and render the log entries
+    try {
+        const entries = JSON.parse(btn.dataset.log || '[]');
+        if (!entries.length) {
+            panel.innerHTML = '<span class="text-gray-400 italic">No log entries.</span>';
+        } else {
+            panel.innerHTML = entries.map((e, i) => {
+                const ts     = e.ts     ? new Date(e.ts).toLocaleString() : '—';
+                const type   = (e.type   || 'unknown').replace(/_/g, ' ');
+                const detail = e.detail || '';
+                return `<div class="flex gap-2 items-start py-0.5 border-b border-gray-100 last:border-0">
+                    <span class="shrink-0 text-gray-400">${String(i + 1).padStart(2, '0')}.</span>
+                    <span class="font-bold text-rose-700 capitalize">${type}</span>
+                    ${detail ? `<span class="text-gray-500">— ${detail}</span>` : ''}
+                    <span class="ml-auto shrink-0 text-gray-400 text-[9px]">${ts}</span>
+                </div>`;
+            }).join('');
+        }
+    } catch (err) {
+        panel.innerHTML = '<span class="text-gray-400 italic">Could not parse log.</span>';
+    }
+
+    panel.classList.remove('hidden');
+    btn.textContent = 'Hide log';
 }
 </script>
     </div>

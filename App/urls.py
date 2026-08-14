@@ -132,6 +132,11 @@ urlpatterns = [
         name="millialms_student_result",
     ),
     path(
+        "millialms/student/attempt/<int:attempt_id>/violation/",
+        views.millialms_report_violation,
+        name="millialms_report_violation",
+    ),
+    path(
         "lecturer/roster/", views.lecturer_course_roster, name="lecturer_course_roster"
     ),
     path(

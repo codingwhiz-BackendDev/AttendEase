@@ -19,8 +19,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, Paginator
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django.utils.timezone import (
     get_default_timezone,
     is_aware,
@@ -2807,10 +2808,17 @@ def millialms_lecturer_assessment_detail(request, pk):
             "correct_pct": round(q_correct / q_total * 100, 1) if q_total else 0,
         })
 
+    # Pre-serialize violation_log on each attempt so the template can embed
+    # it as safe JSON (JSONField stores a Python list; we need a JSON string).
+    for a in attempts:
+        raw_log = a.violation_log if isinstance(a.violation_log, list) else []
+        a.violation_log_json = json.dumps(raw_log)
+
     context = {
         "user_role": "lecturer",
         "assessment": assessment,
         "attempts": attempts,
+        "flagged_count": sum(1 for a in attempts if a.flagged),
         "pending_manual": pending_manual,
         "pending_manual_count": pending_manual.count(),
         "server_now_lagos": format_lagos_time(current_time),
@@ -3114,6 +3122,93 @@ def millialms_student_result(request, attempt_id):
         "server_now_lagos": format_lagos_time(now()),
     }
     return render(request, "millialms_student_result.html", context)
+
+
+# ========== ANTI-CHEAT VIOLATION REPORTING ==========
+
+# Maximum violations before the attempt is auto-flagged as suspicious.
+VIOLATION_FLAG_THRESHOLD = 3
+
+
+@require_POST
+@student_required
+def millialms_report_violation(request, attempt_id):
+    """
+    AJAX endpoint called by the anti-cheat JS to log a single violation event.
+
+    Expected JSON body:
+        { "type": "tab_switch" | "copy" | "paste" | "devtools" | "fullscreen_exit"
+                  | "right_click" | "context_menu" | "print_screen" | "blur",
+          "detail": "<optional extra info string>" }
+
+    Returns JSON:
+        { "ok": true, "violation_count": N, "flagged": bool, "auto_submit": bool }
+
+    auto_submit is True when the threshold is exceeded for the first time,
+    telling the JS to force-submit the form immediately.
+    """
+    user_obj = User.objects.get(username=request.user)
+
+    # Only allow reporting on an in-progress attempt that belongs to this student.
+    attempt = get_object_or_404(
+        AssessmentAttempt,
+        id=attempt_id,
+        student=user_obj,
+        status=AssessmentAttempt.STATUS_IN_PROGRESS,
+    )
+
+    try:
+        payload = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({"ok": False, "error": "Invalid JSON."}, status=400)
+
+    violation_type = str(payload.get("type", "unknown"))[:64]
+    detail = str(payload.get("detail", ""))[:256]
+
+    # Build the new log entry
+    entry = {
+        "type": violation_type,
+        "detail": detail,
+        "ts": now().isoformat(),
+    }
+
+    # Atomically update the attempt so concurrent requests don't lose events.
+    with transaction.atomic():
+        attempt = AssessmentAttempt.objects.select_for_update().get(id=attempt_id)
+
+        log = attempt.violation_log if isinstance(attempt.violation_log, list) else []
+        log.append(entry)
+        attempt.violation_log = log
+        attempt.violation_count = len(log)
+
+        was_flagged_before = attempt.flagged
+        if attempt.violation_count >= VIOLATION_FLAG_THRESHOLD:
+            attempt.flagged = True
+
+        attempt.save(update_fields=["violation_count", "violation_log", "flagged"])
+
+    # Signal auto-submit only on the exact crossing of the threshold
+    # (not on every subsequent violation) to avoid double-submitting.
+    auto_submit = (
+        attempt.flagged and not was_flagged_before
+        and attempt.violation_count >= VIOLATION_FLAG_THRESHOLD
+    )
+
+    logger.warning(
+        "Anti-cheat violation: attempt=%d student=%s type=%s count=%d flagged=%s",
+        attempt.id,
+        user_obj.username,
+        violation_type,
+        attempt.violation_count,
+        attempt.flagged,
+    )
+
+    return JsonResponse({
+        "ok": True,
+        "violation_count": attempt.violation_count,
+        "flagged": attempt.flagged,
+        "auto_submit": auto_submit,
+    })
 
 
 # ========== LECTURER COURSE ROSTER ==========

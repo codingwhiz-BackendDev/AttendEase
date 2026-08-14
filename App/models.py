@@ -268,12 +268,18 @@ class AssessmentAttempt(models.Model):
         max_digits=8, decimal_places=2, default=0
     )
 
+    # Anti-cheat tracking
+    violation_count = models.PositiveIntegerField(default=0, help_text="Total number of anti-cheat violations detected.")
+    violation_log = models.JSONField(default=list, blank=True, help_text="Timestamped log of each violation event.")
+    flagged = models.BooleanField(default=False, help_text="Set to True when violation threshold is exceeded.")
+
     class Meta:
         unique_together = ("assessment", "student", "attempt_number")
         ordering = ["-started_at"]
         indexes = [
             models.Index(fields=["assessment", "student"]),
             models.Index(fields=["status"]),
+            models.Index(fields=["flagged"]),
         ]
 
     def __str__(self):
