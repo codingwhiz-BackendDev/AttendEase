@@ -8,6 +8,7 @@ import os
 import tempfile
 from datetime import datetime
 from datetime import timezone as dt_timezone
+from App.ai_utils import AIStudyAssistant, get_materials_text
 from functools import wraps
 from collections import defaultdict
 
@@ -1948,7 +1949,7 @@ def lecturer_materials(request):
 
 @student_required
 def student_ai_study(request):
-    """Student AI Study hub — course materials + AI study tools (UI preview)."""
+    """Student AI Study hub — course materials + AI study tools."""
     user_obj = User.objects.get(username=request.user)
     try:
         student_profile = StudentProfile.objects.get(student_name=user_obj)
@@ -1961,6 +1962,16 @@ def student_ai_study(request):
     selected_course, selected_course_id = _pick_selected_course(
         courses, request.GET.get("course")
     )
+    
+    # Get course materials if available
+    materials = []
+    if selected_course:
+        try:
+            from App.models import CourseMaterial
+            materials = list(CourseMaterial.objects.filter(course=selected_course).order_by('-uploaded_at'))
+        except:
+            # CourseMaterial model might not exist yet or migration not run
+            materials = []
 
     context = {
         "user_role": "student",
@@ -1968,9 +1979,264 @@ def student_ai_study(request):
         "courses": courses,
         "selected_course": selected_course,
         "selected_course_id": selected_course_id,
-        "materials": [],  # backend not wired yet
+        "materials": materials,
     }
     return render(request, "student_ai_study.html", context)
+
+
+# ========== AI API ENDPOINTS ==========
+
+@student_required
+def ai_chat(request):
+    """AI Chat endpoint for Q&A"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        question = data.get('question', '').strip()
+        course_code = data.get('course_code', '')
+        chat_history = data.get('history', [])
+        
+        if not question:
+            return JsonResponse({'error': 'Question required'}, status=400)
+        
+        # Get materials context
+        materials_text = ""
+        if course_code:
+            from App.models import Course, CourseMaterial
+            try:
+                course = Course.objects.get(course_code=course_code)
+                materials = CourseMaterial.objects.filter(course=course)
+                materials_text = get_materials_text(materials)
+            except Course.DoesNotExist:
+                pass
+        
+        # Initialize AI assistant
+        assistant = AIStudyAssistant()
+        response, success = assistant.chat(question, course_code, materials_text, chat_history)
+        
+        if success:
+            return JsonResponse({'response': response, 'success': True})
+        else:
+            return JsonResponse({'error': response, 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Chat error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_summarize(request):
+    """AI Summarize endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        topic = data.get('topic', '').strip()
+        course_code = data.get('course_code', '')
+        
+        if not topic:
+            return JsonResponse({'error': 'Topic required'}, status=400)
+        
+        # Get materials context
+        materials_text = ""
+        if course_code:
+            from App.models import Course, CourseMaterial
+            try:
+                course = Course.objects.get(course_code=course_code)
+                materials = CourseMaterial.objects.filter(course=course)
+                materials_text = get_materials_text(materials)
+            except Course.DoesNotExist:
+                pass
+        
+        assistant = AIStudyAssistant()
+        summary, success = assistant.summarize(topic, course_code, materials_text)
+        
+        if success:
+            return JsonResponse({'summary': summary, 'success': True})
+        else:
+            return JsonResponse({'error': summary, 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Summarize error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_explain(request):
+    """AI Explain endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        concept = data.get('concept', '').strip()
+        course_code = data.get('course_code', '')
+        
+        if not concept:
+            return JsonResponse({'error': 'Concept required'}, status=400)
+        
+        # Get materials context
+        materials_text = ""
+        if course_code:
+            from App.models import Course, CourseMaterial
+            try:
+                course = Course.objects.get(course_code=course_code)
+                materials = CourseMaterial.objects.filter(course=course)
+                materials_text = get_materials_text(materials)
+            except Course.DoesNotExist:
+                pass
+        
+        assistant = AIStudyAssistant()
+        explanation, success = assistant.explain(concept, course_code, materials_text)
+        
+        if success:
+            return JsonResponse({'explanation': explanation, 'success': True})
+        else:
+            return JsonResponse({'error': explanation, 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Explain error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_generate_quiz(request):
+    """AI Quiz Generator endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        num_questions = int(data.get('num_questions', 10))
+        difficulty = data.get('difficulty', 'Medium')
+        topics = data.get('topics', '').strip()
+        course_code = data.get('course_code', '')
+        
+        # Get materials context
+        materials_text = ""
+        if course_code:
+            from App.models import Course, CourseMaterial
+            try:
+                course = Course.objects.get(course_code=course_code)
+                materials = CourseMaterial.objects.filter(course=course)
+                materials_text = get_materials_text(materials)
+            except Course.DoesNotExist:
+                pass
+        
+        assistant = AIStudyAssistant()
+        quiz, success = assistant.generate_quiz(num_questions, difficulty, topics, course_code, materials_text)
+        
+        if success:
+            return JsonResponse({'quiz': quiz, 'success': True})
+        else:
+            return JsonResponse({'error': quiz.get('error', 'Unknown error'), 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Quiz error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_generate_flashcards(request):
+    """AI Flashcard Generator endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        num_cards = int(data.get('num_cards', 10))
+        topics = data.get('topics', '').strip()
+        course_code = data.get('course_code', '')
+        
+        # Get materials context
+        materials_text = ""
+        if course_code:
+            from App.models import Course, CourseMaterial
+            try:
+                course = Course.objects.get(course_code=course_code)
+                materials = CourseMaterial.objects.filter(course=course)
+                materials_text = get_materials_text(materials)
+            except Course.DoesNotExist:
+                pass
+        
+        assistant = AIStudyAssistant()
+        flashcards, success = assistant.generate_flashcards(num_cards, topics, course_code, materials_text)
+        
+        if success:
+            return JsonResponse({'flashcards': flashcards, 'success': True})
+        else:
+            return JsonResponse({'error': flashcards.get('error', 'Unknown error'), 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Flashcards error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_practice_question(request):
+    """AI Practice Mode - Generate Question endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        course_code = data.get('course_code', '')
+        previous_questions = data.get('previous_questions', [])
+        
+        # Get materials context
+        materials_text = ""
+        if course_code:
+            from App.models import Course, CourseMaterial
+            try:
+                course = Course.objects.get(course_code=course_code)
+                materials = CourseMaterial.objects.filter(course=course)
+                materials_text = get_materials_text(materials)
+            except Course.DoesNotExist:
+                pass
+        
+        assistant = AIStudyAssistant()
+        question, success = assistant.practice_question(course_code, materials_text, previous_questions)
+        
+        if success:
+            return JsonResponse({'question': question, 'success': True})
+        else:
+            return JsonResponse({'error': question.get('error', 'Unknown error'), 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Practice Question error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_evaluate_answer(request):
+    """AI Practice Mode - Evaluate Answer endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        question = data.get('question', '').strip()
+        student_answer = data.get('student_answer', '').strip()
+        expected_points = data.get('expected_points', [])
+        course_code = data.get('course_code', '')
+        
+        if not question or not student_answer:
+            return JsonResponse({'error': 'Question and answer required'}, status=400)
+        
+        assistant = AIStudyAssistant()
+        evaluation, success = assistant.evaluate_answer(question, student_answer, expected_points, course_code)
+        
+        if success:
+            return JsonResponse({'evaluation': evaluation, 'success': True})
+        else:
+            return JsonResponse({'error': evaluation.get('error', 'Unknown error'), 'success': False}, status=500)
+            
+    except Exception as e:
+        logger.error(f"AI Evaluate Answer error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
 # ========== LECTURER REPORTS HUB (/reports) ==========

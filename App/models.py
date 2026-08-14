@@ -68,6 +68,38 @@ class LecturerProfile(models.Model):
         return f"{self.user} ({self.staff_id})"
 
 
+class CourseMaterial(models.Model):
+    """Course materials uploaded by lecturers for AI Study Hub"""
+    MATERIAL_TYPE_PDF = "pdf"
+    MATERIAL_TYPE_SLIDES = "slides"
+    MATERIAL_TYPE_NOTES = "notes"
+    MATERIAL_TYPE_PAST_QUESTIONS = "past_questions"
+    MATERIAL_TYPE_CHOICES = [
+        (MATERIAL_TYPE_PDF, "PDF"),
+        (MATERIAL_TYPE_SLIDES, "Slides"),
+        (MATERIAL_TYPE_NOTES, "Notes"),
+        (MATERIAL_TYPE_PAST_QUESTIONS, "Past Questions"),
+    ]
+    
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="materials")
+    lecturer = models.ForeignKey(LecturerProfile, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    material_type = models.CharField(max_length=20, choices=MATERIAL_TYPE_CHOICES, default=MATERIAL_TYPE_NOTES)
+    file = models.FileField(upload_to='course_materials/', null=True, blank=True)
+    content = models.TextField(blank=True, help_text="Extracted text content for AI processing")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-uploaded_at']
+        indexes = [
+            models.Index(fields=["course", "material_type"]),
+            models.Index(fields=["uploaded_at"]),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} ({self.course.course_code})"
+
+
 class AttendanceSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lecturer = models.ForeignKey(LecturerProfile, on_delete=models.CASCADE)

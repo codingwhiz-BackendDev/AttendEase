@@ -46,8 +46,8 @@
                     </p>
                 </div>
             </div>
-            <span class="inline-flex items-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-xs font-black text-amber-200">
-                <i class="fas fa-flask"></i> Preview — AI model not connected yet
+            <span class="inline-flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-2.5 text-xs font-black text-emerald-200">
+                <i class="fas fa-bolt"></i> Powered by Gemini AI
             </span>
         </div>
 
@@ -338,6 +338,10 @@
 
 <script>
     (function () {
+        // Course code from template
+        var courseCode = "{{ selected_course.course_code }}";
+        var chatHistory = [];
+        
         // Tool switching
         var toolButtons = document.querySelectorAll(".tool-card");
         var panels = document.querySelectorAll(".ai-panel");
@@ -356,24 +360,18 @@
             });
         });
 
-        // Preview notice for any AI action button
-        function previewNotice() {
-            if (window.Swal) {
-                Swal.fire({
-                    icon: "info",
-                    title: "AI coming soon",
-                    text: "This is a UI preview. Connect an AI model to enable live answers, quizzes and flashcards.",
-                    confirmButtonColor: "#7c3aed",
-                });
-            } else {
-                alert("UI preview — AI model not connected yet.");
-            }
+        // Loading indicator
+        function showLoading(btn) {
+            var originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+            return function() {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            };
         }
-        document.querySelectorAll(".run-ai").forEach(function (b) {
-            b.addEventListener("click", function (e) { e.preventDefault(); previewNotice(); });
-        });
 
-        // Ask AI chat (echo + preview reply)
+        // Ask AI chat
         var chatForm = document.getElementById("chatForm");
         var chatInput = document.getElementById("chatInput");
         var chatLog = document.getElementById("chatLog");
@@ -395,9 +393,42 @@
             if (!text.trim()) return;
             addMsg("user", text.replace(/</g, "&lt;"));
             chatInput.value = "";
-            setTimeout(function () {
-                addMsg("ai", '<span class="text-white/60"><i class="fas fa-circle-info mr-1 text-amber-300"></i>Preview mode — once an AI model is connected, I\'ll answer this using your course materials.</span>');
-            }, 350);
+            
+            // Add loading message
+            var loadingWrap = document.createElement("div");
+            loadingWrap.className = "flex gap-3";
+            loadingWrap.innerHTML = '<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white text-xs"><i class="fas fa-robot"></i></div><div class="rounded-2xl rounded-tl-sm bg-white/8 px-4 py-3 text-sm text-white/60"><i class="fas fa-spinner fa-spin"></i> Thinking...</div>';
+            chatLog.appendChild(loadingWrap);
+            chatLog.scrollTop = chatLog.scrollHeight;
+            
+            // Call AI API
+            fetch("/api/ai/chat/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    question: text,
+                    course_code: courseCode,
+                    history: chatHistory
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatLog.removeChild(loadingWrap);
+                if (data.success) {
+                    addMsg("ai", data.response);
+                    chatHistory.push({role: 'user', content: text});
+                    chatHistory.push({role: 'assistant', content: data.response});
+                } else {
+                    addMsg("ai", '<span class="text-rose-300"><i class="fas fa-exclamation-circle mr-1"></i>Error: ' + (data.error || 'Unknown error') + '</span>');
+                }
+            })
+            .catch(error => {
+                chatLog.removeChild(loadingWrap);
+                addMsg("ai", '<span class="text-rose-300"><i class="fas fa-exclamation-circle mr-1"></i>Connection error. Please try again.</span>');
+            });
         }
 
         if (chatForm) {
@@ -409,6 +440,332 @@
         document.querySelectorAll(".suggestion").forEach(function (s) {
             s.addEventListener("click", function () { send(s.textContent.trim()); });
         });
+
+        // Summarize
+        document.querySelector('[data-panel="summarize"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var topic = btn.previousElementSibling.value;
+            
+            fetch("/api/ai/summarize/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    topic: topic,
+                    course_code: courseCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                restoreBtn();
+                if (data.success) {
+                    var outputDiv = btn.parentElement.nextElementSibling;
+                    outputDiv.innerHTML = '<p class="mb-2 font-black text-white/70">Summary</p>' + 
+                        '<div class="text-sm text-white/80 whitespace-pre-line">' + data.summary + '</div>';
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                restoreBtn();
+                alert('Connection error. Please try again.');
+            });
+        });
+
+        // Explain
+        document.querySelector('[data-panel="explain"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var concept = btn.previousElementSibling.value;
+            
+            fetch("/api/ai/explain/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    concept: concept,
+                    course_code: courseCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                restoreBtn();
+                if (data.success) {
+                    var outputDiv = btn.nextElementSibling;
+                    outputDiv.innerHTML = '<p class="mb-2 font-black text-white/70">Explanation</p>' + 
+                        '<div class="text-sm text-white/80 whitespace-pre-line">' + data.explanation + '</div>';
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                restoreBtn();
+                alert('Connection error. Please try again.');
+            });
+        });
+
+        // Quiz Generator
+        document.querySelector('[data-panel="quiz"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var panel = btn.closest('[data-panel="quiz"]');
+            var numQuestions = panel.querySelector('select:nth-of-type(1)').value;
+            var difficulty = panel.querySelector('select:nth-of-type(2)').value;
+            var topics = panel.querySelector('input[type="text"]').value;
+            
+            fetch("/api/ai/quiz/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    num_questions: numQuestions,
+                    difficulty: difficulty,
+                    topics: topics,
+                    course_code: courseCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                restoreBtn();
+                if (data.success) {
+                    renderQuiz(data.quiz, panel);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                restoreBtn();
+                alert('Connection error. Please try again.');
+            });
+        });
+
+        function renderQuiz(quiz, panel) {
+            var quizContainer = panel.querySelector('.rounded-2xl.border.border-white\\/10');
+            if (!quizContainer) return;
+            
+            var html = '';
+            quiz.forEach(function(q, idx) {
+                html += '<div class="rounded-2xl border border-white/10 bg-white/5 p-4 mb-3">';
+                html += '<p class="mb-3 text-sm font-black text-white"><span class="text-amber-300">Q' + (idx + 1) + '.</span> ' + q.question + '</p>';
+                html += '<div class="space-y-2">';
+                q.options.forEach(function(opt, optIdx) {
+                    html += '<label class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white/70 hover:bg-white/10"><input type="radio" name="q' + idx + '" class="accent-amber-500"> ' + opt + '</label>';
+                });
+                html += '</div>';
+                html += '<button class="mt-3 text-xs text-white/50 hover:text-white reveal-answer" data-answer="' + q.correct_answer + '" data-explanation="' + q.explanation.replace(/"/g, '&quot;') + '"><i class="fas fa-eye mr-1"></i>Show answer</button>';
+                html += '<div class="hidden mt-2 text-xs text-emerald-300 answer-reveal"><strong>Correct:</strong> ' + q.options[q.correct_answer] + '<br><em>' + q.explanation + '</em></div>';
+                html += '</div>';
+            });
+            
+            quizContainer.innerHTML = html;
+            
+            // Add answer reveal functionality
+            panel.querySelectorAll('.reveal-answer').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var answerDiv = this.nextElementSibling;
+                    answerDiv.classList.toggle('hidden');
+                });
+            });
+        }
+
+        // Flashcards
+        document.querySelector('[data-panel="flashcards"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var panel = btn.closest('[data-panel="flashcards"]');
+            
+            fetch("/api/ai/flashcards/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    num_cards: 10,
+                    topics: '',
+                    course_code: courseCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                restoreBtn();
+                if (data.success) {
+                    renderFlashcards(data.flashcards, panel);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                restoreBtn();
+                alert('Connection error. Please try again.');
+            });
+        });
+
+        function renderFlashcards(flashcards, panel) {
+            var grid = panel.querySelector('.grid');
+            if (!grid) return;
+            
+            var html = '';
+            flashcards.forEach(function(card) {
+                html += '<div class="flip-card h-40 cursor-pointer" onclick="this.classList.toggle(\'flipped\')">';
+                html += '<div class="flip-inner h-full w-full">';
+                html += '<div class="flip-face flex h-full w-full flex-col items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-500/15 to-indigo-500/15 p-4 text-center">';
+                html += '<p class="text-[10px] font-black uppercase tracking-wider text-fuchsia-300">Question</p>';
+                html += '<p class="mt-2 text-sm font-bold text-white">' + card.question + '</p>';
+                html += '<p class="mt-2 text-[10px] text-white/40">Tap to flip</p>';
+                html += '</div>';
+                html += '<div class="flip-face flip-back flex h-full w-full flex-col items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-center">';
+                html += '<p class="text-[10px] font-black uppercase tracking-wider text-emerald-300">Answer</p>';
+                html += '<p class="mt-2 text-sm text-white/80">' + card.answer + '</p>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            });
+            
+            grid.innerHTML = html;
+        }
+
+        // Practice Mode
+        var practiceQuestions = [];
+        
+        document.querySelector('[data-panel="practice"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var panel = btn.closest('[data-panel="practice"]');
+            var studentAnswer = panel.querySelector('textarea').value;
+            
+            if (studentAnswer.trim()) {
+                // Evaluate answer
+                var currentQ = practiceQuestions[practiceQuestions.length - 1];
+                fetch("/api/ai/practice/evaluate/", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        question: currentQ.question,
+                        student_answer: studentAnswer,
+                        expected_points: currentQ.expected_points,
+                        course_code: courseCode
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    restoreBtn();
+                    if (data.success) {
+                        showEvaluation(data.evaluation, panel);
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    restoreBtn();
+                    alert('Connection error. Please try again.');
+                });
+            } else {
+                // Generate new question
+                fetch("/api/ai/practice/question/", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        course_code: courseCode,
+                        previous_questions: practiceQuestions.map(function(q) { return q.question; })
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    restoreBtn();
+                    if (data.success) {
+                        practiceQuestions.push(data.question);
+                        showPracticeQuestion(data.question, panel);
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    restoreBtn();
+                    alert('Connection error. Please try again.');
+                });
+            }
+        });
+
+        function showPracticeQuestion(question, panel) {
+            var qDiv = panel.querySelector('.rounded-2xl.border.border-white\\/10');
+            qDiv.innerHTML = '<p class="mb-1 text-[11px] font-black uppercase tracking-wider text-white/40">Question ' + practiceQuestions.length + '</p>';
+            qDiv.innerHTML += '<p class="mb-4 text-base font-bold text-white">' + question.question + '</p>';
+            qDiv.innerHTML += '<textarea rows="3" placeholder="Type your answer…" class="mb-3 w-full resize-none rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-rose-500"></textarea>';
+            qDiv.innerHTML += '<div class="flex items-center justify-between">';
+            qDiv.innerHTML += '<button class="run-ai rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-check mr-2"></i>Submit answer</button>';
+            qDiv.innerHTML += '<button class="rounded-2xl border border-white/10 px-4 py-3 text-sm font-bold text-white/50 hover:bg-white/10">Skip</button>';
+            qDiv.innerHTML += '</div>';
+        }
+
+        function showEvaluation(evaluation, panel) {
+            var qDiv = panel.querySelector('.rounded-2xl.border.border-white\\/10');
+            var scoreColor = evaluation.score >= 70 ? 'text-emerald-300' : evaluation.score >= 50 ? 'text-amber-300' : 'text-rose-300';
+            
+            qDiv.innerHTML = '<div class="text-center mb-4">';
+            qDiv.innerHTML += '<p class="text-3xl font-black ' + scoreColor + '">' + evaluation.score + '/100</p>';
+            qDiv.innerHTML += '<p class="text-sm text-white/60">' + evaluation.feedback + '</p>';
+            qDiv.innerHTML += '</div>';
+            
+            if (evaluation.strong_points && evaluation.strong_points.length) {
+                qDiv.innerHTML += '<p class="mb-2 text-xs font-black text-emerald-300">✓ What you did well:</p>';
+                qDiv.innerHTML += '<ul class="mb-3 text-xs text-white/70 list-disc list-inside">';
+                evaluation.strong_points.forEach(function(point) {
+                    qDiv.innerHTML += '<li>' + point + '</li>';
+                });
+                qDiv.innerHTML += '</ul>';
+            }
+            
+            if (evaluation.missed_points && evaluation.missed_points.length) {
+                qDiv.innerHTML += '<p class="mb-2 text-xs font-black text-amber-300">⚠ What you missed:</p>';
+                qDiv.innerHTML += '<ul class="mb-3 text-xs text-white/70 list-disc list-inside">';
+                evaluation.missed_points.forEach(function(point) {
+                    qDiv.innerHTML += '<li>' + point + '</li>';
+                });
+                qDiv.innerHTML += '</ul>';
+            }
+            
+            if (evaluation.improvement_tips && evaluation.improvement_tips.length) {
+                qDiv.innerHTML += '<p class="mb-2 text-xs font-black text-sky-300">💡 Tips to improve:</p>';
+                qDiv.innerHTML += '<ul class="mb-4 text-xs text-white/70 list-disc list-inside">';
+                evaluation.improvement_tips.forEach(function(tip) {
+                    qDiv.innerHTML += '<li>' + tip + '</li>';
+                });
+                qDiv.innerHTML += '</ul>';
+            }
+            
+            qDiv.innerHTML += '<button class="run-ai w-full rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-arrow-right mr-2"></i>Next question</button>';
+        }
+
+        // CSRF Token helper
+        function getCsrfToken() {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.startsWith('csrftoken=')) {
+                    return cookie.substring('csrftoken='.length);
+                }
+            }
+            return '';
+        }
     })();
 </script>
 {% endblock content %}

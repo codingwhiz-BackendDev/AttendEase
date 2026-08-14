@@ -145,6 +145,28 @@ urlpatterns = [
     path(
         "student/ai-study/", views.student_ai_study, name="student_ai_study"
     ),
+    # AI API Endpoints
+    path(
+        "api/ai/chat/", views.ai_chat, name="ai_chat"
+    ),
+    path(
+        "api/ai/summarize/", views.ai_summarize, name="ai_summarize"
+    ),
+    path(
+        "api/ai/explain/", views.ai_explain, name="ai_explain"
+    ),
+    path(
+        "api/ai/quiz/", views.ai_generate_quiz, name="ai_generate_quiz"
+    ),
+    path(
+        "api/ai/flashcards/", views.ai_generate_flashcards, name="ai_generate_flashcards"
+    ),
+    path(
+        "api/ai/practice/question/", views.ai_practice_question, name="ai_practice_question"
+    ),
+    path(
+        "api/ai/practice/evaluate/", views.ai_evaluate_answer, name="ai_evaluate_answer"
+    ),
     path(
         "lecturer/student/<int:student_user_id>/",
         views.lecturer_student_detail,
