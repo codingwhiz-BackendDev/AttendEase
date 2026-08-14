@@ -16,3 +16,7 @@ psycopg2-binary>=2.9.9
 dj-database-url>=2.1.0
 django-csp>=4.0
 google-generativeai>=0.3.0
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.4
+pypdf>=3.17.0
+python-docx>=1.1.0

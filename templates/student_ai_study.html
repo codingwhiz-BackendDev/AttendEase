@@ -46,8 +46,8 @@
                     </p>
                 </div>
             </div>
-            <span class="inline-flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-2.5 text-xs font-black text-emerald-200">
-                <i class="fas fa-bolt"></i> Powered by Gemini AI
+            <span class="inline-flex items-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-400/10 px-4 py-2.5 text-xs font-black text-fuchsia-200">
+                <i class="fas fa-brain"></i> Smart AI Tutor with RAG
             </span>
         </div>
 
@@ -418,7 +418,25 @@
             .then(data => {
                 chatLog.removeChild(loadingWrap);
                 if (data.success) {
-                    addMsg("ai", data.response);
+                    var responseHtml = data.response;
+                    
+                    // Add citations if available
+                    if (data.citations && data.citations.length > 0) {
+                        responseHtml += '<div class="mt-2 pt-2 border-t border-white/10">';
+                        responseHtml += '<p class="text-[10px] text-white/40">Sources: ';
+                        data.citations.forEach(function(cit) {
+                            responseHtml += '<span class="inline-flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded-full mx-1"><i class="fas fa-book-open text-[8px]"></i>' + cit + '</span>';
+                        });
+                        responseHtml += '</p></div>';
+                    }
+                    
+                    // Add confidence indicator
+                    if (data.confidence !== undefined) {
+                        var confidenceColor = data.confidence >= 0.8 ? 'text-emerald-300' : data.confidence >= 0.5 ? 'text-amber-300' : 'text-rose-300';
+                        responseHtml += '<div class="mt-1 text-[10px] ' + confidenceColor + '"><i class="fas fa-signal mr-1"></i>Confidence: ' + Math.round(data.confidence * 100) + '%</div>';
+                    }
+                    
+                    addMsg("ai", responseHtml);
                     chatHistory.push({role: 'user', content: text});
                     chatHistory.push({role: 'assistant', content: data.response});
                 } else {

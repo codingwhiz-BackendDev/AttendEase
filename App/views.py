@@ -8,7 +8,7 @@ import os
 import tempfile
 from datetime import datetime
 from datetime import timezone as dt_timezone
-from App.ai_utils import AIStudyAssistant, get_materials_text
+from App.smart_ai import get_smart_tutor
 from functools import wraps
 from collections import defaultdict
 
@@ -1988,7 +1988,7 @@ def student_ai_study(request):
 
 @student_required
 def ai_chat(request):
-    """AI Chat endpoint for Q&A"""
+    """Smart AI Chat endpoint with RAG and learning memory"""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
     
@@ -1996,33 +1996,30 @@ def ai_chat(request):
         data = json.loads(request.body)
         question = data.get('question', '').strip()
         course_code = data.get('course_code', '')
-        chat_history = data.get('history', [])
         
         if not question:
             return JsonResponse({'error': 'Question required'}, status=400)
         
-        # Get materials context
-        materials_text = ""
-        if course_code:
-            from App.models import Course, CourseMaterial
-            try:
-                course = Course.objects.get(course_code=course_code)
-                materials = CourseMaterial.objects.filter(course=course)
-                materials_text = get_materials_text(materials)
-            except Course.DoesNotExist:
-                pass
+        # Get smart tutor
+        student_id = str(request.user.id)
+        tutor = get_smart_tutor(course_code, student_id)
         
-        # Initialize AI assistant
-        assistant = AIStudyAssistant()
-        response, success = assistant.chat(question, course_code, materials_text, chat_history)
+        # Get teaching response
+        result = tutor.teach(question)
         
-        if success:
-            return JsonResponse({'response': response, 'success': True})
-        else:
-            return JsonResponse({'error': response, 'success': False}, status=500)
+        if 'error' in result:
+            return JsonResponse({'error': result['error'], 'success': False}, status=500)
+        
+        return JsonResponse({
+            'response': result['answer'],
+            'citations': result.get('citations', []),
+            'confidence': result.get('confidence', 0.5),
+            'context_used': result.get('context_used', 0),
+            'success': True
+        })
             
     except Exception as e:
-        logger.error(f"AI Chat error: {str(e)}")
+        logger.error(f"Smart AI Chat error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
