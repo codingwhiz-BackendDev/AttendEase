@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_csp',
 ]
    
  
@@ -104,12 +105,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
+    'django.middleware.common.BrokenLinkEmailsMiddleware',
+    'django_csp.middleware.CSPMiddleware',
 ]
 
 # Session settings (optional, but recommended)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
-SESSION_COOKIE_SECURE = not DEBUG  # Set to True in production
-CSRF_COOKIE_SECURE = not DEBUG  # Set to True in production
+SESSION_COOKIE_SECURE = not True  # Set to True in production
+CSRF_COOKIE_SECURE = not True  # Set to True in production
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
 
 
 ROOT_URLCONF = 'AttendEase.urls'
@@ -204,6 +210,25 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 # Security Settings for File Uploads
 ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png']
 MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
+
+# Security Headers for Anti-Cheat Protection
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+SECURE_SSL_REDIRECT = not DEBUG  # Enforce HTTPS in production
+
+# Content Security Policy (CSP) for additional security
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'",)  # Allow inline scripts for assessment functionality
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",)  # Allow inline styles
+CSP_IMG_SRC = ("'self'", "data:", "https:",)  # Allow data URIs and HTTPS images
+CSP_CONNECT_SRC = ("'self'",)  # Allow AJAX to same origin
+CSP_FONT_SRC = ("'self'",)  # Allow fonts from same origin
+CSP_FRAME_ANCESTORS = ("'none'",)  # Prevent framing
+CSP_FORM_ACTION = ("'self'",)  # Restrict form submissions
+CSP_BASE_URI = ("'self'",)
+CSP_FRAME_SRC = ("'none'",)  # No iframes for security
+CSP_REPORT_ONLY = False  # Enforce CSP in production
 
 # Configure logging
 LOGGING = {

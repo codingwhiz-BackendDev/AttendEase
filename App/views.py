@@ -9,6 +9,7 @@ import tempfile
 from datetime import datetime
 from datetime import timezone as dt_timezone
 from functools import wraps
+from collections import defaultdict
 
 import numpy as np
 from django.core.mail import send_mail
@@ -21,6 +22,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.timezone import (
     get_default_timezone,
@@ -47,6 +49,26 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Simple in-memory rate limiter for anti-cheat endpoint
+_violation_rate_limiter = defaultdict(list)
+_RATE_LIMIT_WINDOW = 60  # seconds
+_RATE_LIMIT_MAX_REQUESTS = 10  # max requests per window
+
+def _check_rate_limit(identifier):
+    """Check if identifier has exceeded rate limit."""
+    now = datetime.now()
+    # Clean old entries
+    _violation_rate_limiter[identifier] = [
+        ts for ts in _violation_rate_limiter[identifier] 
+        if (now - ts).total_seconds() < _RATE_LIMIT_WINDOW
+    ]
+    # Check if limit exceeded
+    if len(_violation_rate_limiter[identifier]) >= _RATE_LIMIT_MAX_REQUESTS:
+        return False
+    # Add current request
+    _violation_rate_limiter[identifier].append(now)
+    return True
 
 
 MILLIALMS_SUPPORTED_TYPES = {
@@ -2741,7 +2763,16 @@ def millialms_lecturer_assessment_detail(request, pk):
     assessment.status_label = get_assessment_status_label(assessment, current_time)
     assessment.type_label = get_assessment_type_label(assessment.assessment_type)
 
-    attempts = assessment.attempts.select_related("student").order_by("-started_at")
+    # Force-evaluate to a list so we can annotate each object with
+    # violation_log_json without the queryset being re-evaluated from DB.
+    # Exclude bare in-progress attempts (anti-cheat pre-creates with no answers)
+    # — only show submitted/graded attempts in the lecturer table.
+    attempts = list(
+        assessment.attempts
+        .select_related("student")
+        .exclude(status=AssessmentAttempt.STATUS_IN_PROGRESS)
+        .order_by("-started_at")
+    )
     # Include BOTH short answer AND essay responses in pending review.
     pending_manual = AssessmentResponse.objects.filter(
         attempt__assessment=assessment,
@@ -2974,7 +3005,12 @@ def millialms_student_dashboard(request):
     for assessment in assessments:
         assessment.status_label = get_assessment_status_label(assessment, current_time)
         assessment.type_label = get_assessment_type_label(assessment.assessment_type)
-        assessment.my_attempts = assessment.attempts.filter(student=user_obj).count()
+        # Count only completed attempts — in-progress records are anti-cheat
+        # pre-creates and must not reduce the student's remaining attempts.
+        assessment.my_attempts = assessment.attempts.filter(
+            student=user_obj,
+            status__in=[AssessmentAttempt.STATUS_SUBMITTED, AssessmentAttempt.STATUS_GRADED],
+        ).count()
         assessment.remaining_attempts = max(
             assessment.max_attempts - assessment.my_attempts, 0
         )
@@ -3013,11 +3049,17 @@ def millialms_student_assessment_detail(request, pk):
     current_time = now()
     assessment.status_label = get_assessment_status_label(assessment, current_time)
     assessment.type_label = get_assessment_type_label(assessment.assessment_type)
-    attempts = assessment.attempts.filter(student=user_obj).order_by("-attempt_number")
+    attempts = assessment.attempts.filter(
+        student=user_obj,
+        status__in=[AssessmentAttempt.STATUS_SUBMITTED, AssessmentAttempt.STATUS_GRADED],
+    ).order_by("-attempt_number")
+    # Count only completed attempts against max_attempts — in-progress attempts
+    # are pre-created records for the anti-cheat system and must not count.
+    completed_count = attempts.count()
     can_take = (
         assessment.status == Assessment.STATUS_PUBLISHED
         and assessment.status_label == "Live"
-        and attempts.count() < assessment.max_attempts
+        and completed_count < assessment.max_attempts
     )
 
     context = {
@@ -3031,7 +3073,6 @@ def millialms_student_assessment_detail(request, pk):
 
 
 @student_required
-@transaction.atomic
 def millialms_take_assessment(request, pk):
     user_obj = User.objects.get(username=request.user)
     student_profile = get_object_or_404(StudentProfile, student_name=user_obj)
@@ -3042,13 +3083,20 @@ def millialms_take_assessment(request, pk):
     )
     current_time = now()
     status_label = get_assessment_status_label(assessment, current_time)
-    existing_attempts = assessment.attempts.filter(student=user_obj).count()
 
     if assessment.status != Assessment.STATUS_PUBLISHED or status_label != "Live":
         messages.error(request, "This assessment is not currently available to take.")
         return redirect("millialms_student_assessment_detail", pk=assessment.id)
 
-    if existing_attempts >= assessment.max_attempts:
+    # Count only completed (submitted / graded) attempts against the limit.
+    # In-progress attempts are orphans from previous page loads and must not
+    # count, otherwise a page refresh would lock the student out.
+    completed_attempts = assessment.attempts.filter(
+        student=user_obj,
+        status__in=[AssessmentAttempt.STATUS_SUBMITTED, AssessmentAttempt.STATUS_GRADED],
+    ).count()
+
+    if completed_attempts >= assessment.max_attempts:
         messages.error(
             request,
             "You have reached the maximum number of attempts allowed for this assessment.",
@@ -3058,38 +3106,78 @@ def millialms_take_assessment(request, pk):
     questions = list(assessment.questions.prefetch_related("options").all())
     if assessment.randomize_question_order:
         import random
-
         random.shuffle(questions)
 
     if request.method == "POST":
-        attempt = AssessmentAttempt.objects.create(
-            assessment=assessment,
-            student=user_obj,
-            attempt_number=existing_attempts + 1,
-            status=AssessmentAttempt.STATUS_IN_PROGRESS,
-        )
-        for question in questions:
-            response = AssessmentResponse(attempt=attempt, question=question)
-            if question.question_type in {
-                AssessmentQuestion.TYPE_MCQ,
-                AssessmentQuestion.TYPE_TRUE_FALSE,
-            }:
-                option_id = (request.POST.get(f"question_{question.id}") or "").strip()
-                if option_id:
-                    try:
-                        response.selected_option = question.options.get(id=option_id)
-                    except AssessmentOption.DoesNotExist:
+        # Retrieve the in-progress attempt created on GET, or create a new one
+        # (fallback for JS-disabled browsers or direct POST).
+        ac_attempt_id = (request.POST.get("ac_attempt_id") or "").strip()
+        attempt = None
+        if ac_attempt_id:
+            try:
+                attempt = AssessmentAttempt.objects.get(
+                    id=int(ac_attempt_id),
+                    assessment=assessment,
+                    student=user_obj,
+                    status=AssessmentAttempt.STATUS_IN_PROGRESS,
+                )
+            except (AssessmentAttempt.DoesNotExist, ValueError):
+                attempt = None
+
+        with transaction.atomic():
+            if attempt is None:
+                attempt = AssessmentAttempt.objects.create(
+                    assessment=assessment,
+                    student=user_obj,
+                    attempt_number=completed_attempts + 1,
+                    status=AssessmentAttempt.STATUS_IN_PROGRESS,
+                )
+
+            for question in questions:
+                response, _ = AssessmentResponse.objects.get_or_create(
+                    attempt=attempt, question=question
+                )
+                if question.question_type in {
+                    AssessmentQuestion.TYPE_MCQ,
+                    AssessmentQuestion.TYPE_TRUE_FALSE,
+                }:
+                    option_id = (request.POST.get(f"question_{question.id}") or "").strip()
+                    if option_id:
+                        try:
+                            response.selected_option = question.options.get(id=option_id)
+                        except AssessmentOption.DoesNotExist:
+                            response.selected_option = None
+                    else:
                         response.selected_option = None
-            else:
-                response.text_answer = (
-                    request.POST.get(f"question_{question.id}") or ""
-                ).strip()
-            response.save()
-        attempt.submitted_at = now()
-        grade_attempt(attempt)
-        attempt.save(update_fields=["submitted_at"])
+                else:
+                    response.text_answer = (
+                        request.POST.get(f"question_{question.id}") or ""
+                    ).strip()
+                response.save()
+
+            attempt.submitted_at = now()
+            grade_attempt(attempt)
+            attempt.save(update_fields=["submitted_at"])
+
         messages.success(request, "Your assessment has been submitted successfully.")
         return redirect("millialms_student_result", attempt_id=attempt.id)
+
+    # GET — reuse any existing in-progress attempt for this student + assessment
+    # (handles page refresh without creating orphaned records), or create a
+    # fresh one so the anti-cheat JS can report violations in real time.
+    attempt_obj = AssessmentAttempt.objects.filter(
+        assessment=assessment,
+        student=user_obj,
+        status=AssessmentAttempt.STATUS_IN_PROGRESS,
+    ).first()
+
+    if attempt_obj is None:
+        attempt_obj = AssessmentAttempt.objects.create(
+            assessment=assessment,
+            student=user_obj,
+            attempt_number=completed_attempts + 1,
+            status=AssessmentAttempt.STATUS_IN_PROGRESS,
+        )
 
     serialized_questions = [
         serialize_question_for_attempt(q, assessment.randomize_answer_options)
@@ -3099,6 +3187,7 @@ def millialms_take_assessment(request, pk):
         "user_role": "student",
         "assessment": assessment,
         "questions": serialized_questions,
+        "attempt_id": attempt_obj.id,
         "server_now_lagos": format_lagos_time(current_time),
         "essay_reminder": "Essay and short-answer responses will be reviewed and graded by your lecturer after submission.",
     }
@@ -3129,7 +3218,16 @@ def millialms_student_result(request, attempt_id):
 # Maximum violations before the attempt is auto-flagged as suspicious.
 VIOLATION_FLAG_THRESHOLD = 3
 
+# Valid violation types for server-side validation
+VALID_VIOLATION_TYPES = {
+    'tab_switch', 'blur', 'copy', 'cut', 'paste', 'devtools',
+    'fullscreen_exit', 'right_click', 'print_screen', 'print_attempt',
+    'fingerprint-change', 'function-tampered', 'dom-tampered',
+    'debugger-detected', 'console-tampered', 'variable-tampered'
+}
 
+
+@csrf_exempt
 @require_POST
 @student_required
 def millialms_report_violation(request, attempt_id):
@@ -3149,6 +3247,13 @@ def millialms_report_violation(request, attempt_id):
     """
     user_obj = User.objects.get(username=request.user)
 
+    # Rate limiting check (prevent abuse)
+    rate_limit_key = f"{user_obj.id}_{attempt_id}"
+    if not _check_rate_limit(rate_limit_key):
+        logger.warning("Rate limit exceeded for violation reporting: user=%s attempt=%s", 
+                      user_obj.username, attempt_id)
+        return JsonResponse({"ok": False, "error": "Rate limit exceeded."}, status=429)
+
     # Only allow reporting on an in-progress attempt that belongs to this student.
     attempt = get_object_or_404(
         AssessmentAttempt,
@@ -3164,6 +3269,12 @@ def millialms_report_violation(request, attempt_id):
 
     violation_type = str(payload.get("type", "unknown"))[:64]
     detail = str(payload.get("detail", ""))[:256]
+
+    # Server-side validation of violation type
+    if violation_type not in VALID_VIOLATION_TYPES:
+        logger.warning("Invalid violation type received: user=%s type=%s", 
+                      user_obj.username, violation_type)
+        return JsonResponse({"ok": False, "error": "Invalid violation type."}, status=400)
 
     # Build the new log entry
     entry = {
@@ -3194,14 +3305,27 @@ def millialms_report_violation(request, attempt_id):
         and attempt.violation_count >= VIOLATION_FLAG_THRESHOLD
     )
 
+    # Enhanced logging with more context
     logger.warning(
-        "Anti-cheat violation: attempt=%d student=%s type=%s count=%d flagged=%s",
+        "Anti-cheat violation: attempt=%d student=%s assessment=%d type=%s count=%d flagged=%s detail=%s",
         attempt.id,
         user_obj.username,
+        attempt.assessment.id,
         violation_type,
         attempt.violation_count,
         attempt.flagged,
+        detail,
     )
+    
+    # Additional logging for auto-submit events
+    if auto_submit:
+        logger.error(
+            "AUTO-SUBMIT TRIGGERED: attempt=%d student=%s assessment=%d violations=%d",
+            attempt.id,
+            user_obj.username,
+            attempt.assessment.id,
+            attempt.violation_count,
+        )
 
     return JsonResponse({
         "ok": True,

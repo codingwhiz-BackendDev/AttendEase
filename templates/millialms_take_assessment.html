@@ -8,37 +8,6 @@
     .float-orb-1 { animation: float-purple 7s ease-in-out infinite; }
     .float-orb-2 { animation: float-purple 9s ease-in-out infinite; animation-delay: 2s; }
 
-    .glass-card {
-        background: rgba(255, 255, 255, 0.06);
-        backdrop-filter: blur(18px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-    }
-    .white-card {
-        background: #ffffff;
-        border: 1px solid rgba(226, 232, 240, 0.6);
-        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
-        transition: all 0.25s ease;
-    }
-    .white-card:hover {
-        transform: translateY(-3px);
-        border-color: rgba(139, 92, 246, 0.35);
-        box-shadow: 0 16px 44px rgba(139, 92, 246, 0.18);
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
-        transition: all 0.25s ease;
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(102, 126, 234, 0.5); }
-    .btn-outline-light {
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.04);
-        color: white;
-        transition: all 0.2s ease;
-    }
-    .btn-outline-light:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.45); }
-
     .purple-card { background:#ffffff; border:1px solid rgba(118,75,162,0.15); box-shadow:0 4px 20px rgba(102,126,234,0.08); }
     .question-card {
         background: linear-gradient(180deg,#ffffff 0%,rgba(139,92,246,0.02) 100%);
@@ -46,31 +15,26 @@
         box-shadow:0 2px 12px rgba(102,126,234,0.06);
         transition:all 0.25s ease;
     }
-    .question-card:hover {
-        border-color:rgba(139,92,246,0.35);
-        box-shadow:0 10px 30px rgba(102,126,234,0.12);
-    }
+    .question-card:hover { border-color:rgba(139,92,246,0.35); box-shadow:0 10px 30px rgba(102,126,234,0.12); }
     .btn-purple { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); box-shadow:0 8px 24px rgba(102,126,234,0.25); transition:all 0.25s ease; }
     .btn-purple:hover { transform:translateY(-1px); box-shadow:0 12px 32px rgba(102,126,234,0.35); }
     .btn-outline-purple { border:1.5px solid rgba(118,75,162,0.3); background:white; color:#6d28d9; transition:all 0.2s ease; }
     .btn-outline-purple:hover { background:rgba(139,92,246,0.06); border-color:#8b5cf6; }
+
     .q-type-chip-mcq { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
-    .q-type-chip-tf { background:rgba(99,102,241,0.1); color:#4338ca; border-color:rgba(99,102,241,0.3); }
-    .q-type-chip-fb { background:rgba(59,130,246,0.1); color:#1d4ed8; border-color:rgba(59,130,246,0.3); }
-    .q-type-chip-sa { background:rgba(245,158,11,0.1); color:#92400e; border-color:rgba(245,158,11,0.3); }
+    .q-type-chip-tf  { background:rgba(99,102,241,0.1); color:#4338ca; border-color:rgba(99,102,241,0.3); }
+    .q-type-chip-fb  { background:rgba(59,130,246,0.1); color:#1d4ed8; border-color:rgba(59,130,246,0.3); }
+    .q-type-chip-sa  { background:rgba(245,158,11,0.1); color:#92400e; border-color:rgba(245,158,11,0.3); }
     .q-type-chip-essay { background:rgba(168,85,247,0.12); color:#7e22ce; border-color:rgba(168,85,247,0.35); }
     .q-num-badge { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; box-shadow:0 4px 12px rgba(102,126,234,0.3); }
     .points-chip { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.3); }
+
     .option-label {
         border:1.5px solid rgba(118,75,162,0.12);
         background:rgba(139,92,246,0.02);
         transition:all 0.2s ease;
     }
-    .option-label:hover {
-        border-color:rgba(139,92,246,0.4);
-        background:rgba(139,92,246,0.06);
-        transform:translateX(3px);
-    }
+    .option-label:hover { border-color:rgba(139,92,246,0.4); background:rgba(139,92,246,0.06); transform:translateX(3px); }
     .option-label:has(input:checked) {
         border-color:#8b5cf6;
         background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(167,139,250,0.12));
@@ -81,21 +45,51 @@
         transition:all 0.2s ease;
         background:rgba(139,92,246,0.01);
     }
-    .answer-input:focus {
-        border-color:#8b5cf6;
-        box-shadow:0 0 0 4px rgba(139,92,246,0.1);
-        outline:none;
-        background:white;
-    }
+    .answer-input:focus { border-color:#8b5cf6; box-shadow:0 0 0 4px rgba(139,92,246,0.1); outline:none; background:white; }
+
     .notice-banner {
         background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(245,158,11,0.15));
         border-color:rgba(251,191,36,0.35);
         color:#92400e;
     }
     .progress-bar-track { background:rgba(139,92,246,0.1); border-radius:999px; overflow:hidden; }
-    .progress-bar-fill { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 0.6s ease; }
+    .progress-bar-fill  { background:linear-gradient(90deg,#667eea 0%,#764ba2 100%); border-radius:999px; height:100%; transition:width 0.6s ease; }
 
-    /* ── Anti-cheat UI ── */
+    /* ── Anti-cheat: status strip ── */
+    #ac-status-strip {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 7px 16px;
+        background: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
+        font-size: 0.72rem;
+        font-weight: 900;
+        color: rgba(255,255,255,0.85);
+        letter-spacing: 0.06em;
+        transition: background 0.4s ease;
+        user-select: none;
+        border-radius: 0 0 16px 16px;
+        margin-bottom: 0.5rem;
+    }
+    #ac-status-strip.warn   { background: linear-gradient(90deg, #92400e 0%, #b45309 100%); }
+    #ac-status-strip.danger { background: linear-gradient(90deg, #7f1d1d 0%, #b91c1c 100%); }
+    #ac-fs-btn {
+        margin-left: 8px;
+        background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.35);
+        color: white;
+        border-radius: 8px;
+        padding: 2px 12px;
+        font-size: 0.72rem;
+        font-weight: 900;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    #ac-fs-btn:hover { background: rgba(255,255,255,0.28); }
+
+    /* ── Anti-cheat: warning overlay ── */
     #ac-warn-overlay {
         display: none;
         position: fixed;
@@ -107,6 +101,11 @@
         justify-content: center;
     }
     #ac-warn-overlay.show { display: flex; }
+
+    @keyframes acPop {
+        from { transform: scale(0.82); opacity: 0; }
+        to   { transform: scale(1);    opacity: 1; }
+    }
     .ac-warn-box {
         background: #fff;
         border-radius: 28px;
@@ -117,13 +116,9 @@
         box-shadow: 0 30px 80px rgba(0,0,0,0.45);
         animation: acPop 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-    @keyframes acPop {
-        from { transform: scale(0.82); opacity: 0; }
-        to   { transform: scale(1);    opacity: 1; }
-    }
-    .ac-icon { font-size: 3rem; margin-bottom: 0.75rem; }
-    .ac-title { font-size: 1.35rem; font-weight: 900; color: #1e1b4b; margin-bottom: 0.5rem; }
-    .ac-msg   { font-size: 0.9rem;  font-weight: 600; color: #4b5563; line-height: 1.6; }
+    .ac-icon     { font-size: 3rem; margin-bottom: 0.75rem; }
+    .ac-title    { font-size: 1.35rem; font-weight: 900; color: #1e1b4b; margin-bottom: 0.5rem; }
+    .ac-msg      { font-size: 0.9rem; font-weight: 600; color: #4b5563; line-height: 1.6; }
     .ac-count-badge {
         display: inline-flex; align-items: center; gap: 6px;
         margin-top: 1rem;
@@ -139,19 +134,15 @@
         margin-top: 1.4rem;
         display: inline-flex; align-items: center; gap: 8px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 14px;
-        padding: 0.7rem 2rem;
-        font-size: 0.88rem;
-        font-weight: 900;
+        color: white; border: none; border-radius: 14px;
+        padding: 0.7rem 2rem; font-size: 0.88rem; font-weight: 900;
         cursor: pointer;
         box-shadow: 0 8px 22px rgba(102,126,234,0.35);
         transition: all 0.2s ease;
     }
     .ac-dismiss-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(102,126,234,0.45); }
 
-    /* final auto-submit overlay (no dismiss button) */
+    /* ── Anti-cheat: final auto-submit overlay ── */
     #ac-final-overlay {
         display: none;
         position: fixed;
@@ -173,54 +164,27 @@
         box-shadow: 0 30px 80px rgba(0,0,0,0.55);
         animation: acPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-
-    /* violation counter strip */
-    #ac-status-strip {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        z-index: 9000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 6px 16px;
-        background: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
-        font-size: 0.72rem;
-        font-weight: 900;
-        color: rgba(255,255,255,0.82);
-        letter-spacing: 0.06em;
-        transition: background 0.4s ease;
-        user-select: none;
-    }
-    #ac-status-strip.warn  { background: linear-gradient(90deg, #92400e 0%, #b45309 100%); }
-    #ac-status-strip.danger{ background: linear-gradient(90deg, #7f1d1d 0%, #b91c1c 100%); }
-    #ac-vcount { font-size: 0.82rem; }
-
-    /* push page content below the strip */
-    body { padding-top: 34px; }
 </style>
 
-{# ── Anti-cheat warning overlay (dismissible, shown per violation 1 & 2) ── #}
+{# ── Anti-cheat: dismissible warning overlay ── #}
 <div id="ac-warn-overlay" role="dialog" aria-modal="true" aria-labelledby="ac-warn-title">
     <div class="ac-warn-box">
         <div class="ac-icon">⚠️</div>
         <div class="ac-title" id="ac-warn-title">Academic Integrity Warning</div>
-        <div class="ac-msg" id="ac-warn-msg">
-            A suspicious action was detected. This incident has been recorded.
-        </div>
+        <div class="ac-msg" id="ac-warn-msg">A suspicious action was detected. This incident has been recorded.</div>
         <div class="ac-count-badge">
             <i class="fas fa-triangle-exclamation"></i>
             <span id="ac-warn-count-text">Violation 1 of 3</span>
         </div>
         <div>
-            <button class="ac-dismiss-btn" onclick="acDismissWarn()">
+            <button class="ac-dismiss-btn" id="ac-dismiss-btn">
                 <i class="fas fa-arrow-right"></i> Return to assessment
             </button>
         </div>
     </div>
 </div>
 
-{# ── Final auto-submit overlay (shown when threshold crossed) ── #}
+{# ── Anti-cheat: final auto-submit overlay (undismissable) ── #}
 <div id="ac-final-overlay" role="alertdialog" aria-modal="true" aria-labelledby="ac-final-title">
     <div class="ac-final-box">
         <div class="ac-icon">🚨</div>
@@ -237,16 +201,6 @@
     </div>
 </div>
 
-{# ── Fixed violation status strip ── #}
-<div id="ac-status-strip">
-    <i class="fas fa-shield-halved"></i>
-    <span>INTEGRITY MONITORING ACTIVE</span>
-    <span style="opacity:0.4;">·</span>
-    <span id="ac-vcount">0 violation(s)</span>
-    <span style="opacity:0.4;">·</span>
-    <span>Max 3 allowed</span>
-</div>
-
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 relative overflow-hidden">
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-24 -left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 float-orb-1"></div>
@@ -254,574 +208,697 @@
         <div class="absolute bottom-10 left-1/3 w-80 h-80 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 float-orb-1"></div>
     </div>
 
-    <div class="relative p-4 md:p-8 max-w-5xl mx-auto space-y-8">
-    <div class="flex flex-wrap items-start justify-between gap-5">
-        <div class="flex-1 min-w-0">
-            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-purple-600 mb-2">
-                <i class="fas fa-pen-to-square mr-1.5"></i>MilliaLMS — Assessment in Progress
-            </p>
-            <h1 class="text-2xl md:text-3xl font-black bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent leading-tight break-words">
-                {{ assessment.title }}
-            </h1>
-            <p class="mt-3 max-w-4xl text-gray-700 text-sm font-medium leading-relaxed">
-                {{ assessment.instructions|default:'Answer all required questions and submit when you are done. You cannot resume after submitting.' }}
-            </p>
+    <div class="relative p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+
+        {# ── Anti-cheat status strip (inline, not fixed — avoids body padding conflicts) ── #}
+        <div id="ac-status-strip">
+            <i class="fas fa-shield-halved"></i>
+            <span>INTEGRITY MONITORING ACTIVE</span>
+            <span style="opacity:0.4;">·</span>
+            <span id="ac-vcount">0 violation(s)</span>
+            <span style="opacity:0.4;">·</span>
+            <span>Max 3 allowed</span>
+            <button id="ac-fs-btn" type="button">Enter Fullscreen</button>
         </div>
-        <div class="flex flex-wrap gap-3">
-            {% if assessment.time_limit_minutes %}
-            <div class="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3 shadow-sm text-sm font-black text-amber-900 flex items-center gap-2">
-                <i class="fas fa-stopwatch text-lg"></i>
-                <span id="timerDisplay">{{ assessment.time_limit_minutes }}:00</span>
+
+        {# ── Assessment header ── #}
+        <div class="flex flex-wrap items-start justify-between gap-5">
+            <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-purple-400 mb-2">
+                    <i class="fas fa-pen-to-square mr-1.5"></i>MilliaLMS — Assessment in Progress
+                </p>
+                <h1 class="text-2xl md:text-3xl font-black bg-gradient-to-r from-purple-300 via-indigo-300 to-purple-300 bg-clip-text text-transparent leading-tight break-words">
+                    {{ assessment.title }}
+                </h1>
+                <p class="mt-3 max-w-4xl text-slate-300 text-sm font-medium leading-relaxed">
+                    {{ assessment.instructions|default:'Answer all required questions and submit when you are done. You cannot resume after submitting.' }}
+                </p>
             </div>
-            {% endif %}
-            <div class="rounded-2xl border border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-3 shadow-sm text-sm font-bold text-purple-800 flex items-center gap-2">
-                <i class="fas fa-question"></i>{{ questions|length }} question{{ questions|pluralize }}
-            </div>
-        </div>
-    </div>
-
-    {% if messages %}
-    <div class="space-y-3">
-        {% for message in messages %}
-        <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800{% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800{% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
-            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="rounded-3xl notice-banner border px-5 py-4 text-sm shadow-sm flex items-start gap-3">
-        <i class="fas fa-shield-check text-xl mt-0.5 flex-shrink-0"></i>
-        <div class="font-bold leading-relaxed">
-            <strong>This assessment is monitored.</strong>
-            Switching tabs, copying text, right-clicking, opening DevTools, or leaving fullscreen will be logged as violations.
-            After <strong>3 violations</strong> your attempt is auto-submitted and flagged for your lecturer.
-            &nbsp;{{ essay_reminder }}
-        </div>
-    </div>
-
-    <div class="rounded-3xl purple-card shadow-sm p-5">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <span class="text-xs font-black uppercase tracking-wider text-gray-500">Your Progress</span>
-            <span class="text-xs font-black text-purple-700">{{ questions|length }} questions total</span>
-        </div>
-        <div class="h-2 progress-bar-track">
-            <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
-        </div>
-        <p class="mt-2 text-xs font-bold text-gray-500" id="progressText">Answer each question below. Your progress updates as you fill in answers.</p>
-    </div>
-
-    <form method="post" class="space-y-5 md:space-y-6" id="assessmentForm">
-        {% csrf_token %}
-        {# Hidden field carries the attempt id once the attempt is started — populated by JS after first violation report #}
-        <input type="hidden" name="ac_attempt_id" id="ac_attempt_id" value="">
-        {% for item in questions %}
-        <div class="question-card rounded-3xl p-5 md:p-6 shadow-sm" data-question>
-            <div class="flex flex-wrap items-start gap-3 mb-4 md:mb-5">
-                <div class="flex h-10 w-10 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-2xl q-num-badge font-black text-sm">
-                    {{ forloop.counter }}
+            <div class="flex flex-wrap gap-3">
+                {% if assessment.time_limit_minutes %}
+                <div class="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3 shadow-sm text-sm font-black text-amber-900 flex items-center gap-2" id="timer-badge">
+                    <i class="fas fa-stopwatch text-lg"></i>
+                    <span id="timerDisplay">{{ assessment.time_limit_minutes|stringformat:"02d" }}:00</span>
                 </div>
-                <div class="min-w-0 flex-1 pt-0.5">
-                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                        {% with qt=item.question.question_type %}
-                        <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border
-                            {% if qt == 'mcq' %}q-type-chip-mcq
-                            {% elif qt == 'true_false' %}q-type-chip-tf
-                            {% elif qt == 'fill_blank' %}q-type-chip-fb
-                            {% elif qt == 'short_answer' %}q-type-chip-sa
-                            {% elif qt == 'essay' %}q-type-chip-essay{% endif %}">
-                            <i class="fas {% if qt == 'mcq' %}fa-list{% elif qt == 'true_false' %}fa-check-double{% elif qt == 'fill_blank' %}fa-pen-line{% elif qt == 'short_answer' %}fa-memo-circle-info{% elif qt == 'essay' %}fa-feather-pointed{% endif %} mr-1.5"></i>
-                            {{ item.question.get_question_type_display }}
-                        </span>
-                        {% endwith %}
-                        <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border points-chip">
-                            <i class="fas fa-coins mr-1.5"></i>{{ item.question.points }} point{{ item.question.points|pluralize }}
-                        </span>
-                        {% if item.question.question_type == 'essay' or item.question.question_type == 'short_answer' %}
-                        <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border border-amber-300 bg-amber-50 text-amber-800">
-                            <i class="fas fa-memo-circle-check mr-1.5"></i>Manual grading
-                        </span>
-                        {% endif %}
+                {% endif %}
+                <div class="rounded-2xl border border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-3 shadow-sm text-sm font-bold text-purple-800 flex items-center gap-2">
+                    <i class="fas fa-question"></i>{{ questions|length }} question{{ questions|pluralize }}
+                </div>
+            </div>
+        </div>
+
+        {# ── Django messages ── #}
+        {% if messages %}
+        <div class="space-y-3">
+            {% for message in messages %}
+            <div class="rounded-2xl px-5 py-4 text-sm font-bold shadow-sm
+                {% if message.tags == 'success' %}bg-emerald-50 border border-emerald-200 text-emerald-800
+                {% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800
+                {% elif message.tags == 'warning' %}bg-amber-50 border border-amber-200 text-amber-800
+                {% else %}bg-purple-50 border border-purple-200 text-purple-800{% endif %}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-info-circle{% endif %} mr-2"></i>{{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# ── Integrity notice banner ── #}
+        <div class="rounded-3xl notice-banner border px-5 py-4 text-sm shadow-sm flex items-start gap-3">
+            <i class="fas fa-shield-check text-xl mt-0.5 flex-shrink-0"></i>
+            <div class="font-bold leading-relaxed">
+                <strong>This assessment is monitored.</strong>
+                Switching tabs, copying text, right-clicking, opening DevTools, or leaving fullscreen will be logged as violations.
+                After <strong>3 violations</strong> your attempt is auto-submitted and flagged for your lecturer.
+                &nbsp;{{ essay_reminder }}
+            </div>
+        </div>
+
+        {# ── Progress bar ── #}
+        <div class="rounded-3xl purple-card shadow-sm p-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <span class="text-xs font-black uppercase tracking-wider text-gray-500">Your Progress</span>
+                <span class="text-xs font-black text-purple-700">{{ questions|length }} question{{ questions|pluralize }}</span>
+            </div>
+            <div class="h-2 progress-bar-track">
+                <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+            </div>
+            <p class="mt-2 text-xs font-bold text-gray-500" id="progressText">Answer each question below. Your progress updates as you fill in answers.</p>
+        </div>
+
+        {# ── Assessment form ── #}
+        <form method="post" class="space-y-5 md:space-y-6" id="assessmentForm">
+            {% csrf_token %}
+            {# Carry the pre-created attempt ID so violations are linked before submit #}
+            <input type="hidden" name="ac_attempt_id" id="ac_attempt_id" value="{{ attempt_id }}">
+
+            {% for item in questions %}
+            <div class="question-card rounded-3xl p-5 md:p-6 shadow-sm" data-question>
+                <div class="flex flex-wrap items-start gap-3 mb-4 md:mb-5">
+                    <div class="flex h-10 w-10 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-2xl q-num-badge font-black text-sm">
+                        {{ forloop.counter }}
                     </div>
-                    <h2 class="text-lg md:text-xl font-black text-gray-900 leading-relaxed break-words">
-                        {{ item.question.question_text }}
-                    </h2>
+                    <div class="min-w-0 flex-1 pt-0.5">
+                        <div class="flex flex-wrap items-center gap-2 mb-2">
+                            {% with qt=item.question.question_type %}
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border
+                                {% if qt == 'mcq' %}q-type-chip-mcq
+                                {% elif qt == 'true_false' %}q-type-chip-tf
+                                {% elif qt == 'fill_blank' %}q-type-chip-fb
+                                {% elif qt == 'short_answer' %}q-type-chip-sa
+                                {% elif qt == 'essay' %}q-type-chip-essay{% endif %}">
+                                <i class="fas
+                                    {% if qt == 'mcq' %}fa-list
+                                    {% elif qt == 'true_false' %}fa-check-double
+                                    {% elif qt == 'fill_blank' %}fa-pen-line
+                                    {% elif qt == 'short_answer' %}fa-memo-circle-info
+                                    {% elif qt == 'essay' %}fa-feather-pointed{% endif %} mr-1.5"></i>
+                                {{ item.question.get_question_type_display }}
+                            </span>
+                            {% endwith %}
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border points-chip">
+                                <i class="fas fa-coins mr-1.5"></i>{{ item.question.points }} point{{ item.question.points|pluralize }}
+                            </span>
+                            {% if item.question.question_type == 'essay' or item.question.question_type == 'short_answer' %}
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black border border-amber-300 bg-amber-50 text-amber-800">
+                                <i class="fas fa-memo-circle-check mr-1.5"></i>Manual grading
+                            </span>
+                            {% endif %}
+                        </div>
+                        <h2 class="text-lg md:text-xl font-black text-gray-900 leading-relaxed break-words">
+                            {{ item.question.question_text }}
+                        </h2>
+                    </div>
                 </div>
-            </div>
 
-            <div class="md:ml-14">
-                {% if item.question.question_type == 'mcq' or item.question.question_type == 'true_false' %}
-                    <div class="space-y-2.5 md:space-y-3">
-                        {% for option in item.options %}
-                        <label class="option-label flex items-start gap-3 md:gap-4 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 cursor-pointer group">
-                            <div class="flex h-6 w-6 shrink-0 items-center justify-center mt-0.5">
-                                <div class="relative">
-                                    <input type="radio" name="question_{{ item.question.id }}" value="{{ option.id }}" class="peer sr-only" data-input />
-                                    <div class="h-6 w-6 rounded-full border-2 border-purple-200 bg-white transition-all peer-checked:border-purple-600 peer-checked:bg-purple-50 flex items-center justify-center">
-                                        <div class="h-2.5 w-2.5 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
+                <div class="md:ml-14">
+                    {% if item.question.question_type == 'mcq' or item.question.question_type == 'true_false' %}
+                        <div class="space-y-2.5 md:space-y-3">
+                            {% for option in item.options %}
+                            <label class="option-label flex items-start gap-3 md:gap-4 rounded-2xl px-4 md:px-5 py-3.5 md:py-4 cursor-pointer">
+                                <div class="flex h-6 w-6 shrink-0 items-center justify-center mt-0.5">
+                                    <div class="relative">
+                                        <input type="radio" name="question_{{ item.question.id }}" value="{{ option.id }}" class="peer sr-only" data-input />
+                                        <div class="h-6 w-6 rounded-full border-2 border-purple-200 bg-white transition-all peer-checked:border-purple-600 peer-checked:bg-purple-50 flex items-center justify-center">
+                                            <div class="h-2.5 w-2.5 rounded-full bg-purple-600 scale-0 peer-checked:scale-100 transition-transform"></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="flex-1 min-w-0 pt-0.5">
-                                <div class="flex gap-2.5 items-start">
-                                    <span class="font-black text-[13px] text-purple-600 pt-0.5 shrink-0 w-6">{{ forloop.counter|stringformat:"02d" }}.</span>
-                                    <span class="font-semibold text-gray-800 leading-relaxed">{{ option.option_text }}</span>
+                                <div class="flex-1 min-w-0 pt-0.5">
+                                    <div class="flex gap-2.5 items-start">
+                                        <span class="font-black text-[13px] text-purple-600 pt-0.5 shrink-0 w-6">{{ forloop.counter|stringformat:"02d" }}.</span>
+                                        <span class="font-semibold text-gray-800 leading-relaxed">{{ option.option_text }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </label>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="space-y-2">
-                        {% if item.question.question_type == 'fill_blank' and item.accepted_answers %}
-                        <p class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 inline-block">
-                            <i class="fas fa-spell-check mr-1.5"></i>Tip: Enter a single concise answer (spelling matters — case-insensitive match).
-                        </p>
-                        {% elif item.question.question_type == 'short_answer' %}
-                        <p class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 inline-block">
-                            <i class="fas fa-info-circle mr-1.5"></i>Write 1-3 sentences. Your lecturer reviews this manually.
-                        </p>
-                        {% elif item.question.question_type == 'essay' %}
-                        <p class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2 inline-block">
-                            <i class="fas fa-feather-pointed mr-1.5"></i>Essay question — write a full answer. Your lecturer marks this with feedback.
-                        </p>
-                        {% endif %}
-                        <textarea name="question_{{ item.question.id }}"
-                            rows="{% if item.question.question_type == 'essay' %}7{% elif item.question.question_type == 'short_answer' %}4{% else %}2{% endif %}"
-                            class="answer-input w-full rounded-2xl px-4 md:px-5 py-3.5 md:py-4 text-sm md:text-base font-semibold text-gray-800 placeholder:text-gray-400 resize-y"
-                            placeholder="{% if item.question.question_type == 'essay' %}Write your essay answer here...{% elif item.question.question_type == 'short_answer' %}Write your short answer here...{% elif item.question.question_type == 'fill_blank' %}Type the missing word or phrase...{% else %}Type your answer here...{% endif %}"
-                            data-input></textarea>
-                    </div>
-                {% endif %}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="space-y-2">
+                            {% if item.question.question_type == 'fill_blank' %}
+                            <p class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 inline-block">
+                                <i class="fas fa-spell-check mr-1.5"></i>Tip: Enter a single concise answer (spelling matters — case-insensitive match).
+                            </p>
+                            {% elif item.question.question_type == 'short_answer' %}
+                            <p class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 inline-block">
+                                <i class="fas fa-info-circle mr-1.5"></i>Write 1-3 sentences. Your lecturer reviews this manually.
+                            </p>
+                            {% elif item.question.question_type == 'essay' %}
+                            <p class="text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2 inline-block">
+                                <i class="fas fa-feather-pointed mr-1.5"></i>Essay question — write a full answer. Your lecturer marks this with feedback.
+                            </p>
+                            {% endif %}
+                            <textarea name="question_{{ item.question.id }}"
+                                rows="{% if item.question.question_type == 'essay' %}7{% elif item.question.question_type == 'short_answer' %}4{% else %}2{% endif %}"
+                                class="answer-input w-full rounded-2xl px-4 md:px-5 py-3.5 md:py-4 text-sm md:text-base font-semibold text-gray-800 placeholder:text-gray-400 resize-y"
+                                placeholder="{% if item.question.question_type == 'essay' %}Write your essay answer here...{% elif item.question.question_type == 'short_answer' %}Write your short answer here...{% elif item.question.question_type == 'fill_blank' %}Type the missing word or phrase...{% else %}Type your answer here...{% endif %}"
+                                data-input></textarea>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
 
-        <div class="sticky bottom-4 z-10">
-            <div class="purple-card rounded-3xl shadow-2xl p-4 md:p-5 border-purple-200">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="text-xs md:text-sm font-bold text-gray-600 flex items-center gap-2">
-                        <i class="fas fa-shield-halved text-purple-600 text-base"></i>
-                        <span>Once submitted, this attempt cannot be edited or retracted. Make sure every question is answered.</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2.5 md:justify-end">
-                        <a href="{% url 'millialms_student_assessment_detail' assessment.id %}" class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-5 py-3 text-sm font-black">
-                            <i class="fas fa-arrow-left"></i>Cancel
-                        </a>
-                        <button type="submit" id="submitBtn" onclick="return confirmSubmit();" class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3 text-sm font-black text-white">
-                            <i class="fas fa-paper-plane"></i>Submit Assessment
-                        </button>
+            {# ── Sticky submit bar ── #}
+            <div class="sticky bottom-4 z-10">
+                <div class="purple-card rounded-3xl shadow-2xl p-4 md:p-5">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="text-xs md:text-sm font-bold text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-shield-halved text-purple-600 text-base"></i>
+                            <span>Once submitted, this attempt cannot be edited or retracted.</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2.5 md:justify-end">
+                            <a href="{% url 'millialms_student_assessment_detail' assessment.id %}"
+                               class="inline-flex items-center gap-2 rounded-2xl btn-outline-purple px-5 py-3 text-sm font-black"
+                               id="cancelBtn">
+                                <i class="fas fa-arrow-left"></i>Cancel
+                            </a>
+                            <button type="submit" id="submitBtn"
+                                    class="inline-flex items-center gap-2 rounded-2xl btn-purple px-6 py-3 text-sm font-black text-white">
+                                <i class="fas fa-paper-plane"></i>Submit Assessment
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
     </div>
 </div>
 
 <script>
-// ============================================================
-//  Configuration — injected from Django template context
-// ============================================================
-const AC_REPORT_URL  = "{% url 'millialms_report_violation' attempt_id=0 %}".replace('/0/', '/ATTEMPT_ID/');
-const AC_CSRF        = document.querySelector('[name=csrfmiddlewaretoken]').value;
-const AC_MAX         = 3;           // must match VIOLATION_FLAG_THRESHOLD in views.py
-const AC_TIME_LIMIT  = {{ assessment.time_limit_minutes|default:"null" }};  // minutes or null
-const AC_ASSESS_ID   = {{ assessment.id }};
+(function () {
+    'use strict';
 
-// ============================================================
-//  State
-// ============================================================
-let acViolationCount  = 0;
-let acAttemptId       = null;   // set once the first attempt record exists (on first violation or after POST)
-let acAutoSubmitting  = false;
-let acLastType        = '';
-let acInitialized     = false;
+    // ── Config (from Django context) ──────────────────────────────────────────
+    const AC_REPORT_URL = "{% url 'millialms_report_violation' attempt_id=0 %}"
+        .replace('/0/', '/ATTEMPT_ID/');
+    const AC_CSRF       = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const AC_MAX        = 3;     // keep in sync with VIOLATION_FLAG_THRESHOLD
+    const AC_ATTEMPT_ID = {{ attempt_id }};
+    const AC_TIME_LIMIT = {{ assessment.time_limit_minutes|default:"null" }};
 
-// ============================================================
-//  Violation messages by type
-// ============================================================
-const AC_MESSAGES = {
-    tab_switch:      'You switched tabs or minimised the window.',
-    blur:            'The assessment window lost focus.',
-    copy:            'You tried to copy text from the assessment.',
-    cut:             'You tried to cut text from the assessment.',
-    paste:           'You tried to paste text into the assessment.',
-    devtools:        'Developer Tools were opened.',
-    fullscreen_exit: 'You exited fullscreen mode.',
-    right_click:     'You right-clicked inside the assessment.',
-    context_menu:    'The context menu was opened.',
-    print_screen:    'A screenshot shortcut was detected.',
-    print_attempt:   'A print shortcut was detected.',
-};
+    // ── CSP-compatible nonce for inline scripts (if applicable) ───────────────
+    // This ensures our security monitoring works even with strict CSP
 
-// ============================================================
-//  Report a violation to the backend
-// ============================================================
-async function acReport(type, detail = '') {
-    if (acAutoSubmitting) return;
+    // ── Browser fingerprinting for session validation ──────────────────────────
+    function generateFingerprint() {
+        const components = [];
+        
+        // Screen info
+        components.push(screen.width);
+        components.push(screen.height);
+        components.push(screen.colorDepth);
+        
+        // Timezone
+        components.push(new Date().getTimezoneOffset());
+        
+        // Language
+        components.push(navigator.language);
+        
+        // Platform
+        components.push(navigator.platform);
+        
+        // User agent (partial)
+        const ua = navigator.userAgent;
+        components.push(ua.length);
+        components.push(ua.substring(0, 50));
+        
+        // Available fonts (simple check)
+        const testFonts = ['Arial', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia'];
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        testFonts.forEach(font => {
+            ctx.font = `12px ${font}`;
+            ctx.fillText('test', 10, 10);
+            components.push(ctx.measureText('test').width);
+        });
+        
+        // Create hash
+        return components.join('|');
+    }
 
-    acViolationCount++;
-    acLastType = type;
-    acUpdateStrip();
+    const initialFingerprint = generateFingerprint();
+    
+    // Check fingerprint periodically
+    function checkFingerprint() {
+        if (acSubmitting) return;
+        const currentFingerprint = generateFingerprint();
+        if (currentFingerprint !== initialFingerprint) {
+            report('blur', 'fingerprint-change');
+        }
+    }
+    setInterval(checkFingerprint, 5000);
 
-    // If we have an attempt id (mid-attempt AJAX violations) report to backend.
-    // If not (test hasn't been submitted yet / first violation before any POST),
-    // we still show the warning UI — the violation will also be stored server-side
-    // once the form is finally submitted via the hidden field approach.
-    if (acAttemptId) {
+    // ── JavaScript tamper detection ─────────────────────────────────────────────
+    (function() {
+        // Detect debugger/probe attempts
+        let integrityCheckCount = 0;
+        function performIntegrityCheck() {
+            if (acSubmitting) return;
+            integrityCheckCount++;
+            
+            // Check if our critical functions are still intact
+            if (typeof report !== 'function' || 
+                typeof triggerAutoSubmit !== 'function' ||
+                typeof updateStrip !== 'function') {
+                report('devtools', 'function-tampered');
+            }
+            
+            // Check if DOM elements are still present
+            if (!warnOverlay || !finalOverlay || !strip) {
+                report('devtools', 'dom-tampered');
+            }
+            
+            // Check for excessive breakpoints (integrity check taking too long)
+            const checkStart = performance.now();
+            // Simulate some work
+            for (let i = 0; i < 1000; i++) {
+                Math.random();
+            }
+            const checkEnd = performance.now();
+            if (checkEnd - checkStart > 50) {
+                report('devtools', 'debugger-detected');
+            }
+        }
+        
+        // Run integrity checks periodically
+        setInterval(performIntegrityCheck, 10000);
+        
+        // Detect console.log tampering
+        const originalConsoleLog = console.log;
+        console.log = function() {
+            try {
+                originalConsoleLog.apply(console, arguments);
+            } catch (e) {
+                report('devtools', 'console-tampered');
+            }
+        };
+    })();
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let acCount        = 0;
+    let acSubmitting   = false;
+    let acOverlayOpen  = false;   // true while warning overlay is visible
+    let acFSExiting    = false;   // debounce flag for fullscreen exit
+    let acDevOpen      = false;   // last known devtools state
+
+    // ── DOM refs ─────────────────────────────────────────────────────────────
+    const warnOverlay  = document.getElementById('ac-warn-overlay');
+    const finalOverlay = document.getElementById('ac-final-overlay');
+    const warnMsg      = document.getElementById('ac-warn-msg');
+    const warnCountEl  = document.getElementById('ac-warn-count-text');
+    const vcountEl     = document.getElementById('ac-vcount');
+    const strip        = document.getElementById('ac-status-strip');
+    const dismissBtn   = document.getElementById('ac-dismiss-btn');
+    const submitBtn    = document.getElementById('submitBtn');
+    const cancelBtn    = document.getElementById('cancelBtn');
+    const form         = document.getElementById('assessmentForm');
+    const fsBtnStrip   = document.getElementById('ac-fs-btn');
+
+    // ── Violation labels ──────────────────────────────────────────────────────
+    const AC_LABELS = {
+        tab_switch:      'You switched tabs or minimised the window.',
+        blur:            'The assessment window lost focus.',
+        copy:            'You tried to copy text from the assessment.',
+        cut:             'You tried to cut text from the assessment.',
+        paste:           'Paste is blocked during assessments.',
+        devtools:        'Developer Tools were detected.',
+        fullscreen_exit: 'You exited fullscreen mode.',
+        right_click:     'Right-click is disabled during assessments.',
+        print_screen:    'A screenshot shortcut was detected.',
+        print_attempt:   'Printing is disabled during assessments.',
+        'fingerprint-change': 'Browser environment changed unexpectedly.',
+        'function-tampered': 'Security functions were modified.',
+        'dom-tampered': 'Page structure was modified.',
+        'debugger-detected': 'Debugger activity was detected.',
+        'console-tampered': 'Console functions were modified.',
+        'variable-tampered': 'Security variables were modified.',
+    };
+
+    // ── Strip update ──────────────────────────────────────────────────────────
+    function updateStrip() {
+        if (vcountEl) vcountEl.textContent = acCount + ' violation(s)';
+        if (!strip) return;
+        strip.classList.remove('warn', 'danger');
+        if (acCount >= AC_MAX)          strip.classList.add('danger');
+        else if (acCount >= AC_MAX - 1) strip.classList.add('warn');
+    }
+
+    // ── Show warning overlay ──────────────────────────────────────────────────
+    function showWarn(type) {
+        if (!warnOverlay) return;
+        if (warnMsg)     warnMsg.textContent = AC_LABELS[type] || 'A suspicious action was detected.';
+        if (warnCountEl) warnCountEl.textContent = 'Violation ' + acCount + ' of ' + AC_MAX;
+        acOverlayOpen = true;
+        warnOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // ── Dismiss warning ───────────────────────────────────────────────────────
+    function dismissWarn() {
+        if (!warnOverlay) return;
+        acOverlayOpen = false;
+        warnOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    if (dismissBtn) dismissBtn.addEventListener('click', dismissWarn);
+
+    // ── Auto-submit ───────────────────────────────────────────────────────────
+    function triggerAutoSubmit() {
+        if (acSubmitting) return;
+        acSubmitting = true;
+        acOverlayOpen = true;
+
+        // Hide the warning overlay if open; show final one
+        if (warnOverlay) warnOverlay.classList.remove('show');
+        if (finalOverlay) finalOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+
+        // Disable cancel button so student cannot navigate away
+        if (cancelBtn) { cancelBtn.style.pointerEvents = 'none'; cancelBtn.style.opacity = '0.4'; }
+
+        // Remove confirm guard and submit after short delay (let overlay render)
+        if (submitBtn) submitBtn.onclick = null;
+        setTimeout(() => { if (form) form.submit(); }, 1800);
+    }
+
+    // ── Report violation (async, never throws) ────────────────────────────────
+    async function report(type, detail) {
+        if (acSubmitting) return;
+
+        acCount++;
+        updateStrip();
+
+        // Fire AJAX to backend (attempt was pre-created on GET)
         try {
-            const url = AC_REPORT_URL.replace('ATTEMPT_ID', acAttemptId);
+            const url  = AC_REPORT_URL.replace('ATTEMPT_ID', AC_ATTEMPT_ID);
             const resp = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': AC_CSRF,
-                },
-                body: JSON.stringify({ type, detail }),
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': AC_CSRF },
+                body:    JSON.stringify({ type: type, detail: detail || '' }),
             });
             if (resp.ok) {
                 const data = await resp.json();
-                acViolationCount = data.violation_count;
-                acUpdateStrip();
-                if (data.auto_submit && !acAutoSubmitting) {
-                    acTriggerAutoSubmit();
-                    return;
-                }
+                // Trust the server count (handles race conditions)
+                acCount = data.violation_count;
+                updateStrip();
+                if (data.auto_submit) { triggerAutoSubmit(); return; }
+            } else if (resp.status === 429) {
+                // Rate limited - this shouldn't happen normally
+                console.warn('Rate limited on violation reporting');
             }
-        } catch (e) {
-            // Network error — still show the local warning
+        } catch (error) {
+            // Network failure — local count still drives UI
+            console.warn('Failed to report violation:', error);
+        }
+
+        if (acCount >= AC_MAX) {
+            triggerAutoSubmit();
+        } else {
+            showWarn(type);
         }
     }
 
-    if (acViolationCount >= AC_MAX && !acAutoSubmitting) {
-        acTriggerAutoSubmit();
-    } else {
-        acShowWarn(type);
+    // ── Fullscreen helpers ────────────────────────────────────────────────────
+    function requestFS() {
+        const el = document.documentElement;
+        const fn = el.requestFullscreen || el.webkitRequestFullscreen ||
+                   el.mozRequestFullScreen || el.msRequestFullscreen;
+        if (fn) fn.call(el).catch(() => {});
     }
-}
 
-// ============================================================
-//  Update the status strip
-// ============================================================
-function acUpdateStrip() {
-    const strip  = document.getElementById('ac-status-strip');
-    const vcount = document.getElementById('ac-vcount');
-    if (vcount) vcount.textContent = acViolationCount + ' violation(s)';
-    if (strip) {
-        strip.classList.remove('warn', 'danger');
-        if (acViolationCount >= AC_MAX)       strip.classList.add('danger');
-        else if (acViolationCount >= AC_MAX - 1) strip.classList.add('warn');
+    function isFS() {
+        return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+                  document.mozFullScreenElement || document.msFullscreenElement);
     }
-}
 
-// ============================================================
-//  Show dismissible warning overlay
-// ============================================================
-function acShowWarn(type) {
-    const overlay = document.getElementById('ac-warn-overlay');
-    const msg     = document.getElementById('ac-warn-msg');
-    const countEl = document.getElementById('ac-warn-count-text');
-    if (!overlay) return;
-    if (msg) {
-        msg.textContent = AC_MESSAGES[type] || 'A suspicious action was detected. This incident has been recorded.';
+    if (fsBtnStrip) {
+        fsBtnStrip.addEventListener('click', () => {
+            requestFS();
+            // Hide button once fullscreen is granted (handled by fullscreenchange)
+        });
     }
-    if (countEl) {
-        countEl.textContent = 'Violation ' + acViolationCount + ' of ' + AC_MAX;
+
+    function onFSChange() {
+        if (isFS()) {
+            // Entered fullscreen — hide the button
+            if (fsBtnStrip) fsBtnStrip.style.display = 'none';
+        } else {
+            // Exited fullscreen — show button again
+            if (fsBtnStrip) fsBtnStrip.style.display = '';
+            // Debounce: the same exit fires multiple vendor events
+            if (!acFSExiting && !acOverlayOpen) {
+                acFSExiting = true;
+                report('fullscreen_exit', '');
+                setTimeout(() => { acFSExiting = false; }, 1000);
+            }
+        }
     }
-    overlay.classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
 
-function acDismissWarn() {
-    const overlay = document.getElementById('ac-warn-overlay');
-    if (overlay) overlay.classList.remove('show');
-    document.body.style.overflow = '';
-    // Re-request fullscreen after each dismiss
-    acRequestFullscreen();
-}
+    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
+        .forEach(ev => document.addEventListener(ev, onFSChange));
 
-// ============================================================
-//  Auto-submit when threshold reached
-// ============================================================
-function acTriggerAutoSubmit() {
-    if (acAutoSubmitting) return;
-    acAutoSubmitting = true;
-
-    // Show the final overlay (no dismiss button — cannot close)
-    const finalOverlay = document.getElementById('ac-final-overlay');
-    if (finalOverlay) finalOverlay.classList.add('show');
-    document.body.style.overflow = 'hidden';
-
-    // Remove the onclick confirm guard so the form submits without the dialog
-    const btn = document.getElementById('submitBtn');
-    if (btn) btn.removeAttribute('onclick');
-
-    // Small delay so the overlay renders before the page navigates
-    setTimeout(() => {
-        const form = document.getElementById('assessmentForm');
-        if (form) form.submit();
-    }, 1800);
-}
-
-// ============================================================
-//  Fullscreen helpers
-// ============================================================
-function acRequestFullscreen() {
-    const el = document.documentElement;
-    if (el.requestFullscreen)            el.requestFullscreen().catch(() => {});
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    else if (el.mozRequestFullScreen)    el.mozRequestFullScreen();
-    else if (el.msRequestFullscreen)     el.msRequestFullscreen();
-}
-
-function acIsFullscreen() {
-    return !!(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
-    );
-}
-
-// ============================================================
-//  DevTools detection (size heuristic — best effort)
-// ============================================================
-let _devToolsOpen = false;
-function acCheckDevTools() {
-    const threshold = 160;
-    const widthDiff  = window.outerWidth  - window.innerWidth;
-    const heightDiff = window.outerHeight - window.innerHeight;
-    const open = widthDiff > threshold || heightDiff > threshold;
-    if (open && !_devToolsOpen) {
-        _devToolsOpen = true;
-        acReport('devtools', `outer:${window.outerWidth}x${window.outerHeight} inner:${window.innerWidth}x${window.innerHeight}`);
-    } else if (!open) {
-        _devToolsOpen = false;
+    // ── Enhanced DevTools detection ───────────────────────────────────────────────
+    function checkDevTools() {
+        if (acSubmitting) return;
+        
+        // Method 1: Window size heuristic (original)
+        const threshold = 160;
+        const sizeDetected = (window.outerWidth - window.innerWidth   > threshold) ||
+                             (window.outerHeight - window.innerHeight > threshold);
+        
+        // Method 2: Console detection using setter trap
+        let consoleDetected = false;
+        const devtoolsChecker = new Image();
+        Object.defineProperty(devtoolsChecker, 'id', {
+            get: function() {
+                consoleDetected = true;
+            }
+        });
+        console.log('%c', devtoolsChecker);
+        
+        // Method 3: Screen orientation detection (some DevTools affect this)
+        const orientationDetected = window.screen.orientation && 
+                                   (window.screen.orientation.type.startsWith('portrait') && 
+                                    window.innerWidth > window.innerHeight);
+        
+        // Method 4: Focused element detection
+        const focusDetected = document.activeElement && 
+                             (document.activeElement.tagName === 'IFRAME' || 
+                              document.activeElement.tagName === 'FRAME');
+        
+        // Combine all detection methods
+        const open = sizeDetected || consoleDetected || orientationDetected || focusDetected;
+        
+        if (open && !acDevOpen) {
+            acDevOpen = true;
+            const methods = [];
+            if (sizeDetected) methods.push('size');
+            if (consoleDetected) methods.push('console');
+            if (orientationDetected) methods.push('orientation');
+            if (focusDetected) methods.push('focus');
+            report('devtools', methods.join(','));
+        } else if (!open) {
+            acDevOpen = false;
+        }
     }
-}
+    setInterval(checkDevTools, 1500);
 
-// ============================================================
-//  Attach all anti-cheat listeners
-// ============================================================
-function acInit() {
-    if (acInitialized) return;
-    acInitialized = true;
-
-    // 1. Tab switch / window minimise
+    // ── Tab / window visibility ───────────────────────────────────────────────
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden) acReport('tab_switch');
+        if (document.hidden && !acOverlayOpen) report('tab_switch', '');
     });
 
-    // 2. Window blur (split-screen, alt-tab, click outside)
+    // ── Window blur (split screen / alt-tab) ─────────────────────────────────
+    // Guard: skip if our own overlay caused the blur
     window.addEventListener('blur', () => {
-        // Small delay to avoid false positives from modal dialogs
         setTimeout(() => {
-            if (!document.hasFocus()) acReport('blur');
+            if (!document.hasFocus() && !acOverlayOpen && !acSubmitting) {
+                report('blur', '');
+            }
         }, 200);
     });
 
-    // 3. Copy / cut — block AND log
-    document.addEventListener('copy', (e) => {
-        e.preventDefault();
-        acReport('copy');
-    });
-    document.addEventListener('cut', (e) => {
-        e.preventDefault();
-        acReport('cut');
-    });
+    // ── Copy / Cut — block and log ────────────────────────────────────────────
+    document.addEventListener('copy', e => { e.preventDefault(); report('copy', ''); });
+    document.addEventListener('cut',  e => { e.preventDefault(); report('cut', ''); });
 
-    // 4. Paste — block to prevent pasting AI answers
-    document.addEventListener('paste', (e) => {
-        // Allow paste only inside textareas that are answer inputs
+    // ── Paste — block everywhere except answer textareas ─────────────────────
+    document.addEventListener('paste', e => {
         if (e.target && e.target.matches('textarea[data-input]')) return;
         e.preventDefault();
-        acReport('paste');
+        report('paste', '');
     });
 
-    // 5. Right-click / context menu
-    document.addEventListener('contextmenu', (e) => {
+    // ── Right-click / context menu ────────────────────────────────────────────
+    document.addEventListener('contextmenu', e => {
         e.preventDefault();
-        acReport('right_click');
+        report('right_click', '');
     });
 
-    // 6. Keyboard shortcut blocking
-    document.addEventListener('keydown', (e) => {
-        const key  = e.key.toLowerCase();
-        const ctrl = e.ctrlKey || e.metaKey;
+    // ── Keyboard shortcuts ────────────────────────────────────────────────────
+    document.addEventListener('keydown', e => {
+        if (acSubmitting) return;
+        const k     = e.key.toLowerCase();
+        const ctrl  = e.ctrlKey || e.metaKey;
         const shift = e.shiftKey;
+        const alt   = e.altKey;
 
-        // DevTools shortcuts
-        if (key === 'f12') {
-            e.preventDefault();
-            acReport('devtools', 'F12');
-            return;
-        }
-        if (ctrl && shift && ['i','j','c'].includes(key)) {
-            e.preventDefault();
-            acReport('devtools', `Ctrl+Shift+${key.toUpperCase()}`);
-            return;
-        }
-        // Copy / cut / paste
-        if (ctrl && key === 'c') { e.preventDefault(); acReport('copy', 'Ctrl+C'); return; }
-        if (ctrl && key === 'x') { e.preventDefault(); acReport('cut', 'Ctrl+X'); return; }
-        if (ctrl && key === 'v') {
-            // Allow paste only in answer textareas
-            if (e.target && e.target.matches('textarea[data-input]')) return;
-            e.preventDefault();
-            acReport('paste', 'Ctrl+V');
-            return;
-        }
-        // Print shortcut
-        if (ctrl && key === 'p') {
-            e.preventDefault();
-            acReport('print_attempt', 'Ctrl+P');
-            return;
-        }
-        // Print screen / snapshot
-        if (key === 'printscreen') {
-            acReport('print_screen', 'PrintScreen');
-            return;
+        // DevTools
+        if (k === 'f12') { e.preventDefault(); report('devtools', 'F12'); return; }
+        if (ctrl && shift && ['i','j','c'].includes(k)) {
+            e.preventDefault(); report('devtools', 'Ctrl+Shift+' + k.toUpperCase()); return;
         }
         // View source
-        if (ctrl && key === 'u') {
-            e.preventDefault();
-            acReport('devtools', 'Ctrl+U');
-            return;
+        if (ctrl && k === 'u') { e.preventDefault(); report('devtools', 'Ctrl+U'); return; }
+
+        // Copy / cut / paste
+        if (ctrl && k === 'c') { e.preventDefault(); report('copy', 'Ctrl+C'); return; }
+        if (ctrl && k === 'x') { e.preventDefault(); report('cut',  'Ctrl+X'); return; }
+        if (ctrl && k === 'v') {
+            if (e.target && e.target.matches('textarea[data-input]')) return;
+            e.preventDefault(); report('paste', 'Ctrl+V'); return;
         }
-        // Select all — allow within textareas but block page-level
-        if (ctrl && key === 'a' && !(e.target && e.target.matches('textarea[data-input], input'))) {
+
+        // Print
+        if (ctrl && k === 'p') { e.preventDefault(); report('print_attempt', 'Ctrl+P'); return; }
+
+        // Print screen
+        if (k === 'printscreen') { report('print_screen', 'PrintScreen'); return; }
+
+        // Select all — allow inside inputs/textareas only
+        if (ctrl && k === 'a' && !(e.target && e.target.matches('textarea[data-input], input'))) {
             e.preventDefault();
         }
+        
+        // Additional suspicious combinations
+        if (ctrl && alt && ['i','j','c','d'].includes(k)) {
+            e.preventDefault(); report('devtools', 'Ctrl+Alt+' + k.toUpperCase()); return;
+        }
+        
+        // Save page
+        if (ctrl && k === 's') { e.preventDefault(); report('devtools', 'Ctrl+S'); return; }
     });
 
-    // 7. Fullscreen exit detection
-    document.addEventListener('fullscreenchange',       acOnFSChange);
-    document.addEventListener('webkitfullscreenchange', acOnFSChange);
-    document.addEventListener('mozfullscreenchange',    acOnFSChange);
-    document.addEventListener('MSFullscreenChange',     acOnFSChange);
+    // ── Drag & drop block ─────────────────────────────────────────────────────
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('drop',      e => e.preventDefault());
 
-    // 8. DevTools size polling (every 1.5 s)
-    setInterval(acCheckDevTools, 1500);
+    // ── Print via media ───────────────────────────────────────────────────────
+    window.addEventListener('beforeprint', () => report('print_attempt', 'beforeprint'));
 
-    // 9. Block drag-and-drop (could be used to exfiltrate question text)
-    document.addEventListener('dragstart', (e) => e.preventDefault());
-    document.addEventListener('drop',      (e) => e.preventDefault());
+    // ── Submit form with confirmation ─────────────────────────────────────────
+    form.addEventListener('submit', function (e) {
+        if (acSubmitting) return;   // already auto-submitting — let it through
+        e.preventDefault();
 
-    // 10. Block print via media
-    window.addEventListener('beforeprint', (e) => {
-        acReport('print_attempt', 'beforeprint');
+        const cards    = document.querySelectorAll('[data-question]');
+        const total    = cards.length;
+        let   answered = 0;
+        cards.forEach(q => {
+            const radio = q.querySelector('input[type="radio"]:checked');
+            const text  = q.querySelector('textarea[data-input]');
+            if (radio || (text && text.value.trim())) answered++;
+        });
+        const pct       = total > 0 ? Math.round(answered / total * 100) : 0;
+        const allDone   = answered >= total;
+        const titleText = allDone
+            ? 'Submit Assessment?'
+            : `Only ${answered}/${total} Questions Answered`;
+        const bodyText  = allDone
+            ? `You've answered all ${total} question${total !== 1 ? 's' : ''}. Once submitted you cannot change your answers.`
+            : `You've only answered ${answered} of ${total} questions (${pct}%). Unanswered questions score 0 points. Are you sure you want to submit now?`;
+
+        Swal.fire({
+            title:             titleText,
+            text:              bodyText,
+            icon:              allDone ? 'question' : 'warning',
+            showCancelButton:  true,
+            confirmButtonText: '<i class="fas fa-paper-plane mr-1"></i> Submit now',
+            cancelButtonText:  'Go back',
+            confirmButtonColor: '#667eea',
+            cancelButtonColor:  '#e5e7eb',
+            reverseButtons:    true,
+            customClass: {
+                confirmButton: 'font-black text-sm',
+                cancelButton:  'font-black text-sm !text-gray-700',
+            },
+        }).then(result => {
+            if (result.isConfirmed) form.submit();
+        });
     });
-}
 
-let _fsExitReported = false;
-function acOnFSChange() {
-    if (!acIsFullscreen()) {
-        // Only log once per exit event (the same exit fires multiple vendor events)
-        if (!_fsExitReported) {
-            _fsExitReported = true;
-            acReport('fullscreen_exit');
-            setTimeout(() => { _fsExitReported = false; }, 1000);
-        }
+    // ── Progress bar ──────────────────────────────────────────────────────────
+    function updateProgress() {
+        const cards = document.querySelectorAll('[data-question]');
+        const total = cards.length;
+        let answered = 0;
+        cards.forEach(q => {
+            const radio = q.querySelector('input[type="radio"]:checked');
+            const text  = q.querySelector('textarea[data-input]');
+            if (radio || (text && text.value.trim())) answered++;
+        });
+        const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+        const bar = document.getElementById('progressBar');
+        const txt = document.getElementById('progressText');
+        if (bar) bar.style.width = pct + '%';
+        if (txt) txt.textContent = `Answered ${answered}/${total} · ${pct}% complete — keep going!`;
     }
-}
+    form.addEventListener('change', updateProgress);
+    form.addEventListener('input',  updateProgress);
+    updateProgress();
 
-// ============================================================
-//  Fullscreen entry prompt on page load
-// ============================================================
-function acShowFullscreenPrompt() {
-    // We use a small non-blocking banner rather than blocking the user
-    // from starting — browsers require a user gesture for fullscreen.
-    const strip = document.getElementById('ac-status-strip');
-    if (strip && !acIsFullscreen()) {
-        strip.innerHTML += ' <button onclick="acRequestFullscreen();this.remove();" style="margin-left:12px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;border-radius:8px;padding:2px 12px;font-size:0.72rem;font-weight:900;cursor:pointer;">Enter Fullscreen</button>';
-    }
-}
+    // ── Countdown timer ───────────────────────────────────────────────────────
+    {% if assessment.time_limit_minutes %}
+    (function () {
+        let remaining = AC_TIME_LIMIT * 60;
+        const display = document.getElementById('timerDisplay');
+        const badge   = document.getElementById('timer-badge');
 
-// ============================================================
-//  Countdown timer
-// ============================================================
-{% if assessment.time_limit_minutes %}
-(function startTimer() {
-    const totalSeconds = AC_TIME_LIMIT * 60;
-    let remaining = totalSeconds;
-    const display = document.getElementById('timerDisplay');
+        const tick = setInterval(() => {
+            if (acSubmitting) { clearInterval(tick); return; }
+            remaining--;
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            if (display) {
+                display.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            }
+            if (remaining <= 60 && badge) {
+                badge.style.background   = 'linear-gradient(135deg,#fef2f2,#fee2e2)';
+                badge.style.borderColor  = '#fca5a5';
+                badge.style.color        = '#991b1b';
+            }
+            if (remaining <= 0) {
+                clearInterval(tick);
+                if (display) display.textContent = '00:00';
+                acSubmitting = true;   // prevent new violations from stacking
+                if (submitBtn) submitBtn.onclick = null;
+                if (form) form.submit();
+            }
+        }, 1000);
+    })();
+    {% endif %}
 
-    const tick = setInterval(() => {
-        remaining--;
-        const m = Math.floor(remaining / 60);
-        const s = remaining % 60;
-        if (display) {
-            display.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-        }
-        // Colour the timer red in the last 60 s
-        if (remaining <= 60 && display) {
-            display.closest('.rounded-2xl').style.background = 'linear-gradient(135deg,#fef2f2,#fee2e2)';
-            display.closest('.rounded-2xl').style.borderColor = '#fca5a5';
-            display.closest('.rounded-2xl').style.color = '#991b1b';
-        }
-        if (remaining <= 0) {
-            clearInterval(tick);
-            // Time up — auto-submit silently
-            const btn = document.getElementById('submitBtn');
-            if (btn) btn.removeAttribute('onclick');
-            const form = document.getElementById('assessmentForm');
-            if (form) form.submit();
-        }
-    }, 1000);
 })();
-{% endif %}
-
-// ============================================================
-//  Progress bar
-// ============================================================
-function updateProgress() {
-    const cards = document.querySelectorAll('[data-question]');
-    const total = cards.length;
-    let answered = 0;
-    cards.forEach(q => {
-        const radio = q.querySelector('input[type="radio"]:checked');
-        const text  = q.querySelector('textarea[data-input]');
-        if (radio || (text && text.value.trim().length > 0)) answered++;
-    });
-    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
-    const bar = document.getElementById('progressBar');
-    const txt = document.getElementById('progressText');
-    if (bar) bar.style.width = pct + '%';
-    if (txt) txt.textContent = `Answered ${answered}/${total} · ${pct}% complete — keep going!`;
-}
-
-document.getElementById('assessmentForm').addEventListener('change', updateProgress);
-document.getElementById('assessmentForm').addEventListener('input',  updateProgress);
-updateProgress();
-
-// ============================================================
-//  Submit confirmation
-// ============================================================
-function confirmSubmit() {
-    if (acAutoSubmitting) return true;   // already auto-submitting, don't interrupt
-    const total = document.querySelectorAll('[data-question]').length;
-    let answered = 0;
-    document.querySelectorAll('[data-question]').forEach(q => {
-        const radio = q.querySelector('input[type="radio"]:checked');
-        const text  = q.querySelector('textarea[data-input]');
-        if (radio || (text && text.value.trim().length > 0)) answered++;
-    });
-    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
-    let msg = `You've answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nSubmit this attempt now? You cannot change answers after submitting.`;
-    if (answered < total) {
-        msg = `⚠ You've only answered ${answered}/${total} question${total !== 1 ? 's' : ''} (${pct}%).\n\nUnanswered questions earn 0 points. Are you sure you want to submit anyway?`;
-    }
-    return confirm(msg);
-}
-
-// ============================================================
-//  Boot
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-    acInit();
-    acShowFullscreenPrompt();
-});
 </script>
 {% endblock content %}
