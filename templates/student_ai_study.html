@@ -171,6 +171,21 @@
                         <p class="text-sm font-black text-white">Practice</p>
                         <p class="text-[11px] text-white/50">One Q at a time</p>
                     </button>
+                    <button data-tool="research" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/20 text-teal-300"><i class="fas fa-microscope"></i></div>
+                        <p class="text-sm font-black text-white">Research</p>
+                        <p class="text-[11px] text-white/50">Academic research help</p>
+                    </button>
+                    <button data-tool="debate" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/20 text-orange-300"><i class="fas fa-comments"></i></div>
+                        <p class="text-sm font-black text-white">Debate</p>
+                        <p class="text-[11px] text-white/50">Explore perspectives</p>
+                    </button>
+                    <button data-tool="project" class="tool-card rounded-2xl border-2 border-white/10 bg-white/5 p-4 text-left">
+                        <div class="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/20 text-purple-300"><i class="fas fa-project-diagram"></i></div>
+                        <p class="text-sm font-black text-white">Project</p>
+                        <p class="text-[11px] text-white/50">Learning projects</p>
+                    </button>
                 </div>
                 <!-- Workspace -->
                 <div class="rounded-3xl border border-white/10 glass-card p-5 sm:p-6">
@@ -314,6 +329,54 @@
                             </div>
                         </div>
                     </section>
+
+                    <!-- RESEARCH ASSISTANT -->
+                    <section data-panel="research" class="ai-panel hidden">
+                        <p class="mb-3 text-sm text-white/60">Get help with academic research - methodology, sources, and writing.</p>
+                        <div class="mb-3">
+                            <input type="text" placeholder="Research topic or question" class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-teal-500">
+                        </div>
+                        <button class="run-ai rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-microscope mr-2"></i>Generate Research Plan</button>
+                        <div class="mt-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-5 text-sm text-white/50">
+                            <p class="mb-2 font-black text-white/70">Research Plan</p>
+                            <p class="text-white/40">Submit a topic to get research methodology, sources, and questions.</p>
+                        </div>
+                    </section>
+
+                    <!-- DEBATE FACILITATOR -->
+                    <section data-panel="debate" class="ai-panel hidden">
+                        <p class="mb-3 text-sm text-white/60">Explore different perspectives on a topic through structured debate.</p>
+                        <div class="mb-3">
+                            <input type="text" placeholder="Topic to debate" class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-orange-500">
+                        </div>
+                        <button class="run-ai rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-comments mr-2"></i>Generate Debate Positions</button>
+                        <div class="mt-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-5 text-sm text-white/50">
+                            <p class="mb-2 font-black text-white/70">Debate Positions</p>
+                            <p class="text-white/40">Submit a topic to get opposing arguments and evaluation criteria.</p>
+                        </div>
+                    </section>
+
+                    <!-- PROJECT GENERATOR -->
+                    <section data-panel="project" class="ai-panel hidden">
+                        <p class="mb-3 text-sm text-white/60">Get project ideas to deepen your understanding through hands-on learning.</p>
+                        <div class="mb-3 grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="mb-1 block text-[11px] font-black uppercase tracking-wider text-white/50">Concept</label>
+                                <input type="text" placeholder="What to learn" class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-white outline-none placeholder:text-white/30 focus:border-purple-500">
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-[11px] font-black uppercase tracking-wider text-white/50">Difficulty</label>
+                                <select class="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-white outline-none focus:border-purple-500">
+                                    <option>Easy</option><option selected>Medium</option><option>Hard</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="run-ai mt-3 w-full rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-project-diagram mr-2"></i>Generate Project Idea</button>
+                        <div class="mt-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-5 text-sm text-white/50">
+                            <p class="mb-2 font-black text-white/70">Project Details</p>
+                            <p class="text-white/40">Submit a concept to get a project idea with deliverables and timeline.</p>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -346,7 +409,7 @@
         var toolButtons = document.querySelectorAll(".tool-card");
         var panels = document.querySelectorAll(".ai-panel");
         var toolTitle = document.getElementById("toolTitle");
-        var labels = { ask: "Ask AI", summarize: "Summarize", explain: "Explain", quiz: "Quiz Generator", flashcards: "Flashcards", practice: "Practice Mode" };
+        var labels = { ask: "Ask AI", summarize: "Summarize", explain: "Explain", quiz: "Quiz Generator", flashcards: "Flashcards", practice: "Practice Mode", research: "Research Assistant", debate: "Debate Facilitator", project: "Project Generator" };
 
         toolButtons.forEach(function (btn) {
             btn.addEventListener("click", function () {
@@ -420,28 +483,50 @@
                 if (data.success) {
                     var responseHtml = data.response;
                     
-                    // Add teaching strategy indicator
-                    if (data.strategy) {
-                        var strategyLabels = {
-                            'socratic': '🎓 Socratic Method',
-                            'analogy': '💡 Analogies',
-                            'first_principles': '🔬 First Principles',
-                            'real_world': '🌍 Real-World Applications',
-                            'balanced': '⚖️ Balanced Approach'
+                    // Add domain and subject indicator
+                    if (data.domain) {
+                        var domainLabels = {
+                            'mathematics': '📐 Mathematics',
+                            'physics': '⚛️ Physics',
+                            'chemistry': '🧪 Chemistry',
+                            'biology': '🧬 Biology',
+                            'computer_science': '💻 Computer Science',
+                            'engineering': '⚙️ Engineering',
+                            'economics': '💰 Economics',
+                            'business': '📊 Business',
+                            'history': '📜 History',
+                            'literature': '📚 Literature',
+                            'philosophy': '🤔 Philosophy',
+                            'psychology': '🧠 Psychology',
+                            'sociology': '👥 Sociology',
+                            'general': '🎓 General'
                         };
-                        responseHtml = '<div class="mb-2 text-[10px] text-fuchsia-300"><i class="fas fa-chess mr-1"></i>' + (strategyLabels[data.strategy] || data.strategy) + '</div>' + responseHtml;
+                        responseHtml = '<div class="mb-2 text-[10px] text-purple-300"><i class="fas fa-graduation-cap mr-1"></i>' + (domainLabels[data.domain] || data.domain) + '</div>' + responseHtml;
                     }
                     
-                    // Add request type indicator
-                    if (data.request_type && data.request_type !== 'general') {
-                        var typeLabels = {
-                            'math': '📐 Mathematical',
-                            'diagram': '📊 Visual/Diagram',
-                            'explanation': '📚 Explanation',
-                            'problem': '🔧 Problem Solving',
-                            'conceptual': '🧠 Conceptual'
+                    // Add learning style indicator
+                    if (data.learning_style) {
+                        var styleLabels = {
+                            'visual': '👁️ Visual Learner',
+                            'auditory': '👂 Auditory Learner',
+                            'kinesthetic': '✋ Kinesthetic Learner',
+                            'reading_writing': '📝 Reading/Writing',
+                            'balanced': '⚖️ Balanced Approach'
                         };
-                        responseHtml = '<div class="mb-1 text-[10px] text-sky-300"><i class="fas fa-tag mr-1"></i>' + (typeLabels[data.request_type] || data.request_type) + '</div>' + responseHtml;
+                        responseHtml = '<div class="mb-1 text-[10px] text-sky-300"><i class="fas fa-brain mr-1"></i>' + (styleLabels[data.learning_style] || data.learning_style) + '</div>' + responseHtml;
+                    }
+                    
+                    // Add Bloom's level indicator
+                    if (data.bloom_level) {
+                        var bloomLabels = {
+                            'remember': '📝 Remember',
+                            'understand': '💡 Understand',
+                            'apply': '🔧 Apply',
+                            'analyze': '🔍 Analyze',
+                            'evaluate': '⚖️ Evaluate',
+                            'create': '🎨 Create'
+                        };
+                        responseHtml = '<div class="mb-1 text-[10px] text-emerald-300"><i class="fas fa-layer-group mr-1"></i>' + (bloomLabels[data.bloom_level] || data.bloom_level) + '</div>' + responseHtml;
                     }
                     
                     // Add citations if available
@@ -460,14 +545,29 @@
                         responseHtml += '<div class="mt-1 text-[10px] ' + confidenceColor + '"><i class="fas fa-signal mr-1"></i>Confidence: ' + Math.round(data.confidence * 100) + '%</div>';
                     }
                     
+                    // Add critical thinking questions
+                    if (data.critical_questions && data.critical_questions.length > 0) {
+                        responseHtml += '<div class="mt-2 pt-2 border-t border-white/10">';
+                        responseHtml += '<p class="text-[10px] text-fuchsia-300"><i class="fas fa-lightbulb mr-1"></i>Critical Thinking:</p>';
+                        responseHtml += '<ul class="mt-1 text-[10px] text-white/50 list-disc list-inside">';
+                        data.critical_questions.slice(0, 3).forEach(function(q) {
+                            responseHtml += '<li>' + q + '</li>';
+                        });
+                        responseHtml += '</ul></div>';
+                    }
+                    
                     // Add learning state if available
                     if (data.learning_state) {
-                        var mastered = data.learning_state.mastered || [];
-                        var struggling = data.learning_state.struggling || [];
-                        if (mastered.length > 0 || struggling.length > 0) {
+                        var mastered = data.learning_state.mastered_topics || [];
+                        var masteredDomains = data.learning_state.mastered_domains || [];
+                        var struggling = data.learning_state.struggling_topics || [];
+                        if (mastered.length > 0 || masteredDomains.length > 0 || struggling.length > 0) {
                             responseHtml += '<div class="mt-2 text-[10px] text-white/30">';
+                            if (masteredDomains.length > 0) {
+                                responseHtml += '<span class="text-emerald-400">✓ Domains: ' + masteredDomains.slice(0, 3).join(', ') + '</span> ';
+                            }
                             if (mastered.length > 0) {
-                                responseHtml += '<span class="text-emerald-400">✓ Mastered: ' + mastered.slice(0, 3).join(', ') + '</span> ';
+                                responseHtml += '<span class="text-emerald-400">| Topics: ' + mastered.slice(0, 3).join(', ') + '</span> ';
                             }
                             if (struggling.length > 0) {
                                 responseHtml += '<span class="text-amber-400">⚠ Focus: ' + struggling.slice(0, 3).join(', ') + '</span>';
@@ -812,6 +912,150 @@
             
             qDiv.innerHTML += '<button class="run-ai w-full rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-arrow-right mr-2"></i>Next question</button>';
         }
+
+        // Research Assistant
+        document.querySelector('[data-panel="research"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var topic = btn.previousElementSibling.value;
+            
+            fetch("/api/ai/research/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    topic: topic,
+                    course_code: courseCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                restoreBtn();
+                if (data.success) {
+                    var outputDiv = btn.nextElementSibling.nextElementSibling;
+                    outputDiv.innerHTML = '<p class="mb-2 font-black text-white/70">Research Plan</p>';
+                    outputDiv.innerHTML += '<div class="text-sm text-white/80">';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Domain:</strong> ' + data.research.domain + '</p>';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Suggested Methods:</strong> ' + data.research.suggested_methods.join(', ') + '</p>';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Research Questions:</strong></p>';
+                    outputDiv.innerHTML += '<ul class="list-disc list-inside mb-2">';
+                    data.research.research_questions.forEach(function(q) {
+                        outputDiv.innerHTML += '<li>' + q + '</li>';
+                    });
+                    outputDiv.innerHTML += '</ul>';
+                    outputDiv.innerHTML += '<p><strong>Suggested Sources:</strong> ' + data.research.sources.join(', ') + '</p>';
+                    outputDiv.innerHTML += '</div>';
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                restoreBtn();
+                alert('Connection error. Please try again.');
+            });
+        });
+
+        // Debate Facilitator
+        document.querySelector('[data-panel="debate"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var topic = btn.previousElementSibling.value;
+            
+            fetch("/api/ai/debate/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    topic: topic,
+                    course_code: courseCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                restoreBtn();
+                if (data.success) {
+                    var outputDiv = btn.nextElementSibling.nextElementSibling;
+                    outputDiv.innerHTML = '<p class="mb-2 font-black text-white/70">Debate Positions</p>';
+                    outputDiv.innerHTML += '<div class="text-sm text-white/80">';
+                    outputDiv.innerHTML += '<p class="mb-3"><strong>Position A (For):</strong> ' + data.debate.position_a + '</p>';
+                    outputDiv.innerHTML += '<p class="mb-3"><strong>Position B (Against):</strong> ' + data.debate.position_b + '</p>';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Key Questions:</strong></p>';
+                    outputDiv.innerHTML += '<ul class="list-disc list-inside mb-2">';
+                    data.debate.key_questions.forEach(function(q) {
+                        outputDiv.innerHTML += '<li>' + q + '</li>';
+                    });
+                    outputDiv.innerHTML += '</ul>';
+                    outputDiv.innerHTML += '<p><strong>Evaluation Criteria:</strong> ' + data.debate.evaluation_criteria.join(', ') + '</p>';
+                    outputDiv.innerHTML += '</div>';
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                restoreBtn();
+                alert('Connection error. Please try again.');
+            });
+        });
+
+        // Project Generator
+        document.querySelector('[data-panel="project"] .run-ai').addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            var restoreBtn = showLoading(btn);
+            var panel = btn.closest('[data-panel="project"]');
+            var concept = panel.querySelector('input[type="text"]').value;
+            var difficulty = panel.querySelector('select').value;
+            
+            fetch("/api/ai/project/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    concept: concept,
+                    difficulty: difficulty,
+                    course_code: courseCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                restoreBtn();
+                if (data.success) {
+                    var outputDiv = btn.nextElementSibling.nextElementSibling;
+                    outputDiv.innerHTML = '<p class="mb-2 font-black text-white/70">Project Details</p>';
+                    outputDiv.innerHTML += '<div class="text-sm text-white/80">';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Project Idea:</strong> ' + data.project.project_idea + '</p>';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Difficulty:</strong> ' + data.project.difficulty + '</p>';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Deliverables:</strong></p>';
+                    outputDiv.innerHTML += '<ul class="list-disc list-inside mb-2">';
+                    data.project.deliverables.forEach(function(d) {
+                        outputDiv.innerHTML += '<li>' + d + '</li>';
+                    });
+                    outputDiv.innerHTML += '</ul>';
+                    outputDiv.innerHTML += '<p class="mb-2"><strong>Timeline:</strong> ' + data.project.timeline + '</p>';
+                    outputDiv.innerHTML += '<p><strong>Learning Objectives:</strong></p>';
+                    outputDiv.innerHTML += '<ul class="list-disc list-inside">';
+                    data.project.learning_objectives.forEach(function(obj) {
+                        outputDiv.innerHTML += '<li>' + obj + '</li>';
+                    });
+                    outputDiv.innerHTML += '</ul>';
+                    outputDiv.innerHTML += '</div>';
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                restoreBtn();
+                alert('Connection error. Please try again.');
+            });
+        });
 
         // CSRF Token helper
         function getCsrfToken() {

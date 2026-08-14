@@ -174,6 +174,15 @@ urlpatterns = [
         "api/ai/interactive-practice/", views.ai_interactive_practice, name="ai_interactive_practice"
     ),
     path(
+        "api/ai/research/", views.ai_research_assistant, name="ai_research_assistant"
+    ),
+    path(
+        "api/ai/debate/", views.ai_debate_facilitator, name="ai_debate_facilitator"
+    ),
+    path(
+        "api/ai/project/", views.ai_project_suggester, name="ai_project_suggester"
+    ),
+    path(
         "lecturer/student/<int:student_user_id>/",
         views.lecturer_student_detail,
         name="lecturer_student_detail",

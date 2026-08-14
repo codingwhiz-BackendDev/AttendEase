@@ -8,7 +8,7 @@ import os
 import tempfile
 from datetime import datetime
 from datetime import timezone as dt_timezone
-from App.smart_ai import get_ultimate_tutor
+from App.universal_ai import get_universal_tutor
 from functools import wraps
 from collections import defaultdict
 
@@ -1988,7 +1988,7 @@ def student_ai_study(request):
 
 @student_required
 def ai_chat(request):
-    """Ultimate AI Chat endpoint with advanced teaching capabilities"""
+    """Universal AI Chat endpoint - handles ALL subjects and learning types"""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
     
@@ -2000,11 +2000,11 @@ def ai_chat(request):
         if not question:
             return JsonResponse({'error': 'Question required'}, status=400)
         
-        # Get ultimate tutor
+        # Get universal tutor
         student_id = str(request.user.id)
-        tutor = get_ultimate_tutor(course_code, student_id)
+        tutor = get_universal_tutor(course_code, student_id)
         
-        # Get ultimate teaching response
+        # Get universal teaching response
         result = tutor.teach(question)
         
         if 'error' in result:
@@ -2015,15 +2015,17 @@ def ai_chat(request):
             'citations': result.get('citations', []),
             'confidence': result.get('confidence', 0.5),
             'context_used': result.get('context_used', 0),
-            'strategy': result.get('strategy', 'balanced'),
-            'request_type': result.get('request_type', 'general'),
-            'topic': result.get('topic', 'general'),
+            'domain': result.get('domain', 'general'),
+            'keyword': result.get('keyword', 'general'),
+            'learning_style': result.get('learning_style', 'balanced'),
+            'bloom_level': result.get('bloom_level', 'understand'),
+            'critical_questions': result.get('critical_questions', []),
             'learning_state': result.get('learning_state', {}),
             'success': True
         })
             
     except Exception as e:
-        logger.error(f"Ultimate AI Chat error: {str(e)}")
+        logger.error(f"Universal AI Chat error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
@@ -2296,6 +2298,85 @@ def ai_interactive_practice(request):
             
     except Exception as e:
         logger.error(f"AI Interactive Practice error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_research_assistant(request):
+    """Research assistant endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        topic = data.get('topic', '').strip()
+        course_code = data.get('course_code', '')
+        
+        if not topic:
+            return JsonResponse({'error': 'Topic required'}, status=400)
+        
+        student_id = str(request.user.id)
+        tutor = get_universal_tutor(course_code, student_id)
+        
+        research = tutor.suggest_research(topic)
+        
+        return JsonResponse({'research': research, 'success': True})
+            
+    except Exception as e:
+        logger.error(f"AI Research error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_debate_facilitator(request):
+    """Debate facilitator endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        topic = data.get('topic', '').strip()
+        course_code = data.get('course_code', '')
+        
+        if not topic:
+            return JsonResponse({'error': 'Topic required'}, status=400)
+        
+        student_id = str(request.user.id)
+        tutor = get_universal_tutor(course_code, student_id)
+        
+        debate = tutor.generate_debate(topic)
+        
+        return JsonResponse({'debate': debate, 'success': True})
+            
+    except Exception as e:
+        logger.error(f"AI Debate error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_project_suggester(request):
+    """Project suggestion endpoint"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        concept = data.get('concept', '').strip()
+        difficulty = data.get('difficulty', 'medium')
+        course_code = data.get('course_code', '')
+        
+        if not concept:
+            return JsonResponse({'error': 'Concept required'}, status=400)
+        
+        student_id = str(request.user.id)
+        tutor = get_universal_tutor(course_code, student_id)
+        
+        project = tutor.suggest_project(concept, difficulty)
+        
+        return JsonResponse({'project': project, 'success': True})
+            
+    except Exception as e:
+        logger.error(f"AI Project error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
