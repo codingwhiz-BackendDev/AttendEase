@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}AI Study | ClassMillia{% endblock %}
 {% block content %}
+<!-- MathJax for mathematical formula rendering -->
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
     .glass-card {
         background: rgba(255, 255, 255, 0.06);
@@ -56,6 +58,21 @@
         padding-left: 1rem;
         margin: 0.5rem 0;
         color: rgba(255,255,255,0.7);
+    }
+    
+    /* MathJax styling for dark theme */
+    .mjx-chtml {
+        color: white !important;
+        font-size: 1em !important;
+    }
+    .mjx-chtml span {
+        color: white !important;
+    }
+    .ai-response .math {
+        background: rgba(0,0,0,0.2);
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin: 0.5rem 0;
     }
 </style>
 
@@ -235,23 +252,30 @@
 
                     <!-- ASK AI -->
                     <section data-panel="ask" class="ai-panel">
-                        <div id="chatLog" class="chat-scroll mb-4 max-h-80 space-y-4 overflow-y-auto pr-1">
+                        <div id="chatLog" class="chat-scroll mb-4 max-h-96 space-y-4 overflow-y-auto pr-2">
                             <div class="flex gap-3">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white text-xs"><i class="fas fa-robot"></i></div>
-                                <div class="rounded-2xl rounded-tl-sm bg-white/8 px-4 py-3 text-sm text-white/80">
-                                    Hi! Ask me anything about <b>{{ selected_course.course_code }}</b>. Try one of the suggestions below.
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white text-sm shadow-lg shadow-fuchsia-900/40"><i class="fas fa-robot"></i></div>
+                                <div class="rounded-2xl rounded-tl-sm bg-white/10 px-5 py-4 text-sm text-white/90 shadow-lg">
+                                    <p class="mb-2">Hi! 👋 I'm your AI study tutor for <b>{{ selected_course.course_code }}</b>. How can I help you today?</p>
+                                    <p class="text-xs text-white/60">Try asking about concepts, explanations, or practice problems from your course materials.</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 flex flex-wrap gap-2">
-                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white">Explain this topic simply</button>
-                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white">10 questions from chapters 2–4</button>
-                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white">Most important concepts to revise</button>
+                        
+                        <!-- Quick suggestions -->
+                        <div class="mb-4 flex flex-wrap gap-2">
+                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/70 hover:bg-white/10 hover:text-white transition-all">📚 Explain a topic simply</button>
+                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/70 hover:bg-white/10 hover:text-white transition-all">🧠 Generate practice questions</button>
+                            <button type="button" class="suggestion rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/70 hover:bg-white/10 hover:text-white transition-all">✨ Help with homework</button>
                         </div>
-                        <form id="chatForm" class="flex items-end gap-2">
-                            <textarea id="chatInput" rows="1" placeholder="Ask about your course material…"
-                                class="max-h-32 flex-1 resize-none rounded-2xl border-2 border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"></textarea>
-                            <button type="submit" class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-fuchsia-500 to-indigo-600 text-white shadow-lg transition-all hover:-translate-y-0.5">
+                        
+                        <!-- Input area -->
+                        <form id="chatForm" class="flex items-end gap-3">
+                            <div class="flex-1 relative">
+                                <textarea id="chatInput" rows="2" placeholder="Ask about your course material…"
+                                    class="w-full max-h-32 resize-none rounded-2xl border-2 border-white/10 bg-white/5 px-5 py-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 transition-all shadow-inner"></textarea>
+                            </div>
+                            <button type="submit" class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-fuchsia-500 to-indigo-600 text-white shadow-lg shadow-fuchsia-900/40 transition-all hover:-translate-y-0.5 hover:shadow-fuchsia-900/60">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </form>
@@ -505,24 +529,39 @@
 
         function addMsg(role, text) {
             var wrap = document.createElement("div");
-            wrap.className = "flex gap-3" + (role === "user" ? " flex-row-reverse" : "");
-            var avatar = '<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ' +
-                (role === "user" ? "bg-white/15 text-white" : "bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white") +
-                ' text-xs"><i class="fas ' + (role === "user" ? "fa-user" : "fa-robot") + '"></i></div>';
+            wrap.className = "flex gap-3 mb-4" + (role === "user" ? " flex-row-reverse" : "");
+            
+            // Enhanced avatar styling
+            var avatar = '<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ' +
+                (role === "user" ? "bg-white/15 text-white shadow-lg" : "bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white shadow-lg shadow-fuchsia-900/40") +
+                ' text-sm transition-transform hover:scale-105"><i class="fas ' + (role === "user" ? "fa-user" : "fa-robot") + '"></i></div>';
             
             // Format text for better readability
             var formattedText = formatAIResponse(text);
             
-            var bubble = '<div class="rounded-2xl ' + (role === "user" ? "rounded-tr-sm bg-indigo-500/25" : "rounded-tl-sm bg-white/8 ai-response") +
-                ' px-4 py-3 text-sm text-white/85 max-w-[80%]">' + formattedText + "</div>";
+            // Enhanced bubble styling
+            var bubbleClass = role === "user" 
+                ? "rounded-tr-sm bg-gradient-to-br from-indigo-500/25 to-purple-500/25 border border-indigo-500/20 shadow-lg" 
+                : "rounded-tl-sm bg-white/10 border border-white/10 shadow-lg ai-response";
+            
+            var bubble = '<div class="rounded-2xl ' + bubbleClass +
+                ' px-5 py-4 text-sm text-white/90 max-w-[80%] backdrop-blur-sm">' + formattedText + "</div>";
+            
             wrap.innerHTML = avatar + bubble;
             chatLog.appendChild(wrap);
             chatLog.scrollTop = chatLog.scrollHeight;
+            
+            // Render mathematical formulas if this is an AI response
+            if (role !== "user") {
+                renderMath(wrap);
+            }
         }
         
         function formatAIResponse(text) {
             // Convert markdown-like formatting to HTML
             var formatted = text
+                // Preserve LaTeX formulas for MathJax (don't modify these)
+                // Process other formatting first
                 // Headers
                 .replace(/^### (.*$)/gim, '<h3 class="text-lg font-bold text-white mt-4 mb-2">$1</h3>')
                 .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold text-white mt-4 mb-2">$1</h2>')
@@ -531,8 +570,14 @@
                 .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>')
                 // Italic
                 .replace(/\*(.*?)\*/g, '<em class="italic text-white/90">$1</em>')
-                // Code blocks
-                .replace(/```([\s\S]*?)```/g, '<pre class="bg-black/30 p-3 rounded-lg my-2 overflow-x-auto text-xs font-mono text-emerald-300">$1</pre>')
+                // Code blocks (but preserve LaTeX)
+                .replace(/```([\s\S]*?)```/g, function(match, code) {
+                    if (code.includes('\\') || code.includes('$')) {
+                        // Likely LaTeX, preserve as code block
+                        return '<pre class="bg-black/30 p-3 rounded-lg my-2 overflow-x-auto text-xs font-mono text-emerald-300">' + code + '</pre>';
+                    }
+                    return '<pre class="bg-black/30 p-3 rounded-lg my-2 overflow-x-auto text-xs font-mono text-emerald-300">' + code + '</pre>';
+                })
                 // Inline code
                 .replace(/`([^`]+)`/g, '<code class="bg-black/30 px-1 py-0.5 rounded text-xs font-mono text-emerald-300">$1</code>')
                 // Lists
@@ -543,6 +588,15 @@
                 .replace(/\n/g, '<br>');
             
             return formatted;
+        }
+        
+        function renderMath(element) {
+            // Trigger MathJax to render LaTeX formulas
+            if (window.MathJax) {
+                MathJax.typesetPromise([element]).catch(function(err) {
+                    console.log('MathJax error:', err);
+                });
+            }
         }
 
         function send(text) {
@@ -691,6 +745,42 @@
         document.querySelectorAll(".suggestion").forEach(function (s) {
             s.addEventListener("click", function () { send(s.textContent.trim()); });
         });
+        
+        // Load chat history on page load
+        function loadChatHistory() {
+            fetch("/api/ai/chat-history/?course_code=" + courseCode, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.history) {
+                    // Clear existing messages except the welcome message
+                    var welcomeMsg = chatLog.querySelector('.flex'); // Keep first message
+                    chatLog.innerHTML = '';
+                    if (welcomeMsg) {
+                        chatLog.appendChild(welcomeMsg);
+                    }
+                    
+                    // Load historical messages
+                    data.history.forEach(function(msg) {
+                        addMsg("user", msg.query);
+                        setTimeout(function() {
+                            addMsg("ai", msg.response);
+                        }, 100);
+                    });
+                }
+            })
+            .catch(error => {
+                console.log('Error loading chat history:', error);
+            });
+        }
+        
+        // Load chat history when page loads
+        loadChatHistory();
 
         // Summarize
         document.querySelector('[data-panel="summarize"] .run-ai').addEventListener('click', function(e) {

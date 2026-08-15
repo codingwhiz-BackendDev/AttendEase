@@ -10,6 +10,7 @@ from .models import (
     Course,
     LecturerProfile,
     StudentProfile,
+    AIChatMessage
 )
 
 admin.site.register(StudentProfile)
@@ -20,6 +21,7 @@ admin.site.register(Assessment)
 admin.site.register(AssessmentQuestion)
 admin.site.register(AssessmentOption)
 admin.site.register(AssessmentResponse)
+admin.site.register(AIChatMessage)
 
 
 @admin.register(AssessmentAttempt)
