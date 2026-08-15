@@ -150,6 +150,9 @@ urlpatterns = [
         "api/ai/chat/", views.ai_chat, name="ai_chat"
     ),
     path(
+        "api/ai/chat-history/", views.ai_chat_history, name="ai_chat_history"
+    ),
+    path(
         "api/ai/summarize/", views.ai_summarize, name="ai_summarize"
     ),
     path(

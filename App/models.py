@@ -347,3 +347,26 @@ class AssessmentResponse(models.Model):
 
     def __str__(self):
         return f"Response: {self.attempt} / {self.question}"
+
+
+class AIChatMessage(models.Model):
+    """Store AI chat conversations for students"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ai_chats")
+    course_code = models.CharField(max_length=20, null=True, blank=True)
+    query = models.TextField()
+    response = models.TextField()
+    domain = models.CharField(max_length=50, null=True, blank=True)
+    learning_style = models.CharField(max_length=50, null=True, blank=True)
+    bloom_level = models.CharField(max_length=50, null=True, blank=True)
+    confidence = models.FloatField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=["user", "timestamp"]),
+            models.Index(fields=["course_code"]),
+        ]
+    
+    def __str__(self):
+        return f"Chat: {self.user.username} - {self.query[:50]}..."

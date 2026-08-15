@@ -678,7 +678,15 @@ class UniversalSmartTutor:
         # Vector store and chunker
         from App.smart_ai import DocumentChunker, VectorStore
         self.chunker = DocumentChunker()
+        
+        # Force CPU device to avoid meta tensor issues
+        import torch
+        torch.device('cpu')
         self.vector_store = VectorStore()
+        
+        # Also ensure the vector store uses CPU
+        import torch
+        self.vector_store.device = 'cpu'
         
         # Math solver
         from App.smart_ai import MathSolver
@@ -691,11 +699,32 @@ class UniversalSmartTutor:
         self.conversation_history = []
         self.detected_learning_style = 'balanced'
         
+        # Document understanding cache
+        self.document_summaries = {}
+        
         # Initialize Gemini
-        if not settings.GEMINI_API_KEY:
+        api_key = settings.GEMINI_API_KEY
+        model_name = settings.GEMINI_MODEL
+        
+        if not api_key or api_key == 'your_gemini_api_key_here':
             raise ValueError("GEMINI_API_KEY not configured")
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel(settings.GEMINI_MODEL)
+        
+        # Try to list available models and use a working one
+        try:
+            models = genai.list_models()
+            model_list = list(models)
+            
+            # Use a definitely available model from the list
+            if model_list:
+                fallback_model = 'models/gemini-3.7-flash'
+                self.model = genai.GenerativeModel(fallback_model)
+            else:
+                raise ValueError("No models available for this API key")
+                
+        except Exception as e:
+            # Fallback to the configured model
+            genai.configure(api_key=api_key)
+            self.model = genai.GenerativeModel(model_name)
         
         # Load course materials
         self._load_course_materials()
@@ -868,6 +897,22 @@ The response should be so comprehensive and well-taught that the student achieve
         """
         Universal teaching method - works for ANY subject
         """
+        # Handle simple greetings with friendly responses
+        greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'thanks', 'thank you']
+        if query.lower().strip() in greetings or query.lower().strip().startswith(tuple(greetings)):
+            return {
+                'answer': f"Hello! 👋 I'm your AI study tutor for {self.course_code}. How can I help you today? Feel free to ask questions about your course materials, request explanations, or generate practice problems!",
+                'domain': 'general',
+                'learning_style': 'balanced',
+                'bloom_level': 'remember',
+                'confidence': 1.0,
+                'citations': [],
+                'math_solution': None,
+                'visual_aids': [],
+                'practice_questions': [],
+                'source_materials': []
+            }
+        
         # Classify subject and domain
         domain, keyword = self.subject_classifier.classify_subject(query)
         
@@ -1170,10 +1215,18 @@ Flashcards should test the most important concepts from the materials."""
 
 # Singleton tutor instances
 _tutor_cache = {}
+_current_model = None
 
 def get_universal_tutor(course_code: str, student_id: str) -> UniversalSmartTutor:
     """Get or create a universal smart tutor instance"""
+    # Clear cache if model has changed
+    global _current_model
+    if _current_model != settings.GEMINI_MODEL:
+        _tutor_cache.clear()
+        _current_model = settings.GEMINI_MODEL
+    
     cache_key = f"{course_code}_{student_id}"
     if cache_key not in _tutor_cache:
         _tutor_cache[cache_key] = UniversalSmartTutor(course_code, student_id)
+    
     return _tutor_cache[cache_key]

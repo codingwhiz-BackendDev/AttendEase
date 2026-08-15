@@ -107,13 +107,13 @@
                         <!-- Category -->
                         <div>
                             <label class="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-white/50">Category</label>
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-1 gap-2">
                                 {% for cat in material_categories %}
                                 <label class="cat-pill cursor-pointer">
                                     <input type="radio" name="category" value="{{ cat.key }}" class="peer sr-only" {% if forloop.first %}checked{% endif %}>
                                     <div class="flex items-center gap-2 rounded-2xl border-2 border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-white/70 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/15 peer-checked:text-white">
                                         <i class="fas {{ cat.icon }} text-{{ cat.color }}-300"></i>
-                                        <span class="truncate">{{ cat.label }}</span>
+                                        <span>{{ cat.label }}</span>
                                     </div>
                                 </label>
                                 {% endfor %}

@@ -13,9 +13,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import logging
 
-# Load environment variables from .env.local (optional for Docker)
-load_dotenv('.env.local', override=False)
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Load environment variables from .env
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(env_path, override=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -295,5 +301,11 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'classmillia@gmail.com')
 SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'classmillia@gmail.com')
 
 # Gemini AI Configuration
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
-GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
+# Load from .env with proper error handling
+try:
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+    GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-pro')  # Use stable model as default
+except Exception as e:
+    logger.error(f"Error loading Gemini config: {e}")
+    GEMINI_API_KEY = None
+    GEMINI_MODEL = 'gemini-pro'

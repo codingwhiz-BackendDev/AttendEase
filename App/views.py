@@ -2010,6 +2010,19 @@ def ai_chat(request):
         if 'error' in result:
             return JsonResponse({'error': result['error'], 'success': False}, status=500)
         
+        # Save chat message to database
+        from App.models import AIChatMessage
+        AIChatMessage.objects.create(
+            user=request.user,
+            course_code=course_code,
+            query=question,
+            response=result['answer'],
+            domain=result.get('domain', 'general'),
+            learning_style=result.get('learning_style', 'balanced'),
+            bloom_level=result.get('bloom_level', 'understand'),
+            confidence=result.get('confidence', 0.5)
+        )
+        
         return JsonResponse({
             'response': result['answer'],
             'citations': result.get('citations', []),
@@ -2026,6 +2039,44 @@ def ai_chat(request):
             
     except Exception as e:
         logger.error(f"Universal AI Chat error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_chat_history(request):
+    """Get AI chat history for a student"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'GET required'}, status=405)
+    
+    try:
+        course_code = request.GET.get('course_code', '')
+        student_id = str(request.user.id)
+        
+        # Get chat messages
+        from App.models import AIChatMessage
+        messages = AIChatMessage.objects.filter(
+            user=request.user
+        ).order_by('-timestamp')[:50]  # Last 50 messages
+        
+        # Format for frontend
+        history = []
+        for msg in messages:
+            history.append({
+                'query': msg.query,
+                'response': msg.response,
+                'timestamp': msg.timestamp.isoformat(),
+                'domain': msg.domain,
+                'learning_style': msg.learning_style,
+                'course_code': msg.course_code
+            })
+        
+        return JsonResponse({
+            'history': list(reversed(history)),  # Reverse to show oldest first
+            'success': True
+        })
+        
+    except Exception as e:
+        logger.error(f"AI Chat History error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 

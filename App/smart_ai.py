@@ -112,7 +112,10 @@ class VectorStore:
     
     def __init__(self, embedding_dim=384):
         self.embedding_dim = embedding_dim
-        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        # Fix meta tensor issue by explicitly setting device
+        import torch
+        self.device = 'cpu'  # Force CPU to avoid CUDA issues
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2', device=self.device)
         self.index = faiss.IndexFlatIP(embedding_dim)
         self.chunks = []
         self.metadata = []
@@ -802,10 +805,18 @@ Format as JSON:
 
 # Singleton tutor instances
 _tutor_cache = {}
+_current_model = None
 
 def get_ultimate_tutor(course_code: str, student_id: str) -> UltimateSmartTutor:
     """Get or create an ultimate smart tutor instance"""
+    # Clear cache if model has changed
+    global _current_model
+    if _current_model != settings.GEMINI_MODEL:
+        _tutor_cache.clear()
+        _current_model = settings.GEMINI_MODEL
+    
     cache_key = f"{course_code}_{student_id}"
     if cache_key not in _tutor_cache:
         _tutor_cache[cache_key] = UltimateSmartTutor(course_code, student_id)
+    
     return _tutor_cache[cache_key]
