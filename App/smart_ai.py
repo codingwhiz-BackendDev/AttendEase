@@ -20,8 +20,26 @@ from typing import List, Dict, Tuple, Optional
 import numpy as np
 from django.conf import settings
 import google.generativeai as genai
-from sentence_transformers import SentenceTransformer
-import faiss
+
+# Lazy imports for heavy ML libraries
+_sentence_transformers = None
+_faiss = None
+
+def get_sentence_transformers():
+    """Lazy load sentence-transformers only when needed"""
+    global _sentence_transformers
+    if _sentence_transformers is None:
+        from sentence_transformers import SentenceTransformer
+        _sentence_transformers = SentenceTransformer
+    return _sentence_transformers
+
+def get_faiss():
+    """Lazy load FAISS only when needed"""
+    global _faiss
+    if _faiss is None:
+        import faiss
+        _faiss = faiss
+    return _faiss
 
 logger = logging.getLogger(__name__)
 
@@ -110,16 +128,38 @@ class DocumentChunker:
 class VectorStore:
     """FAISS-based vector store with hybrid search"""
     
+    _instance = None
+    _embedder = None
+    
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
     def __init__(self, embedding_dim=384):
+        if hasattr(self, '_initialized') and self._initialized:
+            return
+            
         self.embedding_dim = embedding_dim
         # Fix meta tensor issue by explicitly setting device
         import torch
+        import os
+        os.environ['CUDA_VISIBLE_DEVICES'] = ''  # Disable CUDA
+        torch.cuda.is_available = lambda: False  # Force CPU availability check
         self.device = 'cpu'  # Force CPU to avoid CUDA issues
-        self.embedder = SentenceTransformer('all-MiniLM-L6-v2', device=self.device)
+        
+        # Only load embedder once with lazy loading
+        SentenceTransformer = get_sentence_transformers()
+        if VectorStore._embedder is None:
+            VectorStore._embedder = SentenceTransformer('all-MiniLM-L6-v2', device=self.device)
+        
+        self.embedder = VectorStore._embedder
+        faiss = get_faiss()
         self.index = faiss.IndexFlatIP(embedding_dim)
         self.chunks = []
         self.metadata = []
         self.chunk_types = []  # Track math, code, regular text
+        self._initialized = True
     
     def add_chunks(self, chunks: List[Dict]):
         """Add document chunks to vector store"""

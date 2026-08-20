@@ -370,3 +370,25 @@ class AIChatMessage(models.Model):
     
     def __str__(self):
         return f"Chat: {self.user.username} - {self.query[:50]}..."
+
+
+class StudentDocument(models.Model):
+    """Documents uploaded by students for AI study"""
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_documents")
+    course_code = models.CharField(max_length=20, null=True, blank=True)
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to='student_documents/')
+    file_type = models.CharField(max_length=50, default='pdf')  # pdf, docx, txt, etc.
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    processed = models.BooleanField(default=False)  # Whether it's been processed for AI
+    content_summary = models.TextField(blank=True, null=True)  # AI-generated summary
+    
+    class Meta:
+        ordering = ['-uploaded_at']
+        indexes = [
+            models.Index(fields=["student", "uploaded_at"]),
+            models.Index(fields=["course_code"]),
+        ]
+    
+    def __str__(self):
+        return f"{self.student.username} - {self.title}"

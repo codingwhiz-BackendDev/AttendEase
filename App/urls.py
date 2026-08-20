@@ -153,6 +153,18 @@ urlpatterns = [
         "api/ai/chat-history/", views.ai_chat_history, name="ai_chat_history"
     ),
     path(
+        "api/student/upload-document/", views.student_upload_document, name="student_upload_document"
+    ),
+    path(
+        "api/student/documents/", views.student_list_documents, name="student_list_documents"
+    ),
+    path(
+        "api/student/documents/<int:doc_id>/delete/", views.student_delete_document, name="student_delete_document"
+    ),
+    path(
+        "api/ai/personalized-recommendations/", views.ai_personalized_recommendations, name="ai_personalized_recommendations"
+    ),
+    path(
         "api/ai/summarize/", views.ai_summarize, name="ai_summarize"
     ),
     path(

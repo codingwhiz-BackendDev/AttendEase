@@ -702,6 +702,10 @@ class UniversalSmartTutor:
         # Document understanding cache
         self.document_summaries = {}
         
+        # Quota management
+        self.quota_retries = 0
+        self.max_quota_retries = 3
+        
         # Initialize Gemini
         api_key = settings.GEMINI_API_KEY
         model_name = settings.GEMINI_MODEL
@@ -709,34 +713,75 @@ class UniversalSmartTutor:
         if not api_key or api_key == 'your_gemini_api_key_here':
             raise ValueError("GEMINI_API_KEY not configured")
         
+        # Model management for quota handling
+        self.current_model = None
+        self.available_models = []
+        self.safe_models = []  # Models that are not unavailable
+        self.model_index = 0
+        self.last_quota_error = None
+        
         # Try to list available models and use a working one
         try:
             models = genai.list_models()
             model_list = list(models)
+            self.available_models = [m.name for m in model_list]
             
-            # Use a definitely available model from the list
-            if model_list:
-                fallback_model = 'models/gemini-3.7-flash'
-                self.model = genai.GenerativeModel(fallback_model)
+            # Try different models in order of preference (only available models)
+            # Define unavailable models that should be avoided
+            self.unavailable_models = ['models/gemini-2.5-pro', 'models/gemini-2.5-flash']
+            
+            # Filter available models to only include safe ones
+            self.safe_models = [m for m in self.available_models if m not in self.unavailable_models]
+            
+            if not self.safe_models:
+                raise ValueError("No available models (all models are unavailable)")
+            
+            # Define preferred models in order
+            preferred_models = [
+                'models/gemini-3.7-flash',
+                'models/gemini-3.6-flash', 
+                'models/gemini-3.5-flash',
+                'models/gemini-flash-latest'
+            ]
+            
+            # Find the first preferred model that's available
+            for model in preferred_models:
+                if model in self.safe_models:
+                    self.current_model = model
+                    self.model = genai.GenerativeModel(model)
+                    logger.info(f"Using model: {model}")
+                    break
             else:
-                raise ValueError("No models available for this API key")
+                # Fallback to first safe model
+                self.current_model = self.safe_models[0]
+                self.model = genai.GenerativeModel(self.current_model)
+                logger.info(f"Using fallback model: {self.current_model}")
                 
         except Exception as e:
             # Fallback to the configured model
             genai.configure(api_key=api_key)
+            self.current_model = model_name
             self.model = genai.GenerativeModel(model_name)
         
         # Load course materials
         self._load_course_materials()
     
     def _load_course_materials(self):
-        """Load and deeply understand course materials"""
+        """Load and deeply understand course materials including student uploads"""
         try:
-            from App.models import Course, CourseMaterial
+            from App.models import Course, CourseMaterial, StudentDocument
             course = Course.objects.get(course_code=self.course_code)
             materials = CourseMaterial.objects.filter(course=course)
             
+            # Also load student documents for this course
+            try:
+                student_docs = StudentDocument.objects.filter(course_code=self.course_code, student__id=int(self.student_id))
+            except:
+                student_docs = StudentDocument.objects.none()
+            
             all_chunks = []
+            
+            # Process lecturer materials
             for material in materials:
                 # Process material to extract content
                 content = self.document_processor.process_material(material)
@@ -747,7 +792,8 @@ class UniversalSmartTutor:
                     self.document_summaries[material.id] = {
                         'title': material.title,
                         'type': material.material_type,
-                        'summary': summary
+                        'summary': summary,
+                        'source': 'lecturer'
                     }
                     
                     # Chunk the content with enhanced metadata
@@ -757,14 +803,56 @@ class UniversalSmartTutor:
                             'material_id': material.id,
                             'title': material.title,
                             'type': material.material_type,
-                            'key_concepts': summary['key_terms'][:5]
+                            'key_concepts': summary['key_terms'][:5],
+                            'source': 'lecturer'
                         }
                     )
                     all_chunks.extend(chunks)
             
+            # Process student documents
+            for doc in student_docs:
+                try:
+                    content = ""
+                    if doc.file:
+                        if doc.file_type == 'pdf':
+                            import pypdf
+                            pdf_reader = pypdf.PdfReader(doc.file.path)
+                            for page in pdf_reader.pages:
+                                content += page.extract_text()
+                        elif doc.file_type == 'docx':
+                            from docx import Document
+                            doc_obj = Document(doc.file.path)
+                            content = "\n".join([para.text for para in doc_obj.paragraphs])
+                        elif doc.file_type == 'txt':
+                            content = doc.file.read().decode('utf-8')
+                    
+                    if content.strip():
+                        # Generate simple summary
+                        summary = content[:500]
+                        self.document_summaries[f"student_{doc.id}"] = {
+                            'title': doc.title,
+                            'type': doc.file_type,
+                            'summary': summary,
+                            'source': 'student'
+                        }
+                        
+                        # Chunk the content
+                        chunks = self.chunker.chunk_text(
+                            content,
+                            metadata={
+                                'material_id': f"student_{doc.id}",
+                                'title': doc.title,
+                                'type': doc.file_type,
+                                'source': 'student'
+                            }
+                        )
+                        all_chunks.extend(chunks)
+                except Exception as e:
+                    logger.error(f"Error processing student document {doc.id}: {str(e)}")
+            
             if all_chunks:
                 self.vector_store.add_chunks(all_chunks)
-                logger.info(f"Loaded {len(all_chunks)} chunks from {len(materials)} materials for {self.course_code}")
+                logger.info(f"Loaded {len(all_chunks)} chunks from {len(materials)} lecturer materials and {len(student_docs)} student documents for {self.course_code}")
                 logger.info(f"Document summaries: {len(self.document_summaries)} materials processed")
             
         except Exception as e:
@@ -785,112 +873,132 @@ class UniversalSmartTutor:
         
         return context
     
+    def _generate_follow_up(self, query: str, answer: str, domain: str) -> str:
+        """Generate a relevant follow-up question to test understanding"""
+        try:
+            # Simple follow-up based on the topic
+            follow_up_prompt = f"""Based on this Q&A:
+Student asked: {query}
+You answered: {answer[:200]}...
+
+Generate ONE follow-up question to test if the student understood. Keep it simple and relevant."""
+            
+            response = self.model.generate_content(follow_up_prompt)
+            return response.text.strip()
+        except:
+            return "Does this explanation make sense? Would you like me to try a different approach?"
+    
+    def _extract_citations_from_context(self, context: List[Dict]) -> List[str]:
+        """Extract source citations from the context"""
+        citations = []
+        for ctx in context[:3]:  # Top 3 most relevant
+            metadata = ctx.get('metadata', {})
+            title = metadata.get('title', 'Unknown')
+            source = metadata.get('source', 'lecturer')
+            citations.append(f"{source}: {title}")
+        return citations
+    
+    def _detect_intent(self, query: str) -> str:
+        """Detect the student's intent to route to appropriate functionality"""
+        query_lower = query.lower()
+        
+        # Quiz generation intent
+        quiz_keywords = ['quiz', 'test', 'exam', 'mcq', 'multiple choice', 'question me', 'give me questions']
+        if any(keyword in query_lower for keyword in quiz_keywords):
+            return 'quiz'
+        
+        # Flashcard intent
+        flashcard_keywords = ['flashcard', 'flash card', 'flip card', 'term', 'definition']
+        if any(keyword in query_lower for keyword in flashcard_keywords):
+            return 'flashcards'
+        
+        # Summary intent
+        summary_keywords = ['summarize', 'summary', 'summarize this', 'key points', 'main points', 'overview']
+        if any(keyword in query_lower for keyword in summary_keywords):
+            return 'summarize'
+        
+        # Simple explanation intent
+        simple_keywords = ['explain simply', 'explain in simple terms', 'dumb it down', 'like i\'m 5', 'easy explanation']
+        if any(keyword in query_lower for keyword in simple_keywords):
+            return 'explain_simply'
+        
+        # Deep dive intent
+        deep_keywords = ['deep dive', 'detailed', 'in depth', 'thorough', 'comprehensive', 'advanced']
+        if any(keyword in query_lower for keyword in deep_keywords):
+            return 'deep_dive'
+        
+        # Exam prep intent
+        exam_keywords = ['exam prep', 'exam preparation', 'study for exam', 'past questions', 'revision']
+        if any(keyword in query_lower for keyword in exam_keywords):
+            return 'exam_prep'
+        
+        # Practice intent
+        practice_keywords = ['practice', 'give me a question', 'ask me', 'test my knowledge']
+        if any(keyword in query_lower for keyword in practice_keywords):
+            return 'practice'
+        
+        # Default to general chat
+        return 'chat'
+    
+    def _get_learning_mode_instruction(self, intent: str) -> str:
+        """Get specific instructions based on detected intent"""
+        instructions = {
+            'quiz': "Generate a quiz question with multiple choice options from the course materials.",
+            'flashcards': "Create a flashcard with a question/term on the front and answer/definition on the back.",
+            'summarize': "Provide a concise summary of the key points from the relevant materials.",
+            'explain_simply': "Explain this concept in the simplest possible terms, as if teaching someone who has never seen it before.",
+            'deep_dive': "Provide a comprehensive, detailed explanation covering all aspects of this topic.",
+            'exam_prep': "Focus on exam-relevant information, common question patterns, and what students should know for tests.",
+            'practice': "Ask a practice question to test understanding, then be ready to evaluate their answer.",
+            'chat': "Answer the student's question helpfully and naturally, like a patient tutor."
+        }
+        return instructions.get(intent, instructions['chat'])
+    
     def _build_universal_teaching_prompt(self, query: str, context: List[Dict], domain: str, 
                                            learning_style: str, bloom_level: str) -> str:
         """Build the most comprehensive teaching prompt for ANY subject"""
         
-        # Get domain-specific teaching strategy
-        if domain in ['mathematics', 'physics', 'chemistry', 'biology', 'computer_science', 'engineering']:
-            strategy = self.teaching_strategies.stem_teaching(query, domain)
-        elif domain in ['history', 'literature', 'philosophy', 'arts']:
-            strategy = self.teaching_strategies.humanities_teaching(query, domain)
-        elif domain in ['economics', 'psychology', 'sociology', 'political_science']:
-            strategy = self.teaching_strategies.social_sciences_teaching(query, domain)
+        # Detect intent and get appropriate instructions
+        intent = self._detect_intent(query)
+        mode_instruction = self._get_learning_mode_instruction(intent)
+        
+        # Simple, natural teaching approach - MilliaAi the friendly tutor
+        prompt = f"""You are MilliaAi, a patient, friendly AI tutor who helps students understand any subject. You teach like the smartest, most patient tutor in the world - you can help even the most confused student understand complex topics.
+
+Your teaching style:
+- Be conversational and friendly, like a helpful study buddy
+- Explain things simply, step by step
+- Use real examples and analogies that make sense
+- If something is confusing, break it down into smaller pieces
+- Be encouraging and positive
+- Ask if they understand before moving on
+- If they're stuck, try a different explanation approach
+
+Current situation:
+- Subject: {domain}
+- Course: {self.course_code}
+- Learning mode: {intent}
+- Specific instruction: {mode_instruction}
+
+Student's question: "{query}"
+
+Available course materials (if any):
+"""
+        
+        # Add relevant context from materials with source information
+        if context:
+            for i, ctx in enumerate(context[:3], 1):
+                source = ctx['metadata'].get('source', 'lecturer')
+                title = ctx['metadata'].get('title', 'Unknown')
+                prompt += f"\nMaterial {i} ({source} - {title}): {ctx['text'][:500]}...\n"
         else:
-            strategy = self.teaching_strategies.creative_teaching(query, domain)
+            prompt += "\nNo specific course materials available for this question.\n"
         
-        # Get Bloom's approach
-        bloom_approach = self.bloom_adapter.get_teaching_approach(bloom_level)
+        prompt += f"""
+
+Answer the student's question helpfully and naturally following the learning mode instruction. Don't mention teaching strategies or learning styles - just explain the topic clearly and patiently, like a good tutor would.
+"""
         
-        # Get cross-domain connections
-        connections = self.cross_domain_connector.find_connections(domain, query, self.domains_mastered)
-        
-        # Get critical thinking questions
-        critical_questions = self.critical_thinking.generate_critical_questions(query, domain)
-        
-        # Format context
-        context_text = "\n\n---\n\n".join([
-            f"[Source: {c['metadata'].get('title', 'Unknown')} - Relevance: {c['relevance_score']:.2f}]\n{c['text']}"
-            for c in context[:5]
-        ])
-        
-        # Learning style adaptation
-        style_instructions = {
-            'visual': "Use visual descriptions, diagrams, charts, and spatial explanations",
-            'auditory': "Use verbal explanations, discussions, and auditory examples",
-            'kinesthetic': "Use hands-on examples, practice exercises, and interactive elements",
-            'reading_writing': "Use detailed text explanations, notes, and written exercises",
-            'balanced': "Use a balanced mix of visual, auditory, and kinesthetic approaches"
-        }
-        
-        style_instruction = style_instructions.get(learning_style, style_instructions['balanced'])
-        
-        prompt = f"""You are the world's most advanced and comprehensive AI tutor for {self.course_code}. You can teach ANY subject at the highest level.
-
-DOMAIN: {domain.upper()}
-LEARNING STYLE: {learning_style.upper()}
-BLOOM'S LEVEL: {bloom_level.upper()}
-
-DOMAIN-SPECIFIC TEACHING STRATEGY:
-{strategy}
-
-BLOOM'S TAXONOMY APPROACH:
-{bloom_approach}
-
-LEARNING STYLE ADAPTATION:
-{style_instruction}
-
-CROSS-DOMAIN CONNECTIONS:
-{chr(10).join(connections) if connections else "No specific connections available yet"}
-
-CRITICAL THINKING QUESTIONS TO INCORPORATE:
-{chr(10).join(f"- {q}" for q in critical_questions[:3])}
-
-COURSE MATERIALS (most relevant):
-{context_text if context_text else "No materials available yet"}
-
-STUDENT LEARNING STATE:
-- Mastered topics: {', '.join(self.topics_mastered)}
-- Mastered domains: {', '.join(self.domains_mastered)}
-- Struggling topics: {', '.join(self.topics_struggling)}
-- Detected learning style: {self.detected_learning_style}
-
-STUDENT'S QUESTION:
-{query}
-
-PROVIDE A COMPREHENSIVE, UNIVERSITY-LEVEL RESPONSE THAT INCLUDES:
-
-1. **Direct Answer**: Clear, authoritative answer
-2. **Domain-Specific Treatment**:
-   - STEM: Show formulas, derivations, proofs, examples
-   - Humanities: Provide context, analysis, interpretation, connections
-   - Social Sciences: Include data, studies, real-world applications
-   - Creative: Discuss techniques, examples, creative applications
-3. **Visual Descriptions**: Describe diagrams, charts, or visual aids that would help
-4. **Real-World Applications**: At least 2-3 concrete examples
-5. **Cross-Domain Connections**: Link to other domains the student knows
-6. **Critical Thinking**: Incorporate analysis and evaluation
-7. **Learning Style Alignment**: {style_instruction}
-8. **Practice/Activity**: Suggest a learning activity appropriate for the domain
-9. **Advanced Extensions**: For students who want to go deeper
-10. **Follow-up Questions**: Test understanding and encourage critical thinking
-11. **Citations**: Reference which materials you used [From: Material Name]
-
-ADDITIONAL REQUIREMENTS:
-- Adapt complexity to the Bloom's level ({bloom_level})
-- Use domain-appropriate terminology and conventions
-- Include subject-specific examples and case studies
-- For STEM: Show mathematical/technical details
-- For Humanities: Include historical/cultural context
-- For Social Sciences: Include empirical evidence
-- For Creative: Discuss techniques and principles
-- Always explain the fundamental "WHY"
-- Check for understanding at each step
-- Be challenging yet accessible
-- Encourage independent thinking
-
-The response should be so comprehensive and well-taught that the student achieves deep, university-level understanding regardless of the subject."""
-
         return prompt
     
     def teach(self, query: str) -> Dict:
@@ -937,9 +1045,12 @@ The response should be so comprehensive and well-taught that the student achieve
         prompt = self._build_universal_teaching_prompt(query, context, domain, learning_style, bloom_level)
         
         try:
-            # Generate response
+            # Generate response with quota handling
             response = self.model.generate_content(prompt)
             answer = response.text
+            
+            # Reset quota retries on success
+            self.quota_retries = 0
             
             # Post-process
             answer = self._enhance_response(answer, domain)
@@ -957,8 +1068,15 @@ The response should be so comprehensive and well-taught that the student achieve
                 'response': answer,
                 'domain': domain,
                 'learning_style': learning_style,
-                'bloom_level': bloom_level
+                'bloom_level': bloom_level,
+                'intent': intent
             })
+            
+            # Generate follow-up question for engagement
+            follow_up = self._generate_follow_up(query, answer, domain)
+            
+            # Extract citations from context
+            citations = self._extract_citations_from_context(context) if context else []
             
             # Update domain mastery
             if confidence > 0.8:
@@ -973,7 +1091,8 @@ The response should be so comprehensive and well-taught that the student achieve
                 'keyword': keyword,
                 'learning_style': learning_style,
                 'bloom_level': bloom_level,
-                'critical_questions': self.critical_thinking.generate_critical_questions(query, domain),
+                'intent': intent,
+                'follow_up_question': follow_up,
                 'learning_state': {
                     'mastered_topics': list(self.topics_mastered),
                     'mastered_domains': list(self.domains_mastered),
@@ -982,10 +1101,61 @@ The response should be so comprehensive and well-taught that the student achieve
             }
             
         except Exception as e:
-            logger.error(f"Universal teaching error: {str(e)}")
+            error_msg = str(e)
+            
+            # Handle quota errors specifically
+            if '429' in error_msg or 'quota' in error_msg.lower():
+                logger.warning(f"Quota error: {error_msg}")
+                
+                # Try to switch to a different model
+                if self.quota_retries < self.max_quota_retries:
+                    self.quota_retries += 1
+                    logger.info(f"Quota exceeded, trying alternative model (attempt {self.quota_retries})")
+                    
+                    # Try next available model
+                    if self.model_index < len(self.safe_models) - 1:
+                        self.model_index += 1
+                        self.current_model = self.safe_models[self.model_index]
+                        self.model = genai.GenerativeModel(self.current_model)
+                        logger.info(f"Switched to model: {self.current_model}")
+                        
+                        # Retry the request
+                        return self.teach(query)
+                    else:
+                        self.model_index = 0  # Reset for next time
+                        return {
+                            'error': 'quota_exceeded',
+                            'answer': "⚠️ AI quota exceeded. Please try again in a few minutes or upgrade your API plan for higher limits.",
+                            'domain': domain,
+                            'learning_style': learning_style,
+                            'bloom_level': bloom_level,
+                            'confidence': 0.0,
+                            'citations': [],
+                            'context_used': 0
+                        }
+                else:
+                    return {
+                        'error': 'quota_exceeded',
+                        'answer': "⚠️ AI quota exceeded. Please try again in a few minutes or upgrade your API plan for higher limits.",
+                        'domain': domain,
+                        'learning_style': learning_style,
+                        'bloom_level': bloom_level,
+                        'confidence': 0.0,
+                        'citations': [],
+                        'context_used': 0
+                    }
+            
+            # Handle other errors
+            logger.error(f"Universal teaching error: {error_msg}")
             return {
-                'error': str(e),
-                'answer': "I'm experiencing technical difficulties. Please try again."
+                'error': error_msg,
+                'answer': f"⚠️ Error: {error_msg}",
+                'domain': domain,
+                'learning_style': learning_style,
+                'bloom_level': bloom_level,
+                'confidence': 0.0,
+                'citations': [],
+                'context_used': 0
             }
     
     def _format_math_response(self, math_result: Dict, original_query: str) -> Dict:
@@ -1219,14 +1389,7 @@ _current_model = None
 
 def get_universal_tutor(course_code: str, student_id: str) -> UniversalSmartTutor:
     """Get or create a universal smart tutor instance"""
-    # Clear cache if model has changed
-    global _current_model
-    if _current_model != settings.GEMINI_MODEL:
-        _tutor_cache.clear()
-        _current_model = settings.GEMINI_MODEL
-    
-    cache_key = f"{course_code}_{student_id}"
-    if cache_key not in _tutor_cache:
-        _tutor_cache[cache_key] = UniversalSmartTutor(course_code, student_id)
-    
-    return _tutor_cache[cache_key]
+    # TEMPORARILY DISABLE CACHE TO FIX UNAVAILABLE MODEL ISSUE
+    # Always create new instance to ensure current settings are used
+    logger.info(f"Creating new tutor instance (cache disabled to fix model issue)")
+    return UniversalSmartTutor(course_code, student_id)

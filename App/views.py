@@ -2008,6 +2008,14 @@ def ai_chat(request):
         result = tutor.teach(question)
         
         if 'error' in result:
+            # Handle quota errors specifically
+            if result.get('error') == 'quota_exceeded':
+                return JsonResponse({
+                    'error': 'AI quota exceeded. Please try again in a few minutes.',
+                    'success': False,
+                    'quota_exceeded': True,
+                    'retry_after': 36  # Suggested retry time in seconds
+                }, status=429)
             return JsonResponse({'error': result['error'], 'success': False}, status=500)
         
         # Save chat message to database
@@ -2032,13 +2040,151 @@ def ai_chat(request):
             'keyword': result.get('keyword', 'general'),
             'learning_style': result.get('learning_style', 'balanced'),
             'bloom_level': result.get('bloom_level', 'understand'),
-            'critical_questions': result.get('critical_questions', []),
+            'intent': result.get('intent', 'chat'),
+            'follow_up_question': result.get('follow_up_question', ''),
             'learning_state': result.get('learning_state', {}),
             'success': True
         })
             
     except Exception as e:
         logger.error(f"Universal AI Chat error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def student_upload_document(request):
+    """Upload student documents for AI study"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    try:
+        if 'file' not in request.FILES:
+            return JsonResponse({'error': 'No file provided'}, status=400)
+        
+        file = request.FILES['file']
+        title = request.POST.get('title', file.name)
+        course_code = request.POST.get('course_code', '')
+        
+        # Determine file type
+        file_extension = file.name.split('.')[-1].lower()
+        file_type = 'pdf' if file_extension == 'pdf' else 'docx' if file_extension == 'docx' else 'txt' if file_extension == 'txt' else 'other'
+        
+        # Create student document record
+        from App.models import StudentDocument
+        doc = StudentDocument.objects.create(
+            student=request.user,
+            course_code=course_code,
+            title=title,
+            file=file,
+            file_type=file_type
+        )
+        
+        # Process document for AI
+        try:
+            from App.universal_ai import get_universal_tutor
+            tutor = get_universal_tutor(course_code, str(request.user.id))
+            
+            # Extract text and process
+            from App.smart_ai import DocumentProcessor
+            processor = DocumentProcessor()
+            
+            if file_type == 'pdf':
+                import pypdf
+                pdf_reader = pypdf.PdfReader(file)
+                text = ""
+                for page in pdf_reader.pages:
+                    text += page.extract_text()
+            elif file_type == 'docx':
+                from docx import Document
+                doc_obj = Document(file)
+                text = "\n".join([para.text for para in doc_obj.paragraphs])
+            else:
+                text = file.read().decode('utf-8')
+            
+            # Generate summary
+            if text.strip():
+                summary_prompt = f"Summarize this document in 3-5 bullet points:\n\n{text[:2000]}"
+                result = tutor.teach(summary_prompt)
+                doc.content_summary = result.get('answer', '')[:500]
+                doc.processed = True
+                doc.save()
+            
+        except Exception as e:
+            logger.error(f"Error processing student document: {str(e)}")
+            # Don't fail the upload if processing fails
+        
+        return JsonResponse({
+            'success': True,
+            'document_id': doc.id,
+            'title': doc.title,
+            'file_type': doc.file_type,
+            'uploaded_at': doc.uploaded_at.isoformat(),
+            'processed': doc.processed
+        })
+        
+    except Exception as e:
+        logger.error(f"Student document upload error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def student_list_documents(request):
+    """List student's uploaded documents"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'GET required'}, status=405)
+    
+    try:
+        course_code = request.GET.get('course_code', '')
+        from App.models import StudentDocument
+        
+        documents = StudentDocument.objects.filter(
+            student=request.user
+        )
+        
+        if course_code:
+            documents = documents.filter(course_code=course_code)
+        
+        documents = documents.order_by('-uploaded_at')
+        
+        docs_list = []
+        for doc in documents:
+            docs_list.append({
+                'id': doc.id,
+                'title': doc.title,
+                'file_type': doc.file_type,
+                'uploaded_at': doc.uploaded_at.isoformat(),
+                'processed': doc.processed,
+                'content_summary': doc.content_summary
+            })
+        
+        return JsonResponse({
+            'documents': docs_list,
+            'success': True
+        })
+        
+    except Exception as e:
+        logger.error(f"Student document list error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def student_delete_document(request, doc_id):
+    """Delete a student's uploaded document"""
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'DELETE required'}, status=405)
+    
+    try:
+        from App.models import StudentDocument
+        doc = StudentDocument.objects.get(id=doc_id, student=request.user)
+        doc.file.delete()  # Delete the file
+        doc.delete()  # Delete the record
+        
+        return JsonResponse({'success': True})
+        
+    except StudentDocument.DoesNotExist:
+        return JsonResponse({'error': 'Document not found'}, status=404)
+    except Exception as e:
+        logger.error(f"Student document delete error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 
@@ -2077,6 +2223,105 @@ def ai_chat_history(request):
         
     except Exception as e:
         logger.error(f"AI Chat History error: {str(e)}")
+        return JsonResponse({'error': str(e), 'success': False}, status=500)
+
+
+@student_required
+def ai_personalized_recommendations(request):
+    """Get personalized learning recommendations based on performance"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'GET required'}, status=405)
+    
+    try:
+        course_code = request.GET.get('course_code', '')
+        student_id = str(request.user.id)
+        
+        # Get learning data from chat history
+        from App.models import AIChatMessage, AssessmentAttempt, Assessment
+        
+        # Analyze chat patterns to identify weak areas
+        chat_messages = AIChatMessage.objects.filter(
+            user=request.user,
+            course_code=course_code
+        )
+        
+        # Analyze domains the student engages with
+        domain_engagement = {}
+        for msg in chat_messages:
+            domain = msg.domain or 'general'
+            if domain not in domain_engagement:
+                domain_engagement[domain] = 0
+            domain_engagement[domain] += 1
+        
+        # Get assessment performance data
+        attempts = AssessmentAttempt.objects.filter(
+            student__user=request.user,
+            assessment__course__course_code=course_code
+        )
+        
+        # Identify struggling topics from assessment performance
+        weak_topics = []
+        for attempt in attempts:
+            if attempt.score < 70:  # Below 70% indicates struggling
+                # This is a simplified analysis - could be enhanced with question-level data
+                weak_topics.append(attempt.assessment.title)
+        
+        # Generate recommendations using AI
+        from App.universal_ai import get_universal_tutor
+        tutor = get_universal_tutor(course_code, student_id)
+        
+        recommendations_prompt = f"""Based on the student's learning data:
+- Most engaged domains: {', '.join(domain_engagement.keys())}
+- Weak topics (based on performance): {', '.join(set(weak_topics)) if weak_topics else 'None identified yet'}
+- Total study sessions: {chat_messages.count()}
+
+Provide 3-5 specific, actionable recommendations for what the student should study next.
+Format as a JSON array of recommendations:
+{{
+    "topic": "Specific topic to study",
+    "reason": "Why this is recommended",
+    "priority": "high/medium/low",
+    "study_method": "suggested method (quiz, flashcards, practice, etc.)"
+}}"""
+        
+        try:
+            response = tutor.model.generate_content(recommendations_prompt)
+            # Parse JSON response
+            import re
+            json_match = re.search(r'\[.*\]', response.text, re.DOTALL)
+            if json_match:
+                recommendations = json.loads(json_match.group())
+                return JsonResponse({
+                    'recommendations': recommendations,
+                    'weak_topics': list(set(weak_topics)),
+                    'engagement_stats': domain_engagement,
+                    'success': True
+                })
+        except:
+            # Fallback recommendations if AI parsing fails
+            fallback_recommendations = [
+                {
+                    "topic": "Review course materials",
+                    "reason": "Reinforce your understanding of core concepts",
+                    "priority": "high",
+                    "study_method": "summarize"
+                },
+                {
+                    "topic": "Practice with quizzes",
+                    "reason": "Test your knowledge and identify gaps",
+                    "priority": "medium",
+                    "study_method": "quiz"
+                }
+            ]
+            return JsonResponse({
+                'recommendations': fallback_recommendations,
+                'weak_topics': list(set(weak_topics)),
+                'engagement_stats': domain_engagement,
+                'success': True
+            })
+        
+    except Exception as e:
+        logger.error(f"AI Recommendations error: {str(e)}")
         return JsonResponse({'error': str(e), 'success': False}, status=500)
 
 

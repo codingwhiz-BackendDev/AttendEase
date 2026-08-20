@@ -98,24 +98,38 @@ Be conversational and encouraging, like a patient tutor."""
             return f"Error generating explanation: {str(e)}", False
     
     def generate_quiz(self, num_questions, difficulty, topics, course_code, materials_text=""):
-        """Generate MCQ quiz from materials"""
+        """Generate MCQ quiz from materials with difficulty levels"""
         context = self._build_context(course_code, materials_text)
+        
+        # Enhanced prompt with difficulty-specific instructions
+        difficulty_instructions = {
+            'easy': "Make questions straightforward with clear, obvious answers. Focus on basic concepts and definitions.",
+            'medium': "Make questions moderately challenging. Include some that require applying concepts.",
+            'hard': "Make questions challenging that require deep understanding, synthesis, or application of multiple concepts."
+        }
+        
+        difficulty_instruction = difficulty_instructions.get(difficulty.lower(), difficulty_instructions['medium'])
+        
         prompt = f"""{context}
 
 Task: Generate {num_questions} multiple-choice questions about: {topics}
 
 Difficulty level: {difficulty}
+Specific requirement: {difficulty_instruction}
 
 Format each question as JSON:
 {{
     "question": "Question text",
     "options": ["A", "B", "C", "D"],
     "correct_answer": 0,
-    "explanation": "Why this is correct"
+    "explanation": "Why this is correct",
+    "difficulty": "{difficulty}",
+    "topic": "specific topic covered"
 }}
 
 Return the entire quiz as a JSON array of questions.
-Make questions realistic and based on the course materials."""
+Make questions realistic and based on the course materials.
+Ensure questions match the requested difficulty level."""
         
         try:
             response = self.model.generate_content(prompt)
@@ -132,7 +146,7 @@ Make questions realistic and based on the course materials."""
             return {"error": f"Error generating quiz: {str(e)}"}, False
     
     def generate_flashcards(self, num_cards, topics, course_code, materials_text=""):
-        """Generate flashcards from materials"""
+        """Generate flashcards from materials with categorization"""
         context = self._build_context(course_code, materials_text)
         prompt = f"""{context}
 
@@ -141,11 +155,14 @@ Task: Generate {num_cards} flashcards about: {topics}
 Format each flashcard as JSON:
 {{
     "question": "Front of card (question/term)",
-    "answer": "Back of card (answer/definition)"
+    "answer": "Back of card (answer/definition)",
+    "category": "definition/formula/concept/example",
+    "difficulty": "easy/medium/hard"
 }}
 
 Return the entire set as a JSON array of flashcards.
-Focus on key terms, definitions, formulas, and important concepts from the materials."""
+Focus on key terms, definitions, formulas, and important concepts from the materials.
+Include a mix of easy and challenging cards for comprehensive study."""
         
         try:
             response = self.model.generate_content(prompt)
